@@ -1,0 +1,36 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+
+# Entornos virtuales
+.venv/
+venv/
+env/
+
+# Cachés de herramientas
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+# Archivos personales
+.vscode/
+.idea/
+*.log
+
+# Secretos
+.env
+.env.*
+!.env.example
+*.pem
+
+# Archivos temporales
+*.tmp
+*.bak
+~$*
+
+# Compilaciones
+build/
+dist/

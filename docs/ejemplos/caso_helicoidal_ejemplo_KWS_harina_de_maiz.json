@@ -1,0 +1,318 @@
+{
+  "programa": "Calculadoras de Ingeniería RMR",
+  "version": "2.1.0",
+  "calculadora": "helicoidal",
+  "fecha": "2026-11-13T16:36:23",
+  "proyecto": {
+    "proyecto": "Ejemplo de validación publicado",
+    "cliente": "",
+    "documento": "caso_helicoidal_ejemplo_KWS_harina_de_maiz",
+    "revision": "",
+    "elaboro": "",
+    "reviso": "",
+    "aprobo": ""
+  },
+  "entradas": {
+    "material": "Harina de maíz (corn meal)",
+    "densidad": "0",
+    "carga": "Según tabla del material",
+    "factor_material": "0",
+    "capacidad": "11.611965",
+    "factor_capacidad": "1.0",
+    "diametro": "Automático (menor diámetro que cumpla)",
+    "paso": "Estándar (paso = D)",
+    "helice": "Estándar (hélice continua)",
+    "paletas": "0",
+    "capacidad_rpm": "0",
+    "rpm_maxima": "0",
+    "longitud": "4.8768",
+    "cojinete": "Bronce o madera",
+    "eficiencia": "88",
+    "factor_sobrecarga": "0",
+    "mhp_corregido": "0.5",
+    "angulo": "0",
+    "eficiencia_inclinacion": "0",
+    "factor_inclinacion": "0"
+  },
+  "resultado": {
+    "salidas": [
+      {
+        "clave": "densidad",
+        "etiqueta": "Densidad aparente usada",
+        "valor": 512.5908279667244,
+        "unidad": "kg/m³",
+        "nivel": "E",
+        "nota": ""
+      },
+      {
+        "clave": "densidad_lbft3",
+        "etiqueta": "Densidad aparente usada",
+        "valor": 32.0,
+        "unidad": "lb/ft³",
+        "nivel": "E",
+        "nota": ""
+      },
+      {
+        "clave": "clase_carga",
+        "etiqueta": "Carga de artesa (clase KWS)",
+        "valor": "30 % (30A)",
+        "unidad": "",
+        "nivel": "E",
+        "nota": ""
+      },
+      {
+        "clave": "mf",
+        "etiqueta": "Factor de material MF",
+        "valor": 0.5,
+        "unidad": "",
+        "nivel": "E",
+        "nota": ""
+      },
+      {
+        "clave": "capacidad_lbh",
+        "etiqueta": "Capacidad de diseño CP",
+        "valor": 25600.00072311622,
+        "unidad": "lb/h",
+        "nivel": "D",
+        "nota": ""
+      },
+      {
+        "clave": "cfh",
+        "etiqueta": "Capacidad volumétrica CFH",
+        "valor": 800.0000225973819,
+        "unidad": "ft³/h",
+        "nivel": "V",
+        "nota": ""
+      },
+      {
+        "clave": "cfh_m3h",
+        "etiqueta": "Capacidad volumétrica CFH",
+        "valor": 22.6534779134866,
+        "unidad": "m³/h",
+        "nivel": "D",
+        "nota": ""
+      },
+      {
+        "clave": "cf1",
+        "etiqueta": "Factor de paso CF1",
+        "valor": 1.0,
+        "unidad": "",
+        "nivel": "E",
+        "nota": ""
+      },
+      {
+        "clave": "cf2",
+        "etiqueta": "Factor de hélice especial CF2",
+        "valor": 1.0,
+        "unidad": "",
+        "nivel": "E",
+        "nota": ""
+      },
+      {
+        "clave": "cf3",
+        "etiqueta": "Factor de paletas CF3",
+        "valor": 1.0,
+        "unidad": "",
+        "nivel": "E",
+        "nota": ""
+      },
+      {
+        "clave": "sc",
+        "etiqueta": "Capacidad de selección SC",
+        "valor": 800.0000225973819,
+        "unidad": "ft³/h",
+        "nivel": "E",
+        "nota": ""
+      },
+      {
+        "clave": "diametro",
+        "etiqueta": "Diámetro del tornillo",
+        "valor": 12,
+        "unidad": "plg",
+        "nivel": "E",
+        "nota": ""
+      },
+      {
+        "clave": "diametro_mm",
+        "etiqueta": "Diámetro del tornillo",
+        "valor": 304.79999999999995,
+        "unidad": "mm",
+        "nivel": "D",
+        "nota": ""
+      },
+      {
+        "clave": "capacidad_1rpm",
+        "etiqueta": "Capacidad a 1 rpm",
+        "valor": 12.9,
+        "unidad": "ft³/(h·rpm)",
+        "nivel": "E",
+        "nota": ""
+      },
+      {
+        "clave": "rpm_maxima",
+        "etiqueta": "Velocidad máxima recomendada",
+        "valor": 90,
+        "unidad": "rpm",
+        "nivel": "E",
+        "nota": ""
+      },
+      {
+        "clave": "capacidad_maxima",
+        "etiqueta": "Capacidad a velocidad máxima",
+        "valor": 1161,
+        "unidad": "ft³/h",
+        "nivel": "E",
+        "nota": ""
+      },
+      {
+        "clave": "rpm",
+        "etiqueta": "Velocidad de giro requerida",
+        "valor": 62.015505627704016,
+        "unidad": "rpm",
+        "nivel": "E",
+        "nota": ""
+      },
+      {
+        "clave": "cumple",
+        "etiqueta": "Cumple capacidad a velocidad máxima",
+        "valor": true,
+        "unidad": "",
+        "nivel": "E",
+        "nota": ""
+      },
+      {
+        "clave": "df",
+        "etiqueta": "Factor de diámetro DF",
+        "valor": 55,
+        "unidad": "",
+        "nivel": "E",
+        "nota": ""
+      },
+      {
+        "clave": "hbf",
+        "etiqueta": "Factor de cojinete colgante HBF",
+        "valor": 1.7,
+        "unidad": "",
+        "nivel": "E",
+        "nota": ""
+      },
+      {
+        "clave": "sf",
+        "etiqueta": "Factor de hélice especial SF (potencia)",
+        "valor": 1.0,
+        "unidad": "",
+        "nivel": "E",
+        "nota": ""
+      },
+      {
+        "clave": "pf",
+        "etiqueta": "Factor de paletas PF (potencia)",
+        "valor": 1.0,
+        "unidad": "",
+        "nivel": "E",
+        "nota": ""
+      },
+      {
+        "clave": "longitud_pie",
+        "etiqueta": "Longitud",
+        "valor": 16.0,
+        "unidad": "ft",
+        "nivel": "D",
+        "nota": ""
+      },
+      {
+        "clave": "fhp",
+        "etiqueta": "Potencia de fricción FHP",
+        "valor": 0.09277519641904519,
+        "unidad": "HP",
+        "nivel": "E",
+        "nota": ""
+      },
+      {
+        "clave": "mhp",
+        "etiqueta": "Potencia de material MHP",
+        "valor": 0.20480000578492977,
+        "unidad": "HP",
+        "nivel": "E",
+        "nota": ""
+      },
+      {
+        "clave": "metodo_sobrecarga",
+        "etiqueta": "Corrección por sobrecarga",
+        "valor": "KWS (MHP corregido capturado)",
+        "unidad": "",
+        "nivel": "D",
+        "nota": ""
+      },
+      {
+        "clave": "mhp_corregido",
+        "etiqueta": "MHP corregido (gráfica KWS)",
+        "valor": 0.5,
+        "unidad": "HP",
+        "nivel": "D",
+        "nota": ""
+      },
+      {
+        "clave": "tshp",
+        "etiqueta": "Potencia total en la flecha TSHP",
+        "valor": 0.673608177748915,
+        "unidad": "HP",
+        "nivel": "E",
+        "nota": ""
+      },
+      {
+        "clave": "tshp_kw",
+        "etiqueta": "Potencia total en la flecha",
+        "valor": 0.5023095316441331,
+        "unidad": "kW",
+        "nivel": "E",
+        "nota": ""
+      },
+      {
+        "clave": "motor_hp",
+        "etiqueta": "Motor comercial mínimo (NEMA MG 1)",
+        "valor": 0.75,
+        "unidad": "HP",
+        "nivel": "D",
+        "nota": ""
+      },
+      {
+        "clave": "par_motor",
+        "etiqueta": "Par a plena carga del motor en el tornillo",
+        "valor": 762.2085722201024,
+        "unidad": "lbf·plg",
+        "nivel": "V",
+        "nota": ""
+      },
+      {
+        "clave": "par_motor_nm",
+        "etiqueta": "Par a plena carga del motor en el tornillo",
+        "valor": 86.1180052156721,
+        "unidad": "N·m",
+        "nivel": "D",
+        "nota": ""
+      },
+      {
+        "clave": "motor_kw",
+        "etiqueta": "Motor comercial mínimo (IEC 60072-1)",
+        "valor": 0.55,
+        "unidad": "kW",
+        "nivel": "D",
+        "nota": ""
+      }
+    ],
+    "advertencias": [],
+    "notas": [
+      "Densidad de la tabla KWS para «Harina de maíz (corn meal)»: 32–40 lb/ft³; se usa el mínimo (513 kg/m³), que da el mayor volumen y la mayor velocidad.",
+      "Método válido para transportadores alimentados de forma controlada; los alimentadores de tornillo (screw feeders) requieren consideraciones adicionales de arranque y par (KWS, CEMA 351).",
+      "Verifique el par a plena carga contra la capacidad de la flecha motriz, flechas de acople, tornillos de acople y tubo del tornillo (tablas de par del fabricante) y el tamaño máximo de terrón admisible."
+    ],
+    "ecuaciones": [
+      "CP = Q·f·1000/0.45359237 [lb/h];   CFH = CP/ρ [ft³/h]",
+      "SC = CFH·CF1·CF2·CF3 / η_incl;   N = SC / (capacidad a 1 rpm)",
+      "FHP = L·N·DF·HBF/10⁶;   MHP = CP·L·MF·SF·PF/10⁶   (L en ft)",
+      "TSHP = (FHP + MHP_corregido)·Fi / e   (KWS)",
+      "T = 63 025·HP_motor / N [lbf·plg]"
+    ]
+  }
+}

@@ -1,0 +1,157 @@
+{
+  "programa": "Calculadoras de Ingeniería RMR",
+  "version": "2.0.0",
+  "calculadora": "viga",
+  "fecha": "2026-11-12T15:29:35",
+  "entradas": {
+    "tipo": "Voladizo (empotrada en x = 0)",
+    "longitud": 2,
+    "carga_puntual": 1000,
+    "posicion": 2,
+    "carga_distribuida": 0,
+    "material": "Acero",
+    "modulo": 0,
+    "seccion": "Rectangular maciza",
+    "b": 100,
+    "h": 200,
+    "d": 0,
+    "t": 0,
+    "tf": 0,
+    "tw": 0,
+    "inercia": 0,
+    "c": 0,
+    "area": 0,
+    "esfuerzo_admisible": 165,
+    "limite_deflexion": 360,
+    "norma": "Ninguna (solo análisis elástico)"
+  },
+  "resultado": {
+    "salidas": [
+      {
+        "clave": "reaccion",
+        "etiqueta": "Reacción vertical en el empotramiento",
+        "valor": 9.80665,
+        "unidad": "kN",
+        "nivel": "V",
+        "nota": ""
+      },
+      {
+        "clave": "momento_empotramiento",
+        "etiqueta": "Momento en el empotramiento",
+        "valor": 19.6133,
+        "unidad": "kN·m",
+        "nivel": "V",
+        "nota": ""
+      },
+      {
+        "clave": "modulo_e",
+        "etiqueta": "Módulo de elasticidad E",
+        "valor": 210.0,
+        "unidad": "GPa",
+        "nivel": "O",
+        "nota": ""
+      },
+      {
+        "clave": "inercia",
+        "etiqueta": "Momento de inercia I",
+        "valor": 6666.666666666669,
+        "unidad": "cm⁴",
+        "nivel": "V",
+        "nota": ""
+      },
+      {
+        "clave": "modulo_seccion",
+        "etiqueta": "Módulo de sección S = I/c",
+        "valor": 666.6666666666667,
+        "unidad": "cm³",
+        "nivel": "V",
+        "nota": ""
+      },
+      {
+        "clave": "cortante_max",
+        "etiqueta": "Cortante máximo",
+        "valor": 9.80665,
+        "unidad": "kN",
+        "nivel": "V",
+        "nota": ""
+      },
+      {
+        "clave": "momento_max",
+        "etiqueta": "Momento flector máximo",
+        "valor": 19.6133,
+        "unidad": "kN·m",
+        "nivel": "V",
+        "nota": ""
+      },
+      {
+        "clave": "x_momento_max",
+        "etiqueta": "Ubicación del momento máximo",
+        "valor": 0.0,
+        "unidad": "m",
+        "nivel": "V",
+        "nota": ""
+      },
+      {
+        "clave": "deflexion_max",
+        "etiqueta": "Deflexión máxima",
+        "valor": 1.8679333333333326,
+        "unidad": "mm",
+        "nivel": "V",
+        "nota": ""
+      },
+      {
+        "clave": "x_deflexion_max",
+        "etiqueta": "Ubicación de la deflexión máxima",
+        "valor": 2.0,
+        "unidad": "m",
+        "nivel": "V",
+        "nota": ""
+      },
+      {
+        "clave": "esfuerzo_flexion",
+        "etiqueta": "Esfuerzo máximo de flexión σ = M·c/I",
+        "valor": 29.419949999999993,
+        "unidad": "MPa",
+        "nivel": "V",
+        "nota": ""
+      },
+      {
+        "clave": "esfuerzo_cortante",
+        "etiqueta": "Esfuerzo cortante máximo (aprox. según sección)",
+        "valor": 0.7354987499999998,
+        "unidad": "MPa",
+        "nivel": "V",
+        "nota": ""
+      },
+      {
+        "clave": "relacion_flexion",
+        "etiqueta": "Relación σ/σ_adm",
+        "valor": 0.17830272727272722,
+        "unidad": "",
+        "nivel": "V",
+        "nota": ""
+      },
+      {
+        "clave": "deflexion_limite",
+        "etiqueta": "Deflexión permitida L/360",
+        "valor": 5.555555555555555,
+        "unidad": "mm",
+        "nivel": "D",
+        "nota": ""
+      }
+    ],
+    "advertencias": [
+      "No es una revisión de código: no se verifican pandeo lateral-torsional, pandeo local, cortante del alma ni conexiones (AISC 360 / NTC de acero)."
+    ],
+    "notas": [
+      "E tomado de la lista original (210 GPa). AISC usa 200 GPa para acero estructural; «Hierro» y «Madera» son valores muy variables."
+    ],
+    "ecuaciones": [
+      "Voladizo, P en a: y(x) = P·x²(3a − x)/(6EI) para x ≤ a;  P·a²(3x − a)/(6EI) para x ≥ a",
+      "Voladizo, w: y(x) = w·x²(6L² − 4Lx + x²)/(24EI)",
+      "Simple, P en a (b = L − a): y(x) = P·b·x(L² − b² − x²)/(6·L·EI) para x ≤ a (simétrica para x > a)",
+      "Simple, w: y(x) = w·x(L³ − 2Lx² + x³)/(24EI)",
+      "σ = M·c/I;   τ_max = k·V/A (k = 1.5 rectangular, 4/3 circular, ≈2 tubo delgado; I: V/(h·tw))"
+    ]
+  }
+}

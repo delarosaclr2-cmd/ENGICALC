@@ -1,0 +1,204 @@
+{
+  "programa": "Calculadoras de Ingeniería RMR",
+  "version": "2.2.0",
+  "calculadora": "torre",
+  "fecha": "2026-11-13T17:40:43",
+  "proyecto": {
+    "proyecto": "Validación con ejercicios de libros de texto",
+    "cliente": "",
+    "documento": "torre_cengel_boles_P14_112",
+    "revision": "",
+    "elaboro": "",
+    "reviso": "",
+    "aprobo": ""
+  },
+  "entradas": {
+    "flujo_agua": 60,
+    "t_entrada": 40,
+    "t_salida": 26,
+    "cp": 4.18,
+    "t_bulbo_humedo": 16,
+    "t_bulbo_seco": 22,
+    "t_aire_salida": 34,
+    "hr_aire_salida": 90,
+    "relacion_lg": 0,
+    "altitud": 0
+  },
+  "resultado": {
+    "salidas": [
+      {
+        "clave": "rango",
+        "etiqueta": "Rango de enfriamiento",
+        "valor": 14.0,
+        "unidad": "°C",
+        "nivel": "D",
+        "nota": ""
+      },
+      {
+        "clave": "carga_kw",
+        "etiqueta": "Carga térmica",
+        "valor": 3511.2,
+        "unidad": "kW",
+        "nivel": "V",
+        "nota": ""
+      },
+      {
+        "clave": "carga_btuh",
+        "etiqueta": "Carga térmica",
+        "valor": 11980711.70223883,
+        "unidad": "BTU/h",
+        "nivel": "D",
+        "nota": ""
+      },
+      {
+        "clave": "carga_tr",
+        "etiqueta": "Carga térmica",
+        "valor": 998.3926418532358,
+        "unidad": "TR",
+        "nivel": "D",
+        "nota": "1 TR = 12 000 BTU/h"
+      },
+      {
+        "clave": "aproximacion",
+        "etiqueta": "Aproximación (T salida − bulbo húmedo)",
+        "valor": 10.0,
+        "unidad": "°C",
+        "nivel": "V",
+        "nota": ""
+      },
+      {
+        "clave": "h_aire_entrada",
+        "etiqueta": "Entalpía del aire de entrada (bulbo seco y húmedo)",
+        "valor": 44.69327766601738,
+        "unidad": "kJ/kg a.s.",
+        "nivel": "V",
+        "nota": ""
+      },
+      {
+        "clave": "w_entrada",
+        "etiqueta": "Humedad absoluta del aire de entrada",
+        "valor": 0.008875683603739446,
+        "unidad": "kg/kg a.s.",
+        "nivel": "V",
+        "nota": ""
+      },
+      {
+        "clave": "h_aire_salida",
+        "etiqueta": "Entalpía del aire de salida (90 % HR)",
+        "valor": 113.36409283338372,
+        "unidad": "kJ/kg a.s.",
+        "nivel": "V",
+        "nota": ""
+      },
+      {
+        "clave": "w_salida",
+        "etiqueta": "Humedad absoluta del aire de salida",
+        "valor": 0.030870781531129588,
+        "unidad": "kg/kg a.s.",
+        "nivel": "V",
+        "nota": ""
+      },
+      {
+        "clave": "flujo_aire",
+        "etiqueta": "Flujo de aire seco",
+        "valor": 52.97494643503564,
+        "unidad": "kg/s",
+        "nivel": "V",
+        "nota": ""
+      },
+      {
+        "clave": "relacion_lg",
+        "etiqueta": "Relación L/G (agua/aire seco)",
+        "valor": 1.1326108667911414,
+        "unidad": "",
+        "nivel": "V",
+        "nota": ""
+      },
+      {
+        "clave": "volumen_aire_entrada",
+        "etiqueta": "Caudal de aire a la entrada",
+        "valor": 44.92582779805823,
+        "unidad": "m³/s",
+        "nivel": "V",
+        "nota": ""
+      },
+      {
+        "clave": "volumen_aire_salida",
+        "etiqueta": "Caudal de aire a la salida",
+        "valor": 48.382524960551876,
+        "unidad": "m³/s",
+        "nivel": "V",
+        "nota": ""
+      },
+      {
+        "clave": "evaporacion",
+        "etiqueta": "Agua evaporada (= agua de reposición sin purga ni arrastre)",
+        "valor": 4194.680884332682,
+        "unidad": "kg/h",
+        "nivel": "V",
+        "nota": ""
+      },
+      {
+        "clave": "evaporacion_kgs",
+        "etiqueta": "Agua evaporada",
+        "valor": 1.1651891345368561,
+        "unidad": "kg/s",
+        "nivel": "D",
+        "nota": ""
+      },
+      {
+        "clave": "evaporacion_pct",
+        "etiqueta": "Evaporación respecto al flujo de agua",
+        "valor": 1.9419818908947604,
+        "unidad": "%",
+        "nivel": "V",
+        "nota": ""
+      },
+      {
+        "clave": "kav_l",
+        "etiqueta": "Característica requerida KaV/L (Merkel, Chebyshev 4 puntos)",
+        "valor": 1.4534450091421274,
+        "unidad": "",
+        "nivel": "E",
+        "nota": ""
+      },
+      {
+        "clave": "kav_l_simpson",
+        "etiqueta": "KaV/L por integración numérica (verificación)",
+        "valor": 1.4545496444726065,
+        "unidad": "",
+        "nivel": "V",
+        "nota": ""
+      },
+      {
+        "clave": "dh_minimo",
+        "etiqueta": "Diferencia de entalpía mínima en los puntos de Chebyshev",
+        "valor": 35.58719164113138,
+        "unidad": "kJ/kg a.s.",
+        "nivel": "V",
+        "nota": ""
+      },
+      {
+        "clave": "tipo",
+        "etiqueta": "Tipo de torre sugerido",
+        "valor": "Torre mediana (flujo cruzado)",
+        "unidad": "",
+        "nivel": "O",
+        "nota": "Criterio de rev1 sin fuente."
+      }
+    ],
+    "advertencias": [],
+    "notas": [
+      "KaV/L es la DEMANDA del proceso; la altura de relleno se obtiene con la característica del relleno KaV/L = C·(L/G)^−n de ensayos del fabricante o del CTI."
+    ],
+    "ecuaciones": [
+      "Q = ṁ_agua·cp·(T_entrada − T_salida)",
+      "ṁ_aire = ṁ_agua·cp·ΔT / [(h₂ − h₁) − (ω₂ − ω₁)·h_f(T_fría)]",
+      "ṁ_evap = ṁ_aire·(ω₂ − ω₁);   V̇₁ = ṁ_aire·v₁",
+      "KaV/L = ∫ cp·dT/(h_w − h_a) ≈ cp·R/4·Σ 1/(h_w − h_a) en T_fría + (0.1, 0.4, 0.6, 0.9)·R",
+      "h_a = h_entrada + (L/G)·cp·(T − T_fría)"
+    ]
+  },
+  "fuente": "Çengel y Boles, Termodinámica (McGraw-Hill), cap. 14, problema 14-112; respuestas impresas en el enunciado del libro.",
+  "planteamiento": "Torre húmeda: 60 kg/s de agua de 40 a 26 °C; aire a 1 atm con 22 °C bs y 16 °C bh; sale a 34 °C y 90 % HR."
+}

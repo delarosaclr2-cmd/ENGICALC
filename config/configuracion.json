@@ -1,0 +1,21 @@
+{
+  "_comentario": "Configuración de Calculadoras de Ingeniería RMR. Edite con cuidado (formato JSON).",
+  "sitio": {
+    "nombre": "Nivel del mar (AJUSTAR al sitio del proyecto)",
+    "altitud_m": 0.0,
+    "_nota": "Valor inicial del campo «Altitud del sitio» en las calculadoras que usan presión atmosférica (ductos, soplador, vacío, neumático, bomba, torre, secador). Se puede cambiar en cada cálculo. Ejemplo: Ciudad de México ≈ 2240 m."
+  },
+  "acceso": {
+    "requerir_contrasena": true,
+    "verificar_usuario": false,
+    "usuario": "usuario",
+    "sal": "c4f1a9e27b3d5068",
+    "hash_sha256": "665d4bcc6f666799ef081d3f29bb258d91311a064a61cdc71c5f685cf144e0f4",
+    "_nota": "Misma contraseña que el menú original (manejador de archivos rev4), ahora guardada como hash con sal y no en texto plano. Es una barrera de acceso, no seguridad. Para cambiarla: python menu_principal.py --cambiar-contrasena. Para desactivarla: requerir_contrasena = false."
+  },
+  "reportes": {
+    "empresa": "RMR",
+    "logo": "Etiqueta RMR.png",
+    "elaboro": ""
+  }
+}

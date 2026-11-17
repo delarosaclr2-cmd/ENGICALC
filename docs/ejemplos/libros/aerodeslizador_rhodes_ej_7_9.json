@@ -1,0 +1,89 @@
+{
+  "programa": "Calculadoras de Ingeniería RMR",
+  "version": "2.2.0",
+  "calculadora": "aerodeslizador",
+  "fecha": "2026-11-13T17:40:43",
+  "proyecto": {
+    "proyecto": "Validación con ejercicios de libros de texto",
+    "cliente": "",
+    "documento": "aerodeslizador_rhodes_ej_7_9",
+    "revision": "",
+    "elaboro": "",
+    "reviso": "",
+    "aprobo": ""
+  },
+  "entradas": {
+    "material": "Cemento",
+    "densidad": 989.34,
+    "descarga": "Descarga materiales secos",
+    "velocidad": 0,
+    "ancho": 400,
+    "altura_lecho": 60,
+    "inclinacion": 0,
+    "longitud": 0,
+    "aire_especifico": 0,
+    "porosidad": 0.45,
+    "particula": 60,
+    "viscosidad": 1.84e-05,
+    "densidad_aire": 1.2
+  },
+  "resultado": {
+    "salidas": [
+      {
+        "clave": "velocidad",
+        "etiqueta": "Velocidad del material usada",
+        "valor": 3.0,
+        "unidad": "m/s",
+        "nivel": "O",
+        "nota": ""
+      },
+      {
+        "clave": "capacidad_th",
+        "etiqueta": "Capacidad de transporte",
+        "valor": 256.436928,
+        "unidad": "t/h",
+        "nivel": "O",
+        "nota": ""
+      },
+      {
+        "clave": "dp_lecho_fluidizado",
+        "etiqueta": "ΔP del lecho fluidizado (peso por área)",
+        "valor": 582.12666666,
+        "unidad": "Pa",
+        "nivel": "V",
+        "nota": ""
+      },
+      {
+        "clave": "dp_lecho_fluidizado_mm",
+        "etiqueta": "ΔP del lecho fluidizado",
+        "valor": 59.3604,
+        "unidad": "mm H₂O",
+        "nivel": "D",
+        "nota": ""
+      },
+      {
+        "clave": "u_mf",
+        "etiqueta": "Velocidad mínima de fluidización (Ergun)",
+        "valor": 3.8109606861467307,
+        "unidad": "mm/s",
+        "nivel": "V",
+        "nota": ""
+      }
+    ],
+    "advertencias": [
+      "Velocidad del material tomada de la tabla original (sin fuente)."
+    ],
+    "notas": [
+      "Densidad aparente capturada por el usuario: 989.34 kg/m³.",
+      "Aire de fluidización no calculado: capture la longitud y el caudal específico de la tela."
+    ],
+    "ecuaciones": [
+      "Q_m = v·b·h·ρb·3.6 [t/h]",
+      "ΔP/H = 150·μ·(1−ε)²·u/(ε³·d²) + 1.75·ρg·(1−ε)·u²/(ε³·d)   (Ergun)",
+      "ΔP_fluidizado = ρb·g·H;   u_mf: Ergun(u_mf)·H = ρb·g·H",
+      "Q_aire = q_específico·b·L"
+    ]
+  },
+  "fuente": "Rhodes, Introduction to Particle Technology, 2.ª ed. (Wiley), Ejercicio 7.9, inciso (a) (solución publicada del capítulo 7).",
+  "planteamiento": "Polvo de 60 µm, ρp = 1 800 kg/m³, aire 1.2 kg/m³ y 1.84e-5 Pa·s, ε_mf = 0.45, Umf por Ergun. La densidad del lecho fluidizado que pide el programa es (1 − ε)(ρp − ρf) = 989.3 kg/m³. Ancho y altura del canal no intervienen en Umf."
+}

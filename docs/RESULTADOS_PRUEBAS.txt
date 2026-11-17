@@ -1,0 +1,371 @@
+RESULTADOS DE PRUEBAS — Calculadoras de Ingeniería RMR 2.2.0
+Fecha de ejecución: 13/11/2026 (hora de Ciudad de México)
+Entorno de la suite: Python 3.12.3, Linux con pantalla virtual (Xvfb) para la interfaz Tk
+Bibliotecas: reportlab 5.1.0, openpyxl 3.1.5, matplotlib 3.11.2, Pillow 13.0.0, numpy 2.5.4, pytest 9.2.0
+Ejecución en la PC del usuario (Windows, Python 3.14, PROBAR.bat): ver la sección 4.
+
+1) Registro de calculadoras (python menu_principal.py --lista)
+-------------------------------------------------------------
+banda            Banda transportadora  [VALIDADA BAJO CONDICIONES DOCUMENTADAS]
+elevador         Elevador de cangilones  [VALIDADA BAJO CONDICIONES DOCUMENTADAS]
+helicoidal       Transportador helicoidal  [VALIDADA BAJO CONDICIONES DOCUMENTADAS]
+aerodeslizador   Aerodeslizador (deslizador de polvo)  [VALIDACIÓN PENDIENTE]
+neumatico        Transportador neumático  [VALIDACIÓN PENDIENTE]
+tolva            Tolva de dosificación  [VALIDACIÓN PENDIENTE]
+silo             Silo metálico (predimensionamiento)  [VALIDADA BAJO CONDICIONES DOCUMENTADAS]
+ductos           Ductos de aire con polvo  [VALIDADA BAJO CONDICIONES DOCUMENTADAS]
+colector         Colector de polvo  [VALIDADA BAJO CONDICIONES DOCUMENTADAS]
+soplador         Soplador  [VALIDADA BAJO CONDICIONES DOCUMENTADAS]
+bomba            Bomba centrífuga  [VALIDADA BAJO CONDICIONES DOCUMENTADAS]
+vacio            Bomba de vacío  [VALIDADA BAJO CONDICIONES DOCUMENTADAS]
+torre            Torre de enfriamiento  [VALIDADA BAJO CONDICIONES DOCUMENTADAS]
+secador          Secador rotatorio directo  [VALIDADA BAJO CONDICIONES DOCUMENTADAS]
+viga             Viga en voladizo o simplemente apoyada  [VALIDADA BAJO CONDICIONES DOCUMENTADAS]
+
+2) Suite automática (pytest -rA): 301 passed in 16.30s
+-------------------------------------------------------------
+Validación contra ejemplos publicados (2.1.0): test_acero.py (AISC), test_helicoidal.py (KWS),
+test_bomba.py (Crane, Pumps & Systems), test_ductos.py (ASHRAE DFDB, ACGIH), test_soplador.py (Atlas Copco),
+test_vacio.py, test_colector.py (EPA), test_banda.py (MEKA, IS 11592/ISO 5048), test_elevador.py (KWS),
+test_torre.py (Perry's, ejemplo de diseño).
+Ejercicios de libros de texto (2.1.1): test_libros.py y test_interfaz.py::test_casos_de_libros_se_abren_y_dan_el_resultado_publicado.
+Esquemas ajustables (nuevo en 2.2.0): test_esquemas.py y test_interfaz.py::test_pestana_esquema,
+test_interfaz.py::test_esquema_se_ajusta_a_los_datos.
+
+tests/test_acero.py::test_f11b_continuamente_arriostrada
+tests/test_acero.py::test_f12b_arriostrada_en_tercios
+tests/test_acero.py::test_f13b_arriostrada_al_centro_pandeo_elastico
+tests/test_acero.py::test_f3b_patin_no_compacto
+tests/test_acero.py::test_g1b_cortante_alma
+tests/test_acero.py::test_ntc_coincide_con_la_teoria_clasica
+tests/test_acero.py::test_ntc_limites_y_continuidad
+tests/test_acero.py::test_viga_aisc_y_ntc_en_unidades_mexicanas
+tests/test_acero.py::test_viga_norma_requiere_datos
+tests/test_acero.py::test_voladizo_usa_cb_1
+tests/test_banda.py::test_meka_capacidad_volumetrica_1000_mm
+tests/test_banda.py::test_ancho_util_y_rodillo_iso
+tests/test_banda.py::test_factor_pendiente_is_11592[0-1.0]
+tests/test_banda.py::test_factor_pendiente_is_11592[8-0.97]
+tests/test_banda.py::test_factor_pendiente_is_11592[10-0.95]
+tests/test_banda.py::test_factor_pendiente_is_11592[15-0.9]
+tests/test_banda.py::test_factor_pendiente_is_11592[18-0.85]
+tests/test_banda.py::test_factor_pendiente_is_11592[25-0.68]
+tests/test_banda.py::test_factor_pendiente_is_11592[30-0.56]
+tests/test_banda.py::test_coeficiente_c_y_f_iso_5048
+tests/test_banda.py::test_potencia_con_c_iso_contra_calculo_a_mano
+tests/test_bomba.py::test_ft_contra_tabla_crane[0.622-0.026]
+tests/test_bomba.py::test_ft_contra_tabla_crane[0.824-0.024]
+tests/test_bomba.py::test_ft_contra_tabla_crane[1.049-0.022]
+tests/test_bomba.py::test_ft_contra_tabla_crane[2.067-0.019]
+tests/test_bomba.py::test_ft_contra_tabla_crane[3.068-0.017]
+tests/test_bomba.py::test_ft_contra_tabla_crane[4.026-0.016]
+tests/test_bomba.py::test_ft_contra_tabla_crane[6.065-0.015]
+tests/test_bomba.py::test_ft_contra_tabla_crane[7.981-0.014]
+tests/test_bomba.py::test_ft_contra_tabla_crane[11.938-0.013]
+tests/test_bomba.py::test_ft_contra_tabla_crane[22.626-0.011]
+tests/test_bomba.py::test_k_valvula_de_globo_pumps_and_systems
+tests/test_bomba.py::test_k_crane_en_la_altura_total
+tests/test_bomba.py::test_npsha_ejemplos_pumps_and_systems[cambios0-40.0]
+tests/test_bomba.py::test_npsha_ejemplos_pumps_and_systems[cambios1-20.0]
+tests/test_bomba.py::test_npsha_ejemplos_pumps_and_systems[cambios2-6.8]
+tests/test_bomba.py::test_npsha_con_presion_de_vapor_capturada
+tests/test_bomba.py::test_entradas_invalidas
+tests/test_calculadoras.py::test_registro_completo
+tests/test_calculadoras.py::test_caso_ordinario_sin_errores_y_finito[aerodeslizador]
+tests/test_calculadoras.py::test_caso_ordinario_sin_errores_y_finito[banda]
+tests/test_calculadoras.py::test_caso_ordinario_sin_errores_y_finito[bomba]
+tests/test_calculadoras.py::test_caso_ordinario_sin_errores_y_finito[colector]
+tests/test_calculadoras.py::test_caso_ordinario_sin_errores_y_finito[ductos]
+tests/test_calculadoras.py::test_caso_ordinario_sin_errores_y_finito[elevador]
+tests/test_calculadoras.py::test_caso_ordinario_sin_errores_y_finito[helicoidal]
+tests/test_calculadoras.py::test_caso_ordinario_sin_errores_y_finito[neumatico]
+tests/test_calculadoras.py::test_caso_ordinario_sin_errores_y_finito[secador]
+tests/test_calculadoras.py::test_caso_ordinario_sin_errores_y_finito[silo]
+tests/test_calculadoras.py::test_caso_ordinario_sin_errores_y_finito[soplador]
+tests/test_calculadoras.py::test_caso_ordinario_sin_errores_y_finito[tolva]
+tests/test_calculadoras.py::test_caso_ordinario_sin_errores_y_finito[torre]
+tests/test_calculadoras.py::test_caso_ordinario_sin_errores_y_finito[vacio]
+tests/test_calculadoras.py::test_caso_ordinario_sin_errores_y_finito[viga]
+tests/test_calculadoras.py::test_texto_no_numerico_rechazado[aerodeslizador]
+tests/test_calculadoras.py::test_texto_no_numerico_rechazado[banda]
+tests/test_calculadoras.py::test_texto_no_numerico_rechazado[bomba]
+tests/test_calculadoras.py::test_texto_no_numerico_rechazado[colector]
+tests/test_calculadoras.py::test_texto_no_numerico_rechazado[ductos]
+tests/test_calculadoras.py::test_texto_no_numerico_rechazado[elevador]
+tests/test_calculadoras.py::test_texto_no_numerico_rechazado[helicoidal]
+tests/test_calculadoras.py::test_texto_no_numerico_rechazado[neumatico]
+tests/test_calculadoras.py::test_texto_no_numerico_rechazado[secador]
+tests/test_calculadoras.py::test_texto_no_numerico_rechazado[silo]
+tests/test_calculadoras.py::test_texto_no_numerico_rechazado[soplador]
+tests/test_calculadoras.py::test_texto_no_numerico_rechazado[tolva]
+tests/test_calculadoras.py::test_texto_no_numerico_rechazado[torre]
+tests/test_calculadoras.py::test_texto_no_numerico_rechazado[vacio]
+tests/test_calculadoras.py::test_texto_no_numerico_rechazado[viga]
+tests/test_calculadoras.py::test_ductos_contra_calculo_a_mano
+tests/test_calculadoras.py::test_ductos_limite_velocidad_minima_y_laminar
+tests/test_calculadoras.py::test_ductos_colebrook_y_entradas_invalidas
+tests/test_calculadoras.py::test_colector_potencia_y_almacenamiento
+tests/test_calculadoras.py::test_colector_invalidos
+tests/test_calculadoras.py::test_soplador_adiabatico_e_incompresible
+tests/test_calculadoras.py::test_soplador_extremo_advierte_compresibilidad
+tests/test_calculadoras.py::test_vacio_contra_formula_de_compresion
+tests/test_calculadoras.py::test_vacio_limites
+tests/test_calculadoras.py::test_neumatico_balances
+tests/test_calculadoras.py::test_neumatico_sin_ks_y_fase_densa_advierten
+tests/test_calculadoras.py::test_torre_carga_y_correccion_rev0
+tests/test_calculadoras.py::test_torre_entalpias_contra_tabla_ashrae
+tests/test_calculadoras.py::test_torre_balance_de_aire_y_limites
+tests/test_calculadoras.py::test_banda_geometria_contra_poligono_e_integral
+tests/test_calculadoras.py::test_banda_capacidad_y_potencia
+tests/test_calculadoras.py::test_banda_limites
+tests/test_calculadoras.py::test_elevador_capacidad_sin_truncar_y_eficiencia_separada
+tests/test_calculadoras.py::test_elevador_descarga_centrifuga_y_capturas
+tests/test_calculadoras.py::test_helicoidal_original_conservado_para_trazabilidad
+tests/test_calculadoras.py::test_aerodeslizador_ergun_y_fluidizacion
+tests/test_calculadoras.py::test_aerodeslizador_no_fluidiza_y_sin_aire
+tests/test_calculadoras.py::test_tolva_geometria_y_beverloo
+tests/test_calculadoras.py::test_tolva_limites
+tests/test_calculadoras.py::test_silo_geometria_presiones_y_espesor
+tests/test_calculadoras.py::test_silo_limites
+tests/test_calculadoras.py::test_viga_formulas_clasicas
+tests/test_calculadoras.py::test_viga_carga_intermedia_contra_integracion
+tests/test_calculadoras.py::test_viga_secciones
+tests/test_calculadoras.py::test_bomba_reproduce_prueba_pdf_con_supuestos_originales
+tests/test_calculadoras.py::test_bomba_altura_potencia_y_npsh
+tests/test_calculadoras.py::test_bomba_limites
+tests/test_calculadoras.py::test_secador_balances_de_masa_y_energia
+tests/test_calculadoras.py::test_secador_ua_perry_contra_forma_si_publicada
+tests/test_calculadoras.py::test_secador_base_seca_equivalente
+tests/test_calculadoras.py::test_secador_limites
+tests/test_calculadoras.py::test_beverloo_advierte_polvos_finos
+tests/test_calculadoras.py::test_bomba_curva_del_sistema
+tests/test_calculadoras.py::test_viga_modulo_capturado_tiene_prioridad
+tests/test_calculadoras.py::test_dato_capturado_tiene_prioridad_sobre_la_lista[colector-cambios0-relacion_aire_tela-1.5]
+tests/test_calculadoras.py::test_dato_capturado_tiene_prioridad_sobre_la_lista[elevador-cambios1-cangilones_m-2.5]
+tests/test_calculadoras.py::test_secador_ua_capturado_tiene_prioridad
+tests/test_colector.py::test_tabla_epa_1_1[Cemento-Pulse jet, fieltro-8]
+tests/test_colector.py::test_tabla_epa_1_1[Cemento-Sacudido o aire inverso, tela tejida-2.0]
+tests/test_colector.py::test_tabla_epa_1_1[Ceniza volante-Pulse jet, fieltro-5]
+tests/test_colector.py::test_tabla_epa_1_1[Yeso-Pulse jet, fieltro-10]
+tests/test_colector.py::test_tabla_epa_1_1[Caliza-Sacudido o aire inverso, tela tejida-2.7]
+tests/test_colector.py::test_ejemplo_tabla_1_3_epa
+tests/test_colector.py::test_prioridades_y_faltantes
+tests/test_ductos.py::test_ashrae_dfdb_ducto_24_plg_unidades_inglesas[4000-Medianamente liso \u2014 acero galvanizado, costura longitudinal o espiral (0.09 mm)-0.71]
+tests/test_ductos.py::test_ashrae_dfdb_ducto_24_plg_unidades_inglesas[4000-Medianamente rugoso \u2014 fibra de vidrio r\xedgido, espiral corrugado (0.9 mm)-1.09]
+tests/test_ductos.py::test_ashrae_dfdb_ducto_24_plg_unidades_inglesas[1000-Medianamente liso \u2014 acero galvanizado, costura longitudinal o espiral (0.09 mm)-0.05]
+tests/test_ductos.py::test_ashrae_dfdb_ducto_24_plg_unidades_inglesas[1000-Medianamente rugoso \u2014 fibra de vidrio r\xedgido, espiral corrugado (0.9 mm)-0.07]
+tests/test_ductos.py::test_ashrae_dfdb_ducto_610_mm_si[20-Medianamente liso \u2014 acero galvanizado, costura longitudinal o espiral (0.09 mm)-171]
+tests/test_ductos.py::test_ashrae_dfdb_ducto_610_mm_si[20-Medianamente rugoso \u2014 fibra de vidrio r\xedgido, espiral corrugado (0.9 mm)-262]
+tests/test_ductos.py::test_ashrae_dfdb_ducto_610_mm_si[5.08-Medianamente liso \u2014 acero galvanizado, costura longitudinal o espiral (0.09 mm)-13]
+tests/test_ductos.py::test_ashrae_dfdb_ducto_610_mm_si[5.08-Medianamente rugoso \u2014 fibra de vidrio r\xedgido, espiral corrugado (0.9 mm)-17.7]
+tests/test_ductos.py::test_rugosidad_capturada_tiene_prioridad
+tests/test_ductos.py::test_velocidad_minima_acgih_y_correccion_por_densidad
+tests/test_ductos.py::test_vapores_y_sin_verificacion
+tests/test_elevador.py::test_ejemplo_kws_arena
+tests/test_elevador.py::test_si_equivale_a_la_formula_kws
+tests/test_elevador.py::test_altura_capturada_tiene_prioridad
+tests/test_esquemas.py::test_todas_menos_la_bomba_tienen_esquema
+tests/test_esquemas.py::test_esquema_del_caso_ordinario[aerodeslizador]
+tests/test_esquemas.py::test_esquema_del_caso_ordinario[banda]
+tests/test_esquemas.py::test_esquema_del_caso_ordinario[colector]
+tests/test_esquemas.py::test_esquema_del_caso_ordinario[ductos]
+tests/test_esquemas.py::test_esquema_del_caso_ordinario[elevador]
+tests/test_esquemas.py::test_esquema_del_caso_ordinario[helicoidal]
+tests/test_esquemas.py::test_esquema_del_caso_ordinario[neumatico]
+tests/test_esquemas.py::test_esquema_del_caso_ordinario[secador]
+tests/test_esquemas.py::test_esquema_del_caso_ordinario[silo]
+tests/test_esquemas.py::test_esquema_del_caso_ordinario[soplador]
+tests/test_esquemas.py::test_esquema_del_caso_ordinario[tolva]
+tests/test_esquemas.py::test_esquema_del_caso_ordinario[torre]
+tests/test_esquemas.py::test_esquema_del_caso_ordinario[vacio]
+tests/test_esquemas.py::test_esquema_del_caso_ordinario[viga]
+tests/test_esquemas.py::test_esquemas_con_otros_datos[viga-0]
+tests/test_esquemas.py::test_esquemas_con_otros_datos[viga-1]
+tests/test_esquemas.py::test_esquemas_con_otros_datos[viga-2]
+tests/test_esquemas.py::test_esquemas_con_otros_datos[viga-3]
+tests/test_esquemas.py::test_esquemas_con_otros_datos[helicoidal-4]
+tests/test_esquemas.py::test_esquemas_con_otros_datos[banda-5]
+tests/test_esquemas.py::test_esquemas_con_otros_datos[aerodeslizador-6]
+tests/test_esquemas.py::test_esquemas_con_otros_datos[aerodeslizador-7]
+tests/test_esquemas.py::test_esquemas_con_otros_datos[torre-8]
+tests/test_esquemas.py::test_esquemas_con_otros_datos[torre-9]
+tests/test_esquemas.py::test_esquemas_con_otros_datos[secador-10]
+tests/test_esquemas.py::test_esquemas_con_otros_datos[elevador-11]
+tests/test_esquemas.py::test_esquemas_con_otros_datos[ductos-12]
+tests/test_esquemas.py::test_esquemas_con_otros_datos[vacio-13]
+tests/test_esquemas.py::test_esquemas_con_otros_datos[colector-14]
+tests/test_esquemas.py::test_esquemas_con_otros_datos[soplador-15]
+tests/test_esquemas.py::test_libros_tambien_se_dibujan
+tests/test_esquemas.py::test_banda_areas_dibujadas_iguales_a_las_calculadas
+tests/test_esquemas.py::test_silo_geometria_y_presion_en_el_fondo
+tests/test_esquemas.py::test_viga_deformada_dibujada_es_la_del_calculo
+tests/test_esquemas.py::test_helicoidal_paso_y_carga
+tests/test_esquemas.py::test_cotas_siguen_a_los_datos
+tests/test_helicoidal.py::test_ejemplo_kws_harina_de_maiz
+tests/test_helicoidal.py::test_ejemplo_kws_par_del_motor_publicado
+tests/test_helicoidal.py::test_ejemplo_kws_cal_viva_capacidad_especial
+tests/test_helicoidal.py::test_fo_cema_aproximado
+tests/test_helicoidal.py::test_cema_con_fo_aproximado_y_capturado
+tests/test_helicoidal.py::test_potencia_grande_sin_sobrecarga
+tests/test_helicoidal.py::test_seleccion_y_limites_de_diametro
+tests/test_helicoidal.py::test_datos_de_catalogo_y_material
+tests/test_helicoidal.py::test_paletas_y_paso
+tests/test_helicoidal.py::test_inclinacion
+tests/test_helicoidal.py::test_estado_documentado
+tests/test_interfaz.py::test_menu_lista_todas_las_calculadoras
+tests/test_interfaz.py::test_buscador
+tests/test_interfaz.py::test_cada_calculadora_desde_el_menu[aerodeslizador]
+tests/test_interfaz.py::test_cada_calculadora_desde_el_menu[banda]
+tests/test_interfaz.py::test_cada_calculadora_desde_el_menu[bomba]
+tests/test_interfaz.py::test_cada_calculadora_desde_el_menu[colector]
+tests/test_interfaz.py::test_cada_calculadora_desde_el_menu[ductos]
+tests/test_interfaz.py::test_cada_calculadora_desde_el_menu[elevador]
+tests/test_interfaz.py::test_cada_calculadora_desde_el_menu[helicoidal]
+tests/test_interfaz.py::test_cada_calculadora_desde_el_menu[neumatico]
+tests/test_interfaz.py::test_cada_calculadora_desde_el_menu[secador]
+tests/test_interfaz.py::test_cada_calculadora_desde_el_menu[silo]
+tests/test_interfaz.py::test_cada_calculadora_desde_el_menu[soplador]
+tests/test_interfaz.py::test_cada_calculadora_desde_el_menu[tolva]
+tests/test_interfaz.py::test_cada_calculadora_desde_el_menu[torre]
+tests/test_interfaz.py::test_cada_calculadora_desde_el_menu[vacio]
+tests/test_interfaz.py::test_cada_calculadora_desde_el_menu[viga]
+tests/test_interfaz.py::test_exportar_bloqueado_si_cambian_los_datos
+tests/test_interfaz.py::test_abrir_dos_veces_reutiliza_la_ventana
+tests/test_interfaz.py::test_dialogo_de_acceso
+tests/test_interfaz.py::test_errores_inesperados_se_registran_y_se_muestran
+tests/test_interfaz.py::test_rueda_del_raton_desplaza_el_formulario
+tests/test_interfaz.py::test_pdf_sin_matplotlib_se_genera_sin_grafica
+tests/test_interfaz.py::test_menu_avisa_bibliotecas_faltantes
+tests/test_interfaz.py::test_historial_y_datos_de_proyecto
+tests/test_interfaz.py::test_historial_tolera_lineas_danadas
+tests/test_interfaz.py::test_casos_de_libros_se_abren_y_dan_el_resultado_publicado[aerodeslizador_rhodes_ej_7_9]
+tests/test_interfaz.py::test_casos_de_libros_se_abren_y_dan_el_resultado_publicado[bomba_cengel_cimbala_ej_8_3]
+tests/test_interfaz.py::test_casos_de_libros_se_abren_y_dan_el_resultado_publicado[ductos_cengel_cimbala_ej_8_4]
+tests/test_interfaz.py::test_casos_de_libros_se_abren_y_dan_el_resultado_publicado[secador_geankoplis_ej_9_10_2]
+tests/test_interfaz.py::test_casos_de_libros_se_abren_y_dan_el_resultado_publicado[torre_cengel_boles_P14_112]
+tests/test_interfaz.py::test_casos_de_libros_se_abren_y_dan_el_resultado_publicado[torre_cengel_boles_P14_115]
+tests/test_interfaz.py::test_casos_de_libros_se_abren_y_dan_el_resultado_publicado[vacio_cengel_boles_compresion]
+tests/test_interfaz.py::test_casos_de_libros_se_abren_y_dan_el_resultado_publicado[viga_strength_of_materials_ej_11_1]
+tests/test_interfaz.py::test_pestana_esquema[aerodeslizador]
+tests/test_interfaz.py::test_pestana_esquema[banda]
+tests/test_interfaz.py::test_pestana_esquema[bomba]
+tests/test_interfaz.py::test_pestana_esquema[colector]
+tests/test_interfaz.py::test_pestana_esquema[ductos]
+tests/test_interfaz.py::test_pestana_esquema[elevador]
+tests/test_interfaz.py::test_pestana_esquema[helicoidal]
+tests/test_interfaz.py::test_pestana_esquema[neumatico]
+tests/test_interfaz.py::test_pestana_esquema[secador]
+tests/test_interfaz.py::test_pestana_esquema[silo]
+tests/test_interfaz.py::test_pestana_esquema[soplador]
+tests/test_interfaz.py::test_pestana_esquema[tolva]
+tests/test_interfaz.py::test_pestana_esquema[torre]
+tests/test_interfaz.py::test_pestana_esquema[vacio]
+tests/test_interfaz.py::test_pestana_esquema[viga]
+tests/test_interfaz.py::test_esquema_se_ajusta_a_los_datos
+tests/test_libros.py::test_ejercicio_de_libro[aerodeslizador_rhodes_ej_7_9]
+tests/test_libros.py::test_ejercicio_de_libro[bomba_cengel_cimbala_ej_8_3]
+tests/test_libros.py::test_ejercicio_de_libro[ductos_cengel_cimbala_ej_8_4]
+tests/test_libros.py::test_ejercicio_de_libro[secador_geankoplis_ej_9_10_2]
+tests/test_libros.py::test_ejercicio_de_libro[torre_cengel_boles_P14_112]
+tests/test_libros.py::test_ejercicio_de_libro[torre_cengel_boles_P14_115]
+tests/test_libros.py::test_ejercicio_de_libro[vacio_cengel_boles_compresion]
+tests/test_libros.py::test_ejercicio_de_libro[viga_strength_of_materials_ej_11_1]
+tests/test_libros.py::test_cobertura_de_libros
+tests/test_libros.py::test_secador_contracorriente_solo_cambia_dtml
+tests/test_libros.py::test_secador_paralelo_rechaza_el_caso_de_geankoplis
+tests/test_nucleo.py::test_conversiones_conocidas
+tests/test_nucleo.py::test_presion_altitud_contra_isa
+tests/test_nucleo.py::test_presion_saturacion_tablas_vapor[0.01-611.66]
+tests/test_nucleo.py::test_presion_saturacion_tablas_vapor[20-2339.3]
+tests/test_nucleo.py::test_presion_saturacion_tablas_vapor[25-3169.9]
+tests/test_nucleo.py::test_presion_saturacion_tablas_vapor[50-12352]
+tests/test_nucleo.py::test_presion_saturacion_tablas_vapor[100-101418]
+tests/test_nucleo.py::test_estado_25C_50HR_contra_ashrae
+tests/test_nucleo.py::test_bulbo_humedo_contra_stull[20-50]
+tests/test_nucleo.py::test_bulbo_humedo_contra_stull[30-30]
+tests/test_nucleo.py::test_bulbo_humedo_contra_stull[35-80]
+tests/test_nucleo.py::test_bulbo_humedo_contra_stull[15-90]
+tests/test_nucleo.py::test_ida_y_vuelta_bulbo_humedo
+tests/test_nucleo.py::test_psicrometria_valida_entradas
+tests/test_nucleo.py::test_diametro_por_caudal
+tests/test_nucleo.py::test_colebrook[10000.0-0]
+tests/test_nucleo.py::test_colebrook[100000.0-0.0001]
+tests/test_nucleo.py::test_colebrook[1000000.0-0.001]
+tests/test_nucleo.py::test_colebrook[50000000.0-0.05]
+tests/test_nucleo.py::test_laminar
+tests/test_nucleo.py::test_potencias
+tests/test_nucleo.py::test_media_logaritmica
+tests/test_nucleo.py::test_sutherland
+tests/test_nucleo.py::test_beverloo_a_mano
+tests/test_nucleo.py::test_janssen_contra_integracion_numerica
+tests/test_nucleo.py::test_volumenes_troncos
+tests/test_nucleo.py::test_campo_validacion
+tests/test_reportes.py::test_pdf_excel_y_texto[aerodeslizador]
+tests/test_reportes.py::test_pdf_excel_y_texto[banda]
+tests/test_reportes.py::test_pdf_excel_y_texto[bomba]
+tests/test_reportes.py::test_pdf_excel_y_texto[colector]
+tests/test_reportes.py::test_pdf_excel_y_texto[ductos]
+tests/test_reportes.py::test_pdf_excel_y_texto[elevador]
+tests/test_reportes.py::test_pdf_excel_y_texto[helicoidal]
+tests/test_reportes.py::test_pdf_excel_y_texto[neumatico]
+tests/test_reportes.py::test_pdf_excel_y_texto[secador]
+tests/test_reportes.py::test_pdf_excel_y_texto[silo]
+tests/test_reportes.py::test_pdf_excel_y_texto[soplador]
+tests/test_reportes.py::test_pdf_excel_y_texto[tolva]
+tests/test_reportes.py::test_pdf_excel_y_texto[torre]
+tests/test_reportes.py::test_pdf_excel_y_texto[vacio]
+tests/test_reportes.py::test_pdf_excel_y_texto[viga]
+tests/test_reportes.py::test_pdf_con_texto_y_simbolos
+tests/test_reportes.py::test_caso_json_ida_y_vuelta
+tests/test_reportes.py::test_caso_json_invalido
+tests/test_reportes.py::test_configuracion_incluida_y_contrasena_original
+tests/test_reportes.py::test_configuracion_faltante_o_danada
+tests/test_reportes.py::test_cambiar_y_desactivar_contrasena
+tests/test_reportes.py::test_recursos_presentes
+tests/test_reportes.py::test_pdf_usa_fuente_unicode_incluida_sin_matplotlib
+tests/test_soplador.py::test_ruta_por_entalpia[5000-20]
+tests/test_soplador.py::test_ruta_por_entalpia[30000-40]
+tests/test_soplador.py::test_ruta_por_entalpia[80000-0]
+tests/test_soplador.py::test_lobulos_atlas_copco
+tests/test_torre.py::test_perry_diferencias_de_entalpia
+tests/test_torre.py::test_ejemplo_de_diseno_kav_l
+tests/test_torre.py::test_lg_desde_temperatura_de_salida_y_limites
+tests/test_vacio.py::test_potencias_por_rutas_independientes[10-20]
+tests/test_vacio.py::test_potencias_por_rutas_independientes[50-35]
+tests/test_vacio.py::test_potencias_por_rutas_independientes[1-0]
+301 passed in 16.30s
+
+3) Ejercicios de libros (herramientas/generar_casos_libros.py)
+-------------------------------------------------------------
+| Caso | Magnitud | Publicado | Calculadora | Diferencia | Veredicto |
+|---|---|---|---|---|---|
+| `torre_cengel_boles_P14_112` | Caudal de aire a la entrada [m³/s] | 44.9 | 44.93 | +0.06 % | Coincide |
+| `torre_cengel_boles_P14_112` | Agua de reposición [kg/s] | 1.16 | 1.165 | +0.45 % | Coincide |
+| `torre_cengel_boles_P14_115` | Humedad absoluta del aire de entrada ω₁ [kg/kg] | 0.00211 | 0.002101 | -0.44 % | Coincide |
+| `torre_cengel_boles_P14_115` | Flujo de aire seco [kg/s] (dato del enunciado) | 4.2 | 4.218 | +0.43 % | Coincide |
+| `torre_cengel_boles_P14_115` | Agua de reposición [kg/s] | 0.05 | 0.05019 | +0.39 % | Coincide |
+| `bomba_cengel_cimbala_ej_8_3` | Velocidad [ft/s] | 9.17 | 9.167 | -0.03 % | Coincide |
+| `bomba_cengel_cimbala_ej_8_3` | Número de Reynolds | 126 400 | 126 432 | +0.03 % | Coincide |
+| `bomba_cengel_cimbala_ej_8_3` | Factor de fricción de Darcy | 0.0174 | 0.0174 | -0.02 % | Coincide |
+| `bomba_cengel_cimbala_ej_8_3` | Pérdida de carga hL [ft] | 27.3 | 27.26 | -0.13 % | Coincide |
+| `bomba_cengel_cimbala_ej_8_3` | Potencia de bombeo [W] | 461 | 460.9 | -0.03 % | Coincide |
+| `ductos_cengel_cimbala_ej_8_4` | Diámetro [m] | 0.267 | 0.2672 | +0.09 % | Coincide |
+| `ductos_cengel_cimbala_ej_8_4` | Número de Reynolds | 100 800 | 101 334 | +0.53 % | Coincide |
+| `ductos_cengel_cimbala_ej_8_4` | Factor de fricción de Darcy | 0.018 | 0.01794 | -0.33 % | Coincide |
+| `ductos_cengel_cimbala_ej_8_4` | Pérdida de carga hL [m] | 20 | 19.99 | -0.04 % | Coincide |
+| `vacio_cengel_boles_compresion` | Trabajo isentrópico, k = 1.4 [kJ/kg] | 263.2 | 263.3 | +0.02 % | Coincide |
+| `vacio_cengel_boles_compresion` | Trabajo isotérmico [kJ/kg] | 189.2 | 189.2 | +0.00 % | Coincide |
+| `aerodeslizador_rhodes_ej_7_9` | Velocidad mínima de fluidización Umf [mm/s] | 3.8 | 3.811 | +0.29 % | Coincide |
+| `aerodeslizador_rhodes_ej_7_9` | ΔP de 60 mm de lecho por equilibrio de fuerzas [Pa] (Rhodes: 9 705.4 Pa/m) | 582.3 | 582.1 | -0.03 % | Coincide |
+| `viga_strength_of_materials_ej_11_1` | Deflexión al centro [mm] | 37.2 | 37.2 | +0.01 % | Coincide |
+| `viga_strength_of_materials_ej_11_1` | Momento máximo wL²/8 [kN·m] (estática) | 250 | 250 | +0.00 % | Coincide |
+| `viga_strength_of_materials_ej_11_1` | Reacción en cada apoyo [kN] (estática) | 100 | 100 | +0.00 % | Coincide |
+| `secador_geankoplis_ej_9_10_2` | Agua evaporada [kg/h] (balance de masa) | 17.24 | 17.24 | +0.00 % | Coincide |
+| `secador_geankoplis_ej_9_10_2` | Flujo de aire seco G [kg/h] | 1 171 | 1 170 | -0.10 % | Coincide |
+| `secador_geankoplis_ej_9_10_2` | Humedad del aire de salida H [kg/kg] | 0.0247 | 0.02473 | +0.14 % | Coincide |
+
+8 casos escritos en docs/ejemplos/libros; comprobaciones fuera de tolerancia: 0
+
+4) Ejecución en Windows
+-------------------------------------------------------------
+Pendiente de registrar tras la ejecución de PROBAR.bat en la PC del usuario.

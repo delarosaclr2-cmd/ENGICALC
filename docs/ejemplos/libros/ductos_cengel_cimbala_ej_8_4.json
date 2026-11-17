@@ -1,0 +1,146 @@
+{
+  "programa": "Calculadoras de Ingeniería RMR",
+  "version": "2.2.0",
+  "calculadora": "ductos",
+  "fecha": "2026-11-13T17:40:43",
+  "proyecto": {
+    "proyecto": "Validación con ejercicios de libros de texto",
+    "cliente": "",
+    "documento": "ductos_cengel_cimbala_ej_8_4",
+    "revision": "",
+    "elaboro": "",
+    "reviso": "",
+    "aprobo": ""
+  },
+  "entradas": {
+    "caudal": 1260.0,
+    "velocidad": 6.24,
+    "contaminante": "No verificar / capturar velocidad mínima",
+    "velocidad_minima": 0,
+    "temperatura": 35,
+    "altitud": 0,
+    "densidad": 1.145,
+    "longitud": 150,
+    "friccion": 0,
+    "material_ducto": "Medianamente liso — acero galvanizado, costura longitudinal o espiral (0.09 mm)",
+    "rugosidad": 1e-06,
+    "k_accesorios": 0,
+    "eficiencia": 1
+  },
+  "resultado": {
+    "salidas": [
+      {
+        "clave": "diametro_m",
+        "etiqueta": "Diámetro interior del ducto",
+        "valor": 0.267237122407268,
+        "unidad": "m",
+        "nivel": "V",
+        "nota": ""
+      },
+      {
+        "clave": "diametro_mm",
+        "etiqueta": "Diámetro interior del ducto",
+        "valor": 267.237122407268,
+        "unidad": "mm",
+        "nivel": "V",
+        "nota": ""
+      },
+      {
+        "clave": "densidad",
+        "etiqueta": "Densidad del aire usada",
+        "valor": 1.145,
+        "unidad": "kg/m³",
+        "nivel": "D",
+        "nota": ""
+      },
+      {
+        "clave": "reynolds",
+        "etiqueta": "Número de Reynolds",
+        "valor": 101333.60375364723,
+        "unidad": "",
+        "nivel": "V",
+        "nota": ""
+      },
+      {
+        "clave": "rugosidad",
+        "etiqueta": "Rugosidad absoluta usada",
+        "valor": 1e-06,
+        "unidad": "mm",
+        "nivel": "D",
+        "nota": ""
+      },
+      {
+        "clave": "friccion",
+        "etiqueta": "Factor de fricción de Darcy (turbulento)",
+        "valor": 0.01794015690147496,
+        "unidad": "",
+        "nivel": "V",
+        "nota": ""
+      },
+      {
+        "clave": "dp_friccion_pa",
+        "etiqueta": "Pérdida por fricción",
+        "valor": 224.4736558959767,
+        "unidad": "Pa",
+        "nivel": "V",
+        "nota": ""
+      },
+      {
+        "clave": "dp_accesorios_pa",
+        "etiqueta": "Pérdida por accesorios",
+        "valor": 0.0,
+        "unidad": "Pa",
+        "nivel": "V",
+        "nota": ""
+      },
+      {
+        "clave": "dp_total_pa",
+        "etiqueta": "Pérdida de presión total",
+        "valor": 224.4736558959767,
+        "unidad": "Pa",
+        "nivel": "V",
+        "nota": ""
+      },
+      {
+        "clave": "dp_total_mmh2o",
+        "etiqueta": "Pérdida de presión total",
+        "valor": 22.889942630355595,
+        "unidad": "mm H₂O",
+        "nivel": "V",
+        "nota": ""
+      },
+      {
+        "clave": "potencia_kw",
+        "etiqueta": "Potencia al eje del ventilador",
+        "valor": 0.07856577956359183,
+        "unidad": "kW",
+        "nivel": "V",
+        "nota": ""
+      },
+      {
+        "clave": "potencia_hp",
+        "etiqueta": "Potencia al eje del ventilador",
+        "valor": 0.10535844588103026,
+        "unidad": "HP",
+        "nivel": "D",
+        "nota": ""
+      }
+    ],
+    "advertencias": [],
+    "notas": [
+      "Rugosidad capturada: 1e-06 mm (sustituye a la categoría ASHRAE del material).",
+      "No se verificó la velocidad mínima de transporte del polvo (dato no capturado).",
+      "Condiciones de validez: tramo de sección circular, flujo incompresible, carga de polvo baja (no se corrige la densidad de la mezcla)."
+    ],
+    "ecuaciones": [
+      "D = √(4·Q / (π·v))",
+      "Re = ρ·v·D/μ   (μ del aire por la ley de Sutherland)",
+      "1/√f = −2·log₁₀(ε/(3.7·D) + 2.51/(Re·√f))   (Colebrook-White, si f no se captura)",
+      "ΔP = f·(L/D)·ρ·v²/2 + ΣK·ρ·v²/2",
+      "P = ΔP·Q/η",
+      "v_min = v_min,ACGIH/√df;   df = ρ/(0.075 lb/ft³)   (ACGIH, 31.ª ed., ec. 5.1)"
+    ]
+  },
+  "fuente": "Çengel y Cimbala, Mecánica de fluidos (McGraw-Hill), cap. 8, Ejemplo 8-4 «Determining the Diameter of an Air Duct».",
+  "planteamiento": "Aire a 1 atm y 35 °C (ρ = 1.145 kg/m³), 0.35 m³/s, ducto liso de 150 m, pérdida admisible 20 m. La calculadora dimensiona por velocidad: con la velocidad del libro (6.24 m/s) debe dar el diámetro y la pérdida del libro."
+}

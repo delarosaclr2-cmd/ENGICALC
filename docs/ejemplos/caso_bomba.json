@@ -1,0 +1,192 @@
+{
+  "programa": "Calculadoras de Ingeniería RMR",
+  "version": "2.0.0",
+  "calculadora": "bomba",
+  "fecha": "2026-11-12T15:29:35",
+  "entradas": {
+    "caudal": 1234,
+    "diametro": 8,
+    "longitud": 150,
+    "elevacion": 20,
+    "presion_descarga": 14,
+    "presion_succion": 0,
+    "ge": 1.0,
+    "viscosidad": 1.0,
+    "temperatura": 20,
+    "presion_vapor": 0,
+    "rugosidad": 0.0018,
+    "friccion": 0,
+    "codos": 2,
+    "valvulas": 2,
+    "tees": 1,
+    "reducciones": 2,
+    "k_codo": 0.5,
+    "k_valvula": 1.0,
+    "k_tee": 1.8,
+    "k_reduccion": 0.8,
+    "cribas": 1,
+    "limpiadores": 0,
+    "limpiadores_hd": 0,
+    "limpiadores_rev": 0,
+    "h_criba": 30,
+    "h_limpiador": 35,
+    "h_limpiador_hd": 35,
+    "h_limpiador_rev": 25,
+    "eficiencia": 75,
+    "altitud": 2240,
+    "elevacion_succion": 5,
+    "perdidas_succion": 2
+  },
+  "resultado": {
+    "salidas": [
+      {
+        "clave": "velocidad",
+        "etiqueta": "Velocidad en la tubería",
+        "valor": 7.876346032659224,
+        "unidad": "ft/s",
+        "nivel": "V",
+        "nota": ""
+      },
+      {
+        "clave": "reynolds",
+        "etiqueta": "Número de Reynolds",
+        "valor": 487824.32701732084,
+        "unidad": "",
+        "nivel": "V",
+        "nota": ""
+      },
+      {
+        "clave": "friccion",
+        "etiqueta": "Factor de fricción de Darcy (turbulento)",
+        "valor": 0.015688705739795257,
+        "unidad": "",
+        "nivel": "V",
+        "nota": ""
+      },
+      {
+        "clave": "h_friccion",
+        "etiqueta": "Pérdida por fricción en tubería",
+        "valor": 3.4031688903701105,
+        "unidad": "ft",
+        "nivel": "V",
+        "nota": ""
+      },
+      {
+        "clave": "h_accesorios",
+        "etiqueta": "Pérdida en accesorios",
+        "valor": 6.1701232748379375,
+        "unidad": "ft",
+        "nivel": "O",
+        "nota": ""
+      },
+      {
+        "clave": "h_equipos",
+        "etiqueta": "Pérdida en equipos (cribas, limpiadores)",
+        "valor": 30.0,
+        "unidad": "ft",
+        "nivel": "O",
+        "nota": ""
+      },
+      {
+        "clave": "h_estatica",
+        "etiqueta": "Altura estática por elevación",
+        "valor": 20.0,
+        "unidad": "ft",
+        "nivel": "D",
+        "nota": ""
+      },
+      {
+        "clave": "h_presion",
+        "etiqueta": "Altura por diferencia de presión",
+        "valor": 32.325547709611556,
+        "unidad": "ft",
+        "nivel": "V",
+        "nota": ""
+      },
+      {
+        "clave": "altura_total",
+        "etiqueta": "Altura dinámica total (TDH)",
+        "valor": 91.8988398748196,
+        "unidad": "ft",
+        "nivel": "V",
+        "nota": ""
+      },
+      {
+        "clave": "altura_total_m",
+        "etiqueta": "Altura dinámica total (TDH)",
+        "valor": 28.010766393845017,
+        "unidad": "m",
+        "nivel": "D",
+        "nota": ""
+      },
+      {
+        "clave": "potencia_hidraulica",
+        "etiqueta": "Potencia hidráulica",
+        "valor": 28.63716373876954,
+        "unidad": "HP",
+        "nivel": "V",
+        "nota": ""
+      },
+      {
+        "clave": "potencia_freno",
+        "etiqueta": "Potencia al freno (eje de la bomba)",
+        "valor": 38.18288498502606,
+        "unidad": "HP",
+        "nivel": "V",
+        "nota": ""
+      },
+      {
+        "clave": "potencia_freno_kw",
+        "etiqueta": "Potencia al freno",
+        "valor": 28.472972429974526,
+        "unidad": "kW",
+        "nivel": "D",
+        "nota": ""
+      },
+      {
+        "clave": "presion_atm",
+        "etiqueta": "Presión atmosférica del sitio",
+        "valor": 11.19033592428235,
+        "unidad": "psia",
+        "nivel": "D",
+        "nota": ""
+      },
+      {
+        "clave": "presion_vapor",
+        "etiqueta": "Presión de vapor usada",
+        "valor": 0.3392147976537908,
+        "unidad": "psia",
+        "nivel": "D",
+        "nota": ""
+      },
+      {
+        "clave": "npsha",
+        "etiqueta": "NPSH disponible",
+        "valor": 28.05488812011467,
+        "unidad": "ft",
+        "nivel": "V",
+        "nota": ""
+      },
+      {
+        "clave": "npsha_m",
+        "etiqueta": "NPSH disponible",
+        "valor": 8.55112989901095,
+        "unidad": "m",
+        "nivel": "D",
+        "nota": ""
+      }
+    ],
+    "advertencias": [
+      "K de accesorios y pérdidas por equipo: valores del original sin fuente. Confírmelos (Crane TP-410, datos del fabricante del equipo)."
+    ],
+    "notas": [
+      "Compare el NPSH disponible con el requerido de la curva de la bomba más el margen de su criterio."
+    ],
+    "ecuaciones": [
+      "v = Q·0.002228/A;   h_f = f·(L/D)·v²/(2g);   h_k = ΣK·v²/(2g)",
+      "TDH = Δz + (p_d − p_s)·2.309/GE + h_f + h_k + h_equipos",
+      "WHP = Q[gpm]·TDH[ft]·GE/3960;   BHP = WHP/η",
+      "NPSHa = (p_atm + p_s − p_vap)·2.309/GE + z_s − h_f,s"
+    ]
+  }
+}

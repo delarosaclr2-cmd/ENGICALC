@@ -1,0 +1,211 @@
+{
+  "programa": "Calculadoras de Ingeniería RMR",
+  "version": "2.2.0",
+  "calculadora": "bomba",
+  "fecha": "2026-11-13T17:40:43",
+  "proyecto": {
+    "proyecto": "Validación con ejercicios de libros de texto",
+    "cliente": "",
+    "documento": "bomba_cengel_cimbala_ej_8_3",
+    "revision": "",
+    "elaboro": "",
+    "reviso": "",
+    "aprobo": ""
+  },
+  "entradas": {
+    "caudal": 89.76623376623378,
+    "diametro": 2,
+    "longitud": 200,
+    "elevacion": 0,
+    "presion_descarga": 0,
+    "presion_succion": 0,
+    "ge": 1.0,
+    "viscosidad": 1.122702548813342,
+    "temperatura": 20,
+    "presion_vapor": 0,
+    "rugosidad": 8.4e-05,
+    "friccion": 0,
+    "codos": 0,
+    "codos_rl": 0,
+    "codos_45": 0,
+    "tees": 0,
+    "tees_paso": 0,
+    "valvulas": 0,
+    "tipo_valvula": "Compuerta, abierta (L/D 8)",
+    "retenciones": 0,
+    "entradas": 0,
+    "salidas": 0,
+    "reducciones": 0,
+    "k_codo": 0,
+    "k_valvula": 0,
+    "k_tee": 0,
+    "k_reduccion": 0.8,
+    "cribas": 0,
+    "limpiadores": 0,
+    "limpiadores_hd": 0,
+    "limpiadores_rev": 0,
+    "h_criba": 30,
+    "h_limpiador": 35,
+    "h_limpiador_hd": 35,
+    "h_limpiador_rev": 25,
+    "eficiencia": 0,
+    "altitud": 0,
+    "elevacion_succion": 0,
+    "perdidas_succion": 0
+  },
+  "resultado": {
+    "salidas": [
+      {
+        "clave": "velocidad",
+        "etiqueta": "Velocidad en la tubería",
+        "valor": 9.167324722093172,
+        "unidad": "ft/s",
+        "nivel": "V",
+        "nota": ""
+      },
+      {
+        "clave": "reynolds",
+        "etiqueta": "Número de Reynolds",
+        "valor": 126431.87581159991,
+        "unidad": "",
+        "nivel": "V",
+        "nota": ""
+      },
+      {
+        "clave": "friccion",
+        "etiqueta": "Factor de fricción de Darcy (turbulento)",
+        "valor": 0.01739678240333494,
+        "unidad": "",
+        "nivel": "V",
+        "nota": ""
+      },
+      {
+        "clave": "h_friccion",
+        "etiqueta": "Pérdida por fricción en tubería",
+        "valor": 27.264635689247836,
+        "unidad": "ft",
+        "nivel": "V",
+        "nota": ""
+      },
+      {
+        "clave": "friccion_ft",
+        "etiqueta": "Factor de fricción en turbulencia completa f_T (Crane)",
+        "valor": 0.01022388066946337,
+        "unidad": "",
+        "nivel": "V",
+        "nota": ""
+      },
+      {
+        "clave": "k_total",
+        "etiqueta": "Suma de coeficientes K de accesorios",
+        "valor": 0.0,
+        "unidad": "",
+        "nivel": "E",
+        "nota": ""
+      },
+      {
+        "clave": "h_accesorios",
+        "etiqueta": "Pérdida en accesorios",
+        "valor": 0.0,
+        "unidad": "ft",
+        "nivel": "E",
+        "nota": ""
+      },
+      {
+        "clave": "h_equipos",
+        "etiqueta": "Pérdida en equipos (cribas, limpiadores)",
+        "valor": 0.0,
+        "unidad": "ft",
+        "nivel": "O",
+        "nota": ""
+      },
+      {
+        "clave": "h_estatica",
+        "etiqueta": "Altura estática por elevación",
+        "valor": 0.0,
+        "unidad": "ft",
+        "nivel": "D",
+        "nota": ""
+      },
+      {
+        "clave": "h_presion",
+        "etiqueta": "Altura por diferencia de presión",
+        "valor": 0.0,
+        "unidad": "ft",
+        "nivel": "V",
+        "nota": ""
+      },
+      {
+        "clave": "altura_total",
+        "etiqueta": "Altura dinámica total (TDH)",
+        "valor": 27.264635689247836,
+        "unidad": "ft",
+        "nivel": "V",
+        "nota": ""
+      },
+      {
+        "clave": "altura_total_m",
+        "etiqueta": "Altura dinámica total (TDH)",
+        "valor": 8.310260958082742,
+        "unidad": "m",
+        "nivel": "D",
+        "nota": ""
+      },
+      {
+        "clave": "potencia_hidraulica",
+        "etiqueta": "Potencia hidráulica",
+        "valor": 0.6180413284929853,
+        "unidad": "HP",
+        "nivel": "V",
+        "nota": ""
+      },
+      {
+        "clave": "presion_atm",
+        "etiqueta": "Presión atmosférica del sitio",
+        "valor": 14.69594877551422,
+        "unidad": "psia",
+        "nivel": "D",
+        "nota": ""
+      },
+      {
+        "clave": "presion_vapor",
+        "etiqueta": "Presión de vapor usada",
+        "valor": 0.3392147976537908,
+        "unidad": "psia",
+        "nivel": "D",
+        "nota": ""
+      },
+      {
+        "clave": "npsha",
+        "etiqueta": "NPSH disponible",
+        "valor": 33.14923493968061,
+        "unidad": "ft",
+        "nivel": "V",
+        "nota": ""
+      },
+      {
+        "clave": "npsha_m",
+        "etiqueta": "NPSH disponible",
+        "valor": 10.10388680961465,
+        "unidad": "m",
+        "nivel": "D",
+        "nota": ""
+      }
+    ],
+    "advertencias": [
+      "Sin eficiencia de la bomba solo se reporta la potencia hidráulica; la del motor será mayor."
+    ],
+    "notas": [
+      "Compare el NPSH disponible con el requerido de la curva de la bomba más el margen de su criterio."
+    ],
+    "ecuaciones": [
+      "v = Q·0.002228/A;   h_f = f·(L/D)·v²/(2g);   h_k = ΣK·v²/(2g)",
+      "Crane TP-410: K = (L/D)·f_T;   f_T = 0.25/[log10(ε/(3.7·D))]²",
+      "TDH = Δz + (p_d − p_s)·2.309/GE + h_f + h_k + h_equipos",
+      "WHP = Q[gpm]·TDH[ft]·GE/3960;   BHP = WHP/η",
+      "NPSHa = (p_atm + p_s − p_vap)·2.309/GE + z_s − h_f,s"
+    ]
+  },
+  "fuente": "Çengel y Cimbala, Mecánica de fluidos (McGraw-Hill), cap. 8, Ejemplo 8-3 «Determining the Head Loss in a Water Pipe».",
+  "planteamiento": "Agua a 60 °F (ρ = 62.36 lbm/ft³, μ = 7.536e-4 lbm/(ft·s)), 0.2 ft³/s en tubo horizontal de acero inoxidable de 2 in y 200 ft (ε = 0.000007 ft). Caudal capturado en gpm y viscosidad cinemática μ/ρ en cSt."
+}

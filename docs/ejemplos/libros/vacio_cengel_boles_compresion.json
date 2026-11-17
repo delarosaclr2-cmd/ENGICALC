@@ -1,0 +1,133 @@
+{
+  "programa": "Calculadoras de Ingeniería RMR",
+  "version": "2.2.0",
+  "calculadora": "vacio",
+  "fecha": "2026-11-13T17:40:43",
+  "proyecto": {
+    "proyecto": "Validación con ejercicios de libros de texto",
+    "cliente": "",
+    "documento": "vacio_cengel_boles_compresion",
+    "revision": "",
+    "elaboro": "",
+    "reviso": "",
+    "aprobo": ""
+  },
+  "entradas": {
+    "caudal": 3100.0535999999997,
+    "unidad_caudal": "m³/h",
+    "presion_succion": 100,
+    "presion_descarga": 900,
+    "altitud": 0,
+    "temperatura": 26.850000000000023,
+    "eficiencia": 1.0,
+    "k": 1.4,
+    "velocidad_ducto": 0
+  },
+  "resultado": {
+    "salidas": [
+      {
+        "clave": "caudal_m3h",
+        "etiqueta": "Caudal a succión",
+        "valor": 3100.0535999999997,
+        "unidad": "m³/h",
+        "nivel": "D",
+        "nota": ""
+      },
+      {
+        "clave": "presion_descarga_kpa",
+        "etiqueta": "Presión absoluta de descarga",
+        "valor": 900.0,
+        "unidad": "kPa",
+        "nivel": "D",
+        "nota": ""
+      },
+      {
+        "clave": "relacion_compresion",
+        "etiqueta": "Relación de compresión pd/ps",
+        "valor": 9.0,
+        "unidad": "",
+        "nivel": "V",
+        "nota": ""
+      },
+      {
+        "clave": "masa_kg_h",
+        "etiqueta": "Flujo másico de aire seco",
+        "valor": 3600.0,
+        "unidad": "kg/h",
+        "nivel": "V",
+        "nota": ""
+      },
+      {
+        "clave": "potencia_teorica_kw",
+        "etiqueta": "Potencia teórica adiabática",
+        "valor": 263.2508696591209,
+        "unidad": "kW",
+        "nivel": "V",
+        "nota": ""
+      },
+      {
+        "clave": "potencia_isotermica_kw",
+        "etiqueta": "Potencia teórica isotérmica (mínima ideal)",
+        "valor": 189.20872113832294,
+        "unidad": "kW",
+        "nivel": "V",
+        "nota": ""
+      },
+      {
+        "clave": "potencia_eje_kw",
+        "etiqueta": "Potencia al eje (adiabática/η)",
+        "valor": 263.2508696591209,
+        "unidad": "kW",
+        "nivel": "V",
+        "nota": ""
+      },
+      {
+        "clave": "potencia_eje_hp",
+        "etiqueta": "Potencia al eje",
+        "valor": 353.0252313179827,
+        "unidad": "HP",
+        "nivel": "D",
+        "nota": ""
+      },
+      {
+        "clave": "tipo",
+        "etiqueta": "Tipo de bomba sugerido",
+        "valor": "Bomba de anillo líquido",
+        "unidad": "",
+        "nivel": "O",
+        "nota": ""
+      },
+      {
+        "clave": "velocidad_ducto",
+        "etiqueta": "Velocidad en ducto de succión",
+        "valor": 15.0,
+        "unidad": "m/s",
+        "nivel": "O",
+        "nota": ""
+      },
+      {
+        "clave": "diametro_ducto_mm",
+        "etiqueta": "Diámetro del ducto de succión",
+        "valor": 270.36021356696347,
+        "unidad": "mm",
+        "nivel": "V",
+        "nota": ""
+      }
+    ],
+    "advertencias": [
+      "Velocidad del ducto tomada de la tabla original por rangos de presión (sin fuente).",
+      "Tipo de bomba: criterio original sin fuente. Verifique con curvas del fabricante."
+    ],
+    "notas": [
+      "Las bombas de anillo líquido se acercan más al modelo isotérmico; las secas, al adiabático."
+    ],
+    "ecuaciones": [
+      "P = k/(k−1)·ps·Qs·[(pd/ps)^((k−1)/k) − 1]/η",
+      "P_iso = ps·Qs·ln(pd/ps)",
+      "ṁ = ps·Qs/(R·T)",
+      "D = √(4·Qs/(π·v))"
+    ]
+  },
+  "fuente": "Çengel y Boles, Termodinámica (McGraw-Hill), cap. 7, sección «Reversible steady-flow work», ejemplo de trabajo de compresión de aire por distintos procesos.",
+  "planteamiento": "Aire de 100 kPa y 300 K a 900 kPa, compresión reversible. Se captura el caudal de succión que corresponde a 1 kg/s, de modo que la potencia en kW es el trabajo en kJ/kg."
+}

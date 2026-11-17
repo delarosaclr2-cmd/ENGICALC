@@ -1,0 +1,146 @@
+{
+  "programa": "Calculadoras de Ingeniería RMR",
+  "version": "2.1.0",
+  "calculadora": "torre",
+  "fecha": "2026-11-13T16:36:23",
+  "proyecto": {
+    "proyecto": "Ejemplo de validación publicado",
+    "cliente": "",
+    "documento": "caso_torre_ejemplo_110_84_69F_LG_1.30",
+    "revision": "",
+    "elaboro": "",
+    "reviso": "",
+    "aprobo": ""
+  },
+  "entradas": {
+    "flujo_agua": "10",
+    "t_entrada": "43.333333",
+    "t_salida": "28.888889",
+    "cp": "4.186",
+    "t_bulbo_humedo": "20.555556",
+    "t_bulbo_seco": "0",
+    "t_aire_salida": "31",
+    "relacion_lg": "1.3",
+    "altitud": "0"
+  },
+  "resultado": {
+    "salidas": [
+      {
+        "clave": "rango",
+        "etiqueta": "Rango de enfriamiento",
+        "valor": 14.444444000000004,
+        "unidad": "°C",
+        "nivel": "D",
+        "nota": ""
+      },
+      {
+        "clave": "carga_kw",
+        "etiqueta": "Carga térmica",
+        "valor": 604.6444258400002,
+        "unidad": "kW",
+        "nivel": "V",
+        "nota": ""
+      },
+      {
+        "clave": "carga_btuh",
+        "etiqueta": "Carga térmica",
+        "valor": 2063132.4186474048,
+        "unidad": "BTU/h",
+        "nivel": "D",
+        "nota": ""
+      },
+      {
+        "clave": "carga_tr",
+        "etiqueta": "Carga térmica",
+        "valor": 171.92770155395039,
+        "unidad": "TR",
+        "nivel": "D",
+        "nota": "1 TR = 12 000 BTU/h"
+      },
+      {
+        "clave": "aproximacion",
+        "etiqueta": "Aproximación (T salida − bulbo húmedo)",
+        "valor": 8.333333,
+        "unidad": "°C",
+        "nivel": "V",
+        "nota": ""
+      },
+      {
+        "clave": "h_aire_entrada",
+        "etiqueta": "Entalpía del aire de entrada (≈ saturado a bulbo húmedo)",
+        "valor": 59.328573172248554,
+        "unidad": "kJ/kg a.s.",
+        "nivel": "V",
+        "nota": ""
+      },
+      {
+        "clave": "relacion_lg",
+        "etiqueta": "Relación L/G (agua/aire seco) capturada",
+        "valor": 1.3,
+        "unidad": "",
+        "nivel": "D",
+        "nota": ""
+      },
+      {
+        "clave": "flujo_aire",
+        "etiqueta": "Flujo de aire seco",
+        "valor": 7.692307692307692,
+        "unidad": "kg/s",
+        "nivel": "V",
+        "nota": ""
+      },
+      {
+        "clave": "h_aire_salida",
+        "etiqueta": "Entalpía del aire de salida (balance)",
+        "valor": 137.93234853144858,
+        "unidad": "kJ/kg a.s.",
+        "nivel": "V",
+        "nota": ""
+      },
+      {
+        "clave": "kav_l",
+        "etiqueta": "Característica requerida KaV/L (Merkel, Chebyshev 4 puntos)",
+        "valor": 1.5208138141626921,
+        "unidad": "",
+        "nivel": "E",
+        "nota": ""
+      },
+      {
+        "clave": "kav_l_simpson",
+        "etiqueta": "KaV/L por integración numérica (verificación)",
+        "valor": 1.5221841545128072,
+        "unidad": "",
+        "nivel": "V",
+        "nota": ""
+      },
+      {
+        "clave": "dh_minimo",
+        "etiqueta": "Diferencia de entalpía mínima en los puntos de Chebyshev",
+        "valor": 34.2969832900223,
+        "unidad": "kJ/kg a.s.",
+        "nivel": "V",
+        "nota": ""
+      },
+      {
+        "clave": "tipo",
+        "etiqueta": "Tipo de torre sugerido",
+        "valor": "Torre mediana (flujo cruzado)",
+        "unidad": "",
+        "nivel": "O",
+        "nota": "Criterio de rev1 sin fuente."
+      }
+    ],
+    "advertencias": [],
+    "notas": [
+      "Se usó la relación L/G capturada; la temperatura del aire de salida no se empleó.",
+      "KaV/L es la DEMANDA del proceso; la altura de relleno se obtiene con la característica del relleno KaV/L = C·(L/G)^−n de ensayos del fabricante o del CTI."
+    ],
+    "ecuaciones": [
+      "Q = ṁ_agua·cp·(T_entrada − T_salida)",
+      "h_entrada ≈ h_saturación(T_bulbo húmedo)   (aproximación de Merkel)",
+      "ṁ_aire = ṁ_agua/(L/G);   h_salida = h_entrada + Q/ṁ_aire",
+      "KaV/L = ∫ cp·dT/(h_w − h_a) ≈ cp·R/4·Σ 1/(h_w − h_a) en T_fría + (0.1, 0.4, 0.6, 0.9)·R",
+      "h_a = h_entrada + (L/G)·cp·(T − T_fría)"
+    ]
+  }
+}

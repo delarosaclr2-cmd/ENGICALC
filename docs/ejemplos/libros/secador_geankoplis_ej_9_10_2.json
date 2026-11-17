@@ -1,0 +1,310 @@
+{
+  "programa": "Calculadoras de Ingeniería RMR",
+  "version": "2.2.0",
+  "calculadora": "secador",
+  "fecha": "2026-11-13T17:40:43",
+  "proyecto": {
+    "proyecto": "Validación con ejercicios de libros de texto",
+    "cliente": "",
+    "documento": "secador_geankoplis_ej_9_10_2",
+    "revision": "",
+    "elaboro": "",
+    "reviso": "",
+    "aprobo": ""
+  },
+  "entradas": {
+    "alimentacion": 471.744,
+    "base": "Base seca (kg agua / kg sólido seco × 100)",
+    "humedad_inicial": 4,
+    "humedad_final": 0.2,
+    "cp_solido": 1.465,
+    "t_solido_entrada": 26.7,
+    "t_solido_salida": 62.8,
+    "t_aire_entrada": 93.3,
+    "t_aire_salida": 37.8,
+    "flujo": "Contracorriente (aire en sentido opuesto al sólido)",
+    "t_ambiente": 25,
+    "hr_ambiente": 50.59241679834818,
+    "altitud": 0,
+    "latente": 0,
+    "perdidas": 0,
+    "velocidad_aire": 2,
+    "fraccion_libre": 1.0,
+    "metodo_ua": "Correlación de Perry's: Ua = 0.5·G^0.67/D (unidades inglesas)",
+    "ua": 0,
+    "pci": 0,
+    "eficiencia_quemador": 0,
+    "masa_galon": 0
+  },
+  "resultado": {
+    "salidas": [
+      {
+        "clave": "solido_seco",
+        "etiqueta": "Sólido seco",
+        "valor": 453.6,
+        "unidad": "kg/h",
+        "nivel": "V",
+        "nota": ""
+      },
+      {
+        "clave": "agua_inicial",
+        "etiqueta": "Agua en la alimentación",
+        "valor": 18.144000000000002,
+        "unidad": "kg/h",
+        "nivel": "V",
+        "nota": ""
+      },
+      {
+        "clave": "agua_final",
+        "etiqueta": "Agua en el producto",
+        "valor": 0.9072000000000001,
+        "unidad": "kg/h",
+        "nivel": "V",
+        "nota": ""
+      },
+      {
+        "clave": "producto",
+        "etiqueta": "Producto a la salida",
+        "valor": 454.5072,
+        "unidad": "kg/h",
+        "nivel": "V",
+        "nota": ""
+      },
+      {
+        "clave": "agua_evaporada",
+        "etiqueta": "Agua evaporada",
+        "valor": 17.236800000000002,
+        "unidad": "kg/h",
+        "nivel": "V",
+        "nota": ""
+      },
+      {
+        "clave": "w_entrada",
+        "etiqueta": "Humedad absoluta del aire de entrada",
+        "valor": 0.010000000000000002,
+        "unidad": "kg/kg a.s.",
+        "nivel": "V",
+        "nota": ""
+      },
+      {
+        "clave": "t_evaporacion",
+        "etiqueta": "Bulbo húmedo del aire de entrada (T de evaporación)",
+        "valor": 34.24415590979574,
+        "unidad": "°C",
+        "nivel": "V",
+        "nota": ""
+      },
+      {
+        "clave": "latente",
+        "etiqueta": "Calor latente usado",
+        "valor": 2421.3480933538153,
+        "unidad": "kJ/kg",
+        "nivel": "D",
+        "nota": ""
+      },
+      {
+        "clave": "q_solido",
+        "etiqueta": "Calor para calentar el sólido",
+        "valor": 6.663699,
+        "unidad": "kW",
+        "nivel": "V",
+        "nota": ""
+      },
+      {
+        "clave": "q_residual",
+        "etiqueta": "Calor para calentar el agua residual",
+        "valor": 0.0380808792,
+        "unidad": "kW",
+        "nivel": "V",
+        "nota": ""
+      },
+      {
+        "clave": "q_evaporacion",
+        "etiqueta": "Calor para evaporar y sobrecalentar el vapor",
+        "valor": 11.776286138400003,
+        "unidad": "kW",
+        "nivel": "V",
+        "nota": ""
+      },
+      {
+        "clave": "q_util",
+        "etiqueta": "Calor útil",
+        "valor": 18.478066017600003,
+        "unidad": "kW",
+        "nivel": "V",
+        "nota": ""
+      },
+      {
+        "clave": "q_perdidas",
+        "etiqueta": "Pérdidas de calor",
+        "valor": 0.0,
+        "unidad": "kW",
+        "nivel": "D",
+        "nota": ""
+      },
+      {
+        "clave": "q_total",
+        "etiqueta": "Calor total que cede el aire",
+        "valor": 18.478066017600003,
+        "unidad": "kW",
+        "nivel": "V",
+        "nota": ""
+      },
+      {
+        "clave": "aire_seco",
+        "etiqueta": "Flujo de aire seco",
+        "valor": 1169.800170989338,
+        "unidad": "kg/h",
+        "nivel": "V",
+        "nota": ""
+      },
+      {
+        "clave": "w_salida",
+        "etiqueta": "Humedad absoluta del aire de salida",
+        "valor": 0.02473482431227744,
+        "unidad": "kg/kg a.s.",
+        "nivel": "V",
+        "nota": ""
+      },
+      {
+        "clave": "hr_salida",
+        "etiqueta": "Humedad relativa del aire de salida",
+        "valor": 59.07840715722273,
+        "unidad": "%",
+        "nivel": "V",
+        "nota": ""
+      },
+      {
+        "clave": "rocio_salida",
+        "etiqueta": "Punto de rocío del aire de salida",
+        "valor": 28.419132169801742,
+        "unidad": "°C",
+        "nivel": "V",
+        "nota": ""
+      },
+      {
+        "clave": "caudal_gas",
+        "etiqueta": "Caudal de gas de diseño (mayor entre entrada y salida)",
+        "valor": 0.3427520309200246,
+        "unidad": "m³/s",
+        "nivel": "V",
+        "nota": ""
+      },
+      {
+        "clave": "diametro",
+        "etiqueta": "Diámetro interior del tambor",
+        "valor": 0.46712173991672906,
+        "unidad": "m",
+        "nivel": "V",
+        "nota": ""
+      },
+      {
+        "clave": "flujo_masico_gas",
+        "etiqueta": "Flujo másico de gas por área",
+        "valor": 6825.926999465635,
+        "unidad": "kg/(h·m²)",
+        "nivel": "V",
+        "nota": ""
+      },
+      {
+        "clave": "ua",
+        "etiqueta": "Coeficiente volumétrico Ua",
+        "valor": 778.4984578045335,
+        "unidad": "W/(m³·K)",
+        "nivel": "E",
+        "nota": ""
+      },
+      {
+        "clave": "dtml",
+        "etiqueta": "Diferencia media logarítmica (contracorriente)",
+        "valor": 19.193068486964215,
+        "unidad": "°C",
+        "nivel": "V",
+        "nota": ""
+      },
+      {
+        "clave": "volumen",
+        "etiqueta": "Volumen del tambor",
+        "valor": 1.2366714787984854,
+        "unidad": "m³",
+        "nivel": "E",
+        "nota": ""
+      },
+      {
+        "clave": "longitud",
+        "etiqueta": "Longitud del tambor",
+        "valor": 7.2161292551876475,
+        "unidad": "m",
+        "nivel": "E",
+        "nota": ""
+      },
+      {
+        "clave": "relacion_ld",
+        "etiqueta": "Relación L/D",
+        "valor": 15.448069825382186,
+        "unidad": "",
+        "nivel": "E",
+        "nota": ""
+      },
+      {
+        "clave": "q_calentador",
+        "etiqueta": "Calor del calentador (aire ambiente → entrada)",
+        "valor": 22.73967403607351,
+        "unidad": "kW",
+        "nivel": "V",
+        "nota": ""
+      },
+      {
+        "clave": "eficiencia_termica",
+        "etiqueta": "Eficiencia térmica (calor útil / calentador)",
+        "valor": 81.25915080527089,
+        "unidad": "%",
+        "nivel": "V",
+        "nota": ""
+      },
+      {
+        "clave": "potencia_original",
+        "etiqueta": "Potencia estimada (fórmula rev0, con D real en ft)",
+        "valor": 0.1272222072684914,
+        "unidad": "HP",
+        "nivel": "O",
+        "nota": ""
+      },
+      {
+        "clave": "aletas_original",
+        "etiqueta": "Número de aletas (criterio rev0: 2.63·D)",
+        "valor": 1.2285301759809975,
+        "unidad": "",
+        "nivel": "O",
+        "nota": ""
+      },
+      {
+        "clave": "altura_aletas_original",
+        "etiqueta": "Altura de aletas (criterio rev0: 4.6·D)",
+        "valor": 2.1487600036169536,
+        "unidad": "cm",
+        "nivel": "O",
+        "nota": ""
+      }
+    ],
+    "advertencias": [
+      "L/D = 15.4: Perry's indica que la longitud suele estar entre 5 y 10 diámetros. Revise la velocidad del gas o Ua.",
+      "Ua por la correlación de Perry's (McCormick): estimación preliminar; depende de aletas, rpm y carga del tambor. Confírmelo con el fabricante o con pruebas.",
+      "Potencia de accionamiento y aletas: fórmulas originales sin fuente; NO validadas. El tiempo de residencia y la pendiente no se calculan (correlación de Friedman-Marshall pendiente de verificar contra Perry's)."
+    ],
+    "notas": [
+      "El calentador se supone sin aporte de humedad (gases de combustión no considerados en W)."
+    ],
+    "ecuaciones": [
+      "Base húmeda: ms = F·(1 − xi);  agua_f = ms·xf/(1 − xf);  W = F·xi − agua_f",
+      "Q_útil = ms·cps·ΔTs + agua_f·cpw·ΔTs + W·[cpw·(t_ev − Ts1) + λ + cpv·(Tg2 − t_ev)]",
+      "G = Q_total/((1.006 + 1.86·W_in)·(Tg1 − Tg2));   W_out = W_in + W/G",
+      "D = √(4·Q_gas/(π·v·φ_libre));   V = Q_útil/(Ua·ΔT_ml);   L = V/A",
+      "ΔT_ml: paralelo (Tg1 − Ts1, Tg2 − Ts2);  contracorriente (Tg1 − Ts2, Tg2 − Ts1)",
+      "Ua = 0.5·G^0.67/D [Btu/(h·ft³·°F), G en lb/(h·ft²), D en ft] (Perry's)",
+      "Q_calentador = G·cp_h·(Tg1 − T_amb);   ṁ_comb = Q_calentador/(PCI·η)"
+    ]
+  },
+  "fuente": "Geankoplis, Transport Processes and Unit Operations, 3.ª ed. (Prentice Hall), Ejemplo 9.10-2 «Heat Balance on a Dryer» (solución reproducida en el Textbook Companion de FOSSEE).",
+  "planteamiento": "Secador continuo a contracorriente: 453.6 kg sólido seco/h, X de 0.04 a 0.002 kg/kg (base seca), cp sólido 1.465 kJ/(kg·K), sólido 26.7 → 62.8 °C, aire 93.3 → 37.8 °C con H = 0.010 a la entrada, sin pérdidas. El programa pide el aire ambiente: 25 °C con la HR que da H = 0.010."
+}

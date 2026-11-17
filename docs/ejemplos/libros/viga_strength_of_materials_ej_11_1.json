@@ -1,0 +1,162 @@
+{
+  "programa": "Calculadoras de Ingeniería RMR",
+  "version": "2.2.0",
+  "calculadora": "viga",
+  "fecha": "2026-11-13T17:40:43",
+  "proyecto": {
+    "proyecto": "Validación con ejercicios de libros de texto",
+    "cliente": "",
+    "documento": "viga_strength_of_materials_ej_11_1",
+    "revision": "",
+    "elaboro": "",
+    "reviso": "",
+    "aprobo": ""
+  },
+  "entradas": {
+    "tipo": "Simplemente apoyada (apoyos en x = 0 y x = L)",
+    "longitud": 10,
+    "carga_puntual": 0,
+    "posicion": 0,
+    "carga_distribuida": 2039.4324259558566,
+    "material": "Personalizado (capturar E)",
+    "modulo": 200,
+    "seccion": "Personalizada (I, c, A)",
+    "b": 0,
+    "h": 0,
+    "d": 0,
+    "t": 0,
+    "tf": 0,
+    "tw": 0,
+    "inercia": 35000,
+    "c": 200,
+    "area": 100,
+    "fabricacion": "Laminado (rolado)",
+    "ix_manual": 0,
+    "area_manual": 0,
+    "zx_manual": 0,
+    "sx_manual": 0,
+    "iy_manual": 0,
+    "j_manual": 0,
+    "cw_manual": 0,
+    "norma": "Ninguna (solo análisis elástico)",
+    "fy": 0,
+    "factor_carga": 0,
+    "soporte": "Solo en apoyos (sin soportes intermedios)",
+    "tramos": 2,
+    "esfuerzo_admisible": 0,
+    "limite_deflexion": 0
+  },
+  "resultado": {
+    "salidas": [
+      {
+        "clave": "reaccion_izq",
+        "etiqueta": "Reacción en x = 0",
+        "valor": 100.0,
+        "unidad": "kN",
+        "nivel": "V",
+        "nota": ""
+      },
+      {
+        "clave": "reaccion_der",
+        "etiqueta": "Reacción en x = L",
+        "valor": 100.0,
+        "unidad": "kN",
+        "nivel": "V",
+        "nota": ""
+      },
+      {
+        "clave": "modulo_e",
+        "etiqueta": "Módulo de elasticidad E",
+        "valor": 200.0,
+        "unidad": "GPa",
+        "nivel": "D",
+        "nota": ""
+      },
+      {
+        "clave": "inercia",
+        "etiqueta": "Momento de inercia I",
+        "valor": 35000.0,
+        "unidad": "cm⁴",
+        "nivel": "V",
+        "nota": ""
+      },
+      {
+        "clave": "modulo_seccion",
+        "etiqueta": "Módulo de sección S = I/c",
+        "valor": 1749.9999999999998,
+        "unidad": "cm³",
+        "nivel": "V",
+        "nota": ""
+      },
+      {
+        "clave": "cortante_max",
+        "etiqueta": "Cortante máximo",
+        "valor": 100.0,
+        "unidad": "kN",
+        "nivel": "V",
+        "nota": ""
+      },
+      {
+        "clave": "momento_max",
+        "etiqueta": "Momento flector máximo",
+        "valor": 250.0,
+        "unidad": "kN·m",
+        "nivel": "V",
+        "nota": ""
+      },
+      {
+        "clave": "x_momento_max",
+        "etiqueta": "Ubicación del momento máximo",
+        "valor": 5.0,
+        "unidad": "m",
+        "nivel": "V",
+        "nota": ""
+      },
+      {
+        "clave": "deflexion_max",
+        "etiqueta": "Deflexión máxima",
+        "valor": 37.20238095238095,
+        "unidad": "mm",
+        "nivel": "V",
+        "nota": ""
+      },
+      {
+        "clave": "x_deflexion_max",
+        "etiqueta": "Ubicación de la deflexión máxima",
+        "valor": 5.0,
+        "unidad": "m",
+        "nivel": "V",
+        "nota": ""
+      },
+      {
+        "clave": "esfuerzo_flexion",
+        "etiqueta": "Esfuerzo máximo de flexión σ = M·c/I",
+        "valor": 142.85714285714286,
+        "unidad": "MPa",
+        "nivel": "V",
+        "nota": ""
+      },
+      {
+        "clave": "esfuerzo_cortante",
+        "etiqueta": "Esfuerzo cortante máximo (aprox. según sección)",
+        "valor": 10.0,
+        "unidad": "MPa",
+        "nivel": "D",
+        "nota": ""
+      }
+    ],
+    "advertencias": [
+      "Sin revisión por norma: no se verifican pandeo lateral-torsional, pandeo local ni cortante del alma. Elija AISC 360-22 o NTC-DCEA para acero estructural."
+    ],
+    "notas": [],
+    "ecuaciones": [
+      "Voladizo, P en a: y(x) = P·x²(3a − x)/(6EI) para x ≤ a;  P·a²(3x − a)/(6EI) para x ≥ a",
+      "Voladizo, w: y(x) = w·x²(6L² − 4Lx + x²)/(24EI)",
+      "Simple, P en a (b = L − a): y(x) = P·b·x(L² − b² − x²)/(6·L·EI) para x ≤ a (simétrica para x > a)",
+      "Simple, w: y(x) = w·x(L³ − 2Lx² + x³)/(24EI)",
+      "σ = M·c/I;   τ_max = k·V/A (k = 1.5 rectangular, 4/3 circular, ≈2 tubo delgado; I: V/(h·tw))"
+    ]
+  },
+  "fuente": "Strength of Materials (libro abierto Engineering Mechanics OER), cap. 11 «Beam Deflection», Ejemplo 11.1.",
+  "planteamiento": "Viga simplemente apoyada, L = 10 m, w = 20 kN/m, E = 200 GPa, I = 350 × 10⁶ mm⁴ (= 35 000 cm⁴). La carga se captura en kg/m (20 000/9.80665). Sección personalizada; c y A solo afectan los esfuerzos."
+}
