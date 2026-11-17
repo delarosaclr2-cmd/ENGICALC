@@ -1,4 +1,4 @@
-# Calculadoras de Ingeniería RMR — versión 2.2.0
+# Calculadoras de Ingeniería RR — versión 2.2.0
 
 Plataforma de escritorio (Python + Tkinter) con 15 calculadoras de ingeniería auditadas, corregidas y (12 de 15) validadas contra ejemplos publicados de normas, manuales y libros de texto (ver `docs/INFORME_AUDITORIA.md`, secciones 7 y 8, y `docs/VALIDACION_CON_LIBROS.md`), un menú principal por disciplinas, esquemas ajustables de cada equipo, memoria de cálculo en PDF y Excel, y pruebas automáticas.
 
