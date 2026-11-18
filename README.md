@@ -4,6 +4,24 @@ Plataforma de escritorio (Python + Tkinter) con 15 calculadoras de ingeniería a
 
 > **Aviso.** Herramienta de apoyo para cálculos de ingeniería. Sus resultados no constituyen una memoria certificada ni sustituyen la revisión y firma de un ingeniero responsable. Cada resultado indica su nivel de confianza; los de nivel **O** provienen de criterios del programa original sin fuente y **no están validados**.
 
+## Revisión independiente de agitadores, bombas y ductos HVAC
+
+Las tres memorias nativas se revisan desde archivos independientes, sin cambios
+al menú principal. Abra y ejecute en su IDE el archivo correspondiente:
+
+- `revisar_agitadores.py`
+- `revisar_bombas.py`
+- `revisar_ductos_hvac.py`
+
+También puede ejecutar `py revisar_agitadores.py`, `py revisar_bombas.py` o
+`py revisar_ductos_hvac.py` desde la raíz del repositorio. Estas ventanas incluyen
+actualización automática, esquemas/curvas, captura SI/US, casos JSON y exportación
+PDF/Excel. El acceso usa la configuración de contraseña existente.
+
+Alcance y pruebas: [INTEGRACION_MEMORIAS.md](docs/INTEGRACION_MEMORIAS.md).
+Las referencias de equivalencia comprueban la migración del código; las curvas
+y coeficientes deben revisarse para cada proyecto.
+
 ## 1. Instalación (Windows)
 
 1. Instale Python 3.10 o superior desde python.org (marque «Add python.exe to PATH»). Tkinter ya viene incluido.

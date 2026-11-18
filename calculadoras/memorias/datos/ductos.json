@@ -1,0 +1,475 @@
+{
+  "state": {
+    "v": 4,
+    "mode": "design",
+    "units": {
+      "flow": "m3h",
+      "pressure": "Pa"
+    },
+    "method": "colebrook",
+    "air": {
+      "source": "site",
+      "alt": 2240,
+      "T": 20,
+      "rhoManual": 1.2,
+      "rhoCat": 1.2,
+      "correctComponents": true
+    },
+    "main": {
+      "id": "main",
+      "name": "Ducto principal",
+      "shape": "rect",
+      "D": 0.5,
+      "W": 0.6,
+      "H": 0.4,
+      "L": 15,
+      "eps": 9e-05,
+      "fittings": [
+        {
+          "type": "elbow90",
+          "qty": 2,
+          "K": 0.22
+        }
+      ]
+    },
+    "branches": [
+      {
+        "id": "A",
+        "name": "Ramal A",
+        "shape": "round",
+        "D": 0.355,
+        "W": 0.4,
+        "H": 0.3,
+        "L": 25,
+        "eps": 9e-05,
+        "Qd": 0.5555555555555556,
+        "fittings": [
+          {
+            "type": "tee",
+            "qty": 1,
+            "K": 1.1
+          },
+          {
+            "type": "elbow90",
+            "qty": 2,
+            "K": 0.22
+          },
+          {
+            "type": "damper",
+            "qty": 1,
+            "K": 0.6
+          },
+          {
+            "type": "diffuser",
+            "qty": 1,
+            "K": 3
+          }
+        ],
+        "parent": "main"
+      },
+      {
+        "id": "B",
+        "name": "Ramal B",
+        "shape": "round",
+        "D": 0.315,
+        "W": 0.35,
+        "H": 0.25,
+        "L": 15,
+        "eps": 9e-05,
+        "Qd": 0.4166666666666667,
+        "fittings": [
+          {
+            "type": "tee",
+            "qty": 1,
+            "K": 1.1
+          },
+          {
+            "type": "elbow90",
+            "qty": 1,
+            "K": 0.22
+          },
+          {
+            "type": "damper",
+            "qty": 1,
+            "K": 0.6
+          },
+          {
+            "type": "diffuser",
+            "qty": 1,
+            "K": 3
+          }
+        ],
+        "parent": "main"
+      },
+      {
+        "id": "C",
+        "name": "Ramal C",
+        "shape": "round",
+        "D": 0.28,
+        "W": 0.3,
+        "H": 0.2,
+        "L": 8,
+        "eps": 9e-05,
+        "Qd": 0.2777777777777778,
+        "fittings": [
+          {
+            "type": "tee",
+            "qty": 1,
+            "K": 1.1
+          },
+          {
+            "type": "elbow45",
+            "qty": 1,
+            "K": 0.13
+          },
+          {
+            "type": "damper",
+            "qty": 1,
+            "K": 0.6
+          },
+          {
+            "type": "grille",
+            "qty": 1,
+            "K": 3
+          }
+        ],
+        "parent": "main"
+      }
+    ],
+    "ahu": {
+      "Qnom": 1.25,
+      "comps": [
+        {
+          "id": "g4",
+          "name": "G4",
+          "enabled": true,
+          "n": 2,
+          "states": {
+            "clean": 60,
+            "medium": 85,
+            "dirty": 110
+          },
+          "state": "medium"
+        },
+        {
+          "id": "f9",
+          "name": "F9",
+          "enabled": true,
+          "n": 2,
+          "states": {
+            "clean": 120,
+            "medium": 170,
+            "dirty": 220
+          },
+          "state": "medium"
+        },
+        {
+          "id": "hepa",
+          "name": "HEPA",
+          "enabled": false,
+          "n": 2,
+          "dp": 250
+        },
+        {
+          "id": "cc",
+          "name": "Cooling coil",
+          "enabled": true,
+          "n": 2,
+          "dp": 120
+        },
+        {
+          "id": "hc",
+          "name": "Heating coil",
+          "enabled": true,
+          "n": 2,
+          "dp": 40
+        },
+        {
+          "id": "sil",
+          "name": "Silencer",
+          "enabled": true,
+          "n": 2,
+          "dp": 40
+        }
+      ]
+    },
+    "fan": {
+      "preset": "f450",
+      "f0": 60,
+      "n0": 1750,
+      "speed": 1,
+      "points": [
+        {
+          "Q": 0,
+          "dP": 900,
+          "eta": 0
+        },
+        {
+          "Q": 0.4166666666666667,
+          "dP": 950,
+          "eta": 0.45
+        },
+        {
+          "Q": 0.8333333333333334,
+          "dP": 940,
+          "eta": 0.66
+        },
+        {
+          "Q": 1.25,
+          "dP": 840,
+          "eta": 0.74
+        },
+        {
+          "Q": 1.6666666666666667,
+          "dP": 650,
+          "eta": 0.7
+        },
+        {
+          "Q": 2.0833333333333335,
+          "dP": 370,
+          "eta": 0.52
+        },
+        {
+          "Q": 2.5,
+          "dP": 0,
+          "eta": 0
+        }
+      ],
+      "pressureType": "total",
+      "efficiencyType": "total",
+      "outletArea": 0.24
+    },
+    "op": {
+      "Kbal": [
+        0,
+        0,
+        0
+      ]
+    },
+    "thresholds": {
+      "vMain": 8.9,
+      "vBranch": 7.1,
+      "minFlow": 0.9,
+      "pMargin": 0
+    },
+    "systemKind": "supply",
+    "sizing": {
+      "criterion": "velocity",
+      "velocity": 6,
+      "friction": 1,
+      "aspect": 2,
+      "rectStep": 0.05,
+      "roundSeries": "80,100,125,150,160,180,200,224,250,280,315,355,400,450,500,560,630,710,800,900,1000,1120,1250,1400,1600,1800,2000"
+    }
+  },
+  "fittings": {
+    "elbow90": {
+      "name": "Codo 90°",
+      "K": 0.22,
+      "status": "ok",
+      "src": "ASHRAE, Principles of HVAC 9.ª ed., suplemento «Fitting Loss Coefficients», accesorio 3-1: codo circular de radio suave, r/D = 1.0. Con r/D = 1.5 baja a 0.15; un codo a inglete sin álabes sube a 1.2."
+    },
+    "elbow45": {
+      "name": "Codo 45°",
+      "K": 0.13,
+      "status": "ok",
+      "src": "Codo 90° (0.22) por el factor de ángulo 0.60 para 45° del mismo accesorio 3-1 de ASHRAE."
+    },
+    "tee": {
+      "name": "Tee (derivación)",
+      "K": 1.1,
+      "status": "ok",
+      "src": "McGill AirFlow, Duct System Design Guide (2003), tabla 1.3: tee recta con flujo hacia el ramal y Vb/Vc ≈ 1 → 1.08, referido al ramal. ASHRAE (accesorio 5-10) da 1.2 a 1.6 y Engineering ToolBox 0.3: depende mucho de las relaciones de área y caudal."
+    },
+    "reducer": {
+      "name": "Reducción",
+      "K": 0.05,
+      "status": "unverified",
+      "src": "[No verificado] Contracción gradual (≤ 45°), referida a la sección menor. Valor recordado de ASHRAE SD4-1; Engineering ToolBox la toma como 0. Una contracción brusca ronda 0.5·(1 − A2/A1)."
+    },
+    "expansion": {
+      "name": "Expansión",
+      "K": 0.25,
+      "status": "formula",
+      "src": "Expansión brusca, Borda-Carnot: K = (1 − A1/A2)² referido a la sección menor. 0.25 corresponde a A2/A1 = 2. Una expansión gradual pierde menos."
+    },
+    "damper": {
+      "name": "Damper (abierto)",
+      "K": 0.6,
+      "status": "ok",
+      "src": "ASHRAE Handbook Fundamentals 2009 (SI), accesorio CD9-1: mariposa circular, D/D0 = 0.98, a 0°. Leído en una copia pública, no en el original. Las tablas de placa delgada dan cerca de 0.2."
+    },
+    "diffuser": {
+      "name": "Diffuser",
+      "K": 3,
+      "status": "unverified",
+      "src": "[No verificado] Orden de magnitud: los catálogos de difusores de techo suelen dar una presión total de 2 a 5 veces la presión dinámica del cuello. Sustitúyelo por K = ΔP de catálogo / Pv."
+    },
+    "grille": {
+      "name": "Grille",
+      "K": 3,
+      "status": "ok",
+      "src": "Engineering ToolBox, «Air Duct Components – Minor Dynamic Loss Coefficients»: rejilla con relación de área libre 0.7 → 3 (0.6 → 4; 0.5 → 6)."
+    }
+  },
+  "fanPresets": {
+    "f400": {
+      "name": "Ejemplo A · rodete Ø400",
+      "points": [
+        [
+          0,
+          710,
+          0
+        ],
+        [
+          1050,
+          750,
+          45
+        ],
+        [
+          2100,
+          740,
+          66
+        ],
+        [
+          3150,
+          665,
+          74
+        ],
+        [
+          4200,
+          515,
+          70
+        ],
+        [
+          5250,
+          290,
+          52
+        ],
+        [
+          6300,
+          0,
+          0
+        ]
+      ]
+    },
+    "f450": {
+      "name": "Ejemplo B · rodete Ø450",
+      "points": [
+        [
+          0,
+          900,
+          0
+        ],
+        [
+          1500,
+          950,
+          45
+        ],
+        [
+          3000,
+          940,
+          66
+        ],
+        [
+          4500,
+          840,
+          74
+        ],
+        [
+          6000,
+          650,
+          70
+        ],
+        [
+          7500,
+          370,
+          52
+        ],
+        [
+          9000,
+          0,
+          0
+        ]
+      ]
+    },
+    "f500": {
+      "name": "Ejemplo C · rodete Ø500",
+      "points": [
+        [
+          0,
+          1110,
+          0
+        ],
+        [
+          2050,
+          1175,
+          45
+        ],
+        [
+          4100,
+          1160,
+          66
+        ],
+        [
+          6150,
+          1035,
+          74
+        ],
+        [
+          8200,
+          800,
+          70
+        ],
+        [
+          10300,
+          455,
+          52
+        ],
+        [
+          12350,
+          0,
+          0
+        ]
+      ]
+    }
+  },
+  "damperTable": [
+    [
+      0,
+      0.6
+    ],
+    [
+      10,
+      0.85
+    ],
+    [
+      20,
+      1.7
+    ],
+    [
+      30,
+      4
+    ],
+    [
+      40,
+      9.4
+    ],
+    [
+      50,
+      24
+    ],
+    [
+      60,
+      67
+    ],
+    [
+      70,
+      215
+    ],
+    [
+      75,
+      400
+    ]
+  ]
+}
