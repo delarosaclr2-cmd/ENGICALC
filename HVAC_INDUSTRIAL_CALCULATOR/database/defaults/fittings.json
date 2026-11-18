@@ -1,0 +1,296 @@
+{
+  "_meta": {
+    "descripcion": "Biblioteca de accesorios. mode: 'formula' (coeficiente calculado con fórmula documentada), 'fixed' (K tabulado con fuente), 'user' (K obligatorio del usuario).",
+    "referencia": "Cada K se aplica con la velocidad de la sección de referencia indicada. Para tees y uniones complejas use ASHRAE Duct Fitting Database (coeficientes Cb/Cs en función de relaciones de caudal y área)."
+  },
+  "fittings": [
+    {
+      "id": "elbow90_RD1.0",
+      "name": "Codo 90° liso R/D = 1.0 (radio corto)",
+      "category": "Codos",
+      "mode": "formula",
+      "formula": "bend",
+      "params": {
+        "angle": 90,
+        "R_D": 1.0
+      },
+      "reference": "propia (tramo)",
+      "source": "Idelchik, Handbook of Hydraulic Resistance, Diagrama 6-1",
+      "status": "fórmula verificable"
+    },
+    {
+      "id": "elbow90_RD1.5",
+      "name": "Codo 90° liso R/D = 1.5",
+      "category": "Codos",
+      "mode": "formula",
+      "formula": "bend",
+      "params": {
+        "angle": 90,
+        "R_D": 1.5
+      },
+      "reference": "propia (tramo)",
+      "source": "Idelchik, Handbook of Hydraulic Resistance, Diagrama 6-1",
+      "status": "fórmula verificable"
+    },
+    {
+      "id": "elbow90_RD2.0",
+      "name": "Codo 90° liso R/D = 2.0 (radio largo)",
+      "category": "Codos",
+      "mode": "formula",
+      "formula": "bend",
+      "params": {
+        "angle": 90,
+        "R_D": 2.0
+      },
+      "reference": "propia (tramo)",
+      "source": "Idelchik, Handbook of Hydraulic Resistance, Diagrama 6-1",
+      "status": "fórmula verificable"
+    },
+    {
+      "id": "elbow90_RD2.5",
+      "name": "Codo 90° liso R/D = 2.5",
+      "category": "Codos",
+      "mode": "formula",
+      "formula": "bend",
+      "params": {
+        "angle": 90,
+        "R_D": 2.5
+      },
+      "reference": "propia (tramo)",
+      "source": "Idelchik, Handbook of Hydraulic Resistance, Diagrama 6-1",
+      "status": "fórmula verificable"
+    },
+    {
+      "id": "elbow45_RD1.5",
+      "name": "Codo 45° liso R/D = 1.5",
+      "category": "Codos",
+      "mode": "formula",
+      "formula": "bend",
+      "params": {
+        "angle": 45,
+        "R_D": 1.5
+      },
+      "reference": "propia (tramo)",
+      "source": "Idelchik, Handbook of Hydraulic Resistance, Diagrama 6-1",
+      "status": "fórmula verificable"
+    },
+    {
+      "id": "elbow45_RD2.0",
+      "name": "Codo 45° liso R/D = 2.0",
+      "category": "Codos",
+      "mode": "formula",
+      "formula": "bend",
+      "params": {
+        "angle": 45,
+        "R_D": 2.0
+      },
+      "reference": "propia (tramo)",
+      "source": "Idelchik, Handbook of Hydraulic Resistance, Diagrama 6-1",
+      "status": "fórmula verificable"
+    },
+    {
+      "id": "elbow_gored_user",
+      "name": "Codo segmentado (gajos) — K del usuario",
+      "category": "Codos",
+      "mode": "user",
+      "K": null,
+      "reference": "propia (tramo)",
+      "source": "Usar ASHRAE DFDB (CD3-9, CD3-10…) o ACGIH según número de gajos y R/D",
+      "status": "dato del usuario"
+    },
+    {
+      "id": "branch_entry_30",
+      "name": "Entrada de ramal a 30° (pérdida del ramal)",
+      "category": "Uniones",
+      "mode": "fixed",
+      "K": 0.18,
+      "reference": "ramal (tramo que llega a la unión)",
+      "source": "ACGIH, Industrial Ventilation Manual — pérdida de entrada de ramal (convención: K·VP del ramal, sin pérdida en el principal)",
+      "status": "verificar en edición vigente"
+    },
+    {
+      "id": "branch_entry_45",
+      "name": "Entrada de ramal a 45° (pérdida del ramal)",
+      "category": "Uniones",
+      "mode": "fixed",
+      "K": 0.28,
+      "reference": "ramal (tramo que llega a la unión)",
+      "source": "ACGIH, Industrial Ventilation Manual — pérdida de entrada de ramal",
+      "status": "verificar en edición vigente"
+    },
+    {
+      "id": "main_through",
+      "name": "Paso recto en unión (principal) — K del usuario",
+      "category": "Uniones",
+      "mode": "user",
+      "K": null,
+      "reference": "según fuente",
+      "source": "ACGIH considera nula la pérdida del principal; ASHRAE DFDB da Cs según relación de caudales",
+      "status": "dato del usuario"
+    },
+    {
+      "id": "tee_user",
+      "name": "Tee / derivación — K del usuario",
+      "category": "Uniones",
+      "mode": "user",
+      "K": null,
+      "reference": "según fuente (indicar área de referencia)",
+      "source": "ASHRAE Duct Fitting Database (coeficientes Cb/Cs)",
+      "status": "dato del usuario"
+    },
+    {
+      "id": "sudden_expansion",
+      "name": "Expansión brusca",
+      "category": "Transiciones",
+      "mode": "formula",
+      "formula": "sudden_expansion",
+      "params": {
+        "A_other_m2": null
+      },
+      "reference": "sección pequeña (aguas arriba)",
+      "source": "Borda-Carnot: K = (1 − A1/A2)²",
+      "status": "fórmula verificable"
+    },
+    {
+      "id": "sudden_contraction",
+      "name": "Contracción brusca",
+      "category": "Transiciones",
+      "mode": "formula",
+      "formula": "sudden_contraction",
+      "params": {
+        "A_other_m2": null
+      },
+      "reference": "sección pequeña",
+      "source": "Crane TP-410: K = 0.5·(1 − β²)",
+      "status": "fórmula verificable"
+    },
+    {
+      "id": "diffuser",
+      "name": "Expansión gradual (difusor cónico)",
+      "category": "Transiciones",
+      "mode": "formula",
+      "formula": "diffuser",
+      "params": {
+        "A_other_m2": null,
+        "theta": 30
+      },
+      "reference": "sección pequeña",
+      "source": "Crane TP-410 (fórmulas 3 y 4)",
+      "status": "fórmula verificable"
+    },
+    {
+      "id": "reducer",
+      "name": "Reducción gradual (cónica)",
+      "category": "Transiciones",
+      "mode": "formula",
+      "formula": "reducer",
+      "params": {
+        "A_other_m2": null,
+        "theta": 30
+      },
+      "reference": "sección pequeña",
+      "source": "Crane TP-410 (fórmulas 1 y 2)",
+      "status": "fórmula verificable"
+    },
+    {
+      "id": "transition_user",
+      "name": "Transición (rectangular-circular u otra) — K del usuario",
+      "category": "Transiciones",
+      "mode": "user",
+      "K": null,
+      "reference": "indicar",
+      "source": "ASHRAE DFDB / fabricante",
+      "status": "dato del usuario"
+    },
+    {
+      "id": "exit_free",
+      "name": "Descarga libre a la atmósfera (K = 1)",
+      "category": "Descargas",
+      "mode": "formula",
+      "formula": "exit",
+      "reference": "sección de salida",
+      "source": "Pérdida de la energía cinética no recuperada",
+      "status": "fórmula verificable"
+    },
+    {
+      "id": "stack_head_user",
+      "name": "Sombrerete / remate de chimenea — K del usuario",
+      "category": "Descargas",
+      "mode": "user",
+      "K": null,
+      "reference": "indicar",
+      "source": "Fabricante; ACGIH desaconseja sombreretes que desvían la descarga hacia abajo",
+      "status": "dato del usuario"
+    },
+    {
+      "id": "grille_user",
+      "name": "Rejilla — K del usuario",
+      "category": "Rejillas",
+      "mode": "user",
+      "K": null,
+      "reference": "área libre o de cara (indicar)",
+      "source": "Dato del fabricante",
+      "status": "dato del usuario"
+    },
+    {
+      "id": "damper_user",
+      "name": "Compuerta (abierta/parcial) — K del usuario",
+      "category": "Compuertas",
+      "mode": "user",
+      "K": null,
+      "reference": "propia",
+      "source": "Dato del fabricante según ángulo de apertura",
+      "status": "dato del usuario"
+    },
+    {
+      "id": "blast_gate_user",
+      "name": "Compuerta de guillotina (blast gate) — K del usuario",
+      "category": "Compuertas",
+      "mode": "user",
+      "K": null,
+      "reference": "propia",
+      "source": "Dato del fabricante según inserción",
+      "status": "dato del usuario"
+    },
+    {
+      "id": "valve_user",
+      "name": "Válvula — K del usuario",
+      "category": "Válvulas",
+      "mode": "user",
+      "K": null,
+      "reference": "propia",
+      "source": "Dato del fabricante",
+      "status": "dato del usuario"
+    },
+    {
+      "id": "entry_plain_duct",
+      "name": "Entrada: extremo de ducto liso (Ce = 0.72)",
+      "category": "Entradas",
+      "mode": "fixed",
+      "K": 0.93,
+      "reference": "ducto",
+      "source": "ACGIH: Ce = 0.72 → Fh = (1 − Ce²)/Ce²",
+      "status": "verificar en edición vigente"
+    },
+    {
+      "id": "entry_flanged_duct",
+      "name": "Entrada: extremo de ducto con brida (Ce = 0.82)",
+      "category": "Entradas",
+      "mode": "fixed",
+      "K": 0.49,
+      "reference": "ducto",
+      "source": "ACGIH: Ce = 0.82 → Fh = (1 − Ce²)/Ce²",
+      "status": "verificar en edición vigente"
+    },
+    {
+      "id": "entry_bellmouth",
+      "name": "Entrada: boca acampanada (Ce = 0.98)",
+      "category": "Entradas",
+      "mode": "fixed",
+      "K": 0.04,
+      "reference": "ducto",
+      "source": "ACGIH: Ce = 0.98 → Fh = (1 − Ce²)/Ce²",
+      "status": "verificar en edición vigente"
+    }
+  ]
+}

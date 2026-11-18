@@ -1,0 +1,47 @@
+{
+  "_meta": {
+    "descripcion": "Coeficientes de entrada de campana. Fh = (1 − Ce²)/Ce² referido a la presión de velocidad del ducto (o de la ranura para Fs)."
+  },
+  "entries": [
+    {
+      "id": "plain_duct_end",
+      "name": "Extremo de ducto liso",
+      "Ce": 0.72,
+      "Fh": 0.93,
+      "source": "ACGIH, Industrial Ventilation Manual (coeficientes de entrada)",
+      "status": "verificar en edición vigente"
+    },
+    {
+      "id": "flanged_duct_end",
+      "name": "Extremo de ducto con brida",
+      "Ce": 0.82,
+      "Fh": 0.49,
+      "source": "ACGIH, Industrial Ventilation Manual",
+      "status": "verificar en edición vigente"
+    },
+    {
+      "id": "bell_mouth",
+      "name": "Boca acampanada",
+      "Ce": 0.98,
+      "Fh": 0.04,
+      "source": "ACGIH, Industrial Ventilation Manual",
+      "status": "verificar en edición vigente"
+    },
+    {
+      "id": "sharp_orifice",
+      "name": "Orificio o ranura de arista viva",
+      "Ce": 0.6,
+      "Fh": 1.78,
+      "source": "ACGIH, Industrial Ventilation Manual (ranuras: Fs = 1.78)",
+      "status": "verificar en edición vigente"
+    },
+    {
+      "id": "custom",
+      "name": "Otro (Fh indicado por el usuario)",
+      "Ce": null,
+      "Fh": null,
+      "source": "Dato del usuario",
+      "status": "dato del usuario"
+    }
+  ]
+}

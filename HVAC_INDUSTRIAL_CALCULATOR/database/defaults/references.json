@@ -1,0 +1,172 @@
+{
+  "references": [
+    {
+      "id": "ACGIH",
+      "title": "ACGIH — Industrial Ventilation: A Manual of Recommended Practice for Design (edición vigente)",
+      "type": "Diseño",
+      "use": "Campanas, velocidades de captura y transporte, coeficientes de entrada, método de diseño de sistemas de extracción",
+      "access": "Publicación comercial (acgih.org)"
+    },
+    {
+      "id": "SMACNA_DD",
+      "title": "SMACNA — HVAC Systems Duct Design",
+      "type": "Diseño",
+      "use": "Diseño de ductos, pérdidas y accesorios",
+      "access": "Publicación comercial"
+    },
+    {
+      "id": "SMACNA_DCS",
+      "title": "SMACNA — HVAC Duct Construction Standards: Metal and Flexible",
+      "type": "Construcción",
+      "use": "Calibres, refuerzos, uniones, soportería de ductos",
+      "access": "Publicación comercial"
+    },
+    {
+      "id": "ASHRAE_F",
+      "title": "ASHRAE Handbook—Fundamentals (cap. 1 Psychrometrics; cap. Duct Design)",
+      "type": "Diseño / propiedades",
+      "use": "Propiedades del aire, atmósfera estándar, fricción, diámetro equivalente, coeficientes de accesorios",
+      "access": "Publicación comercial (ashrae.org)"
+    },
+    {
+      "id": "ASHRAE_SE",
+      "title": "ASHRAE Handbook—HVAC Systems and Equipment (cap. Fans)",
+      "type": "Diseño",
+      "use": "Leyes de ventiladores, selección y efectos del sistema",
+      "access": "Publicación comercial"
+    },
+    {
+      "id": "ASHRAE_APP",
+      "title": "ASHRAE Handbook—HVAC Applications (cap. Building Air Intake and Exhaust Design; Industrial Local Exhaust)",
+      "type": "Diseño",
+      "use": "Velocidad de descarga de chimeneas, reingreso de contaminantes",
+      "access": "Publicación comercial"
+    },
+    {
+      "id": "ASHRAE_621",
+      "title": "ANSI/ASHRAE Standard 62.1 — Ventilation and Acceptable Indoor Air Quality",
+      "type": "Norma de diseño",
+      "use": "Caudal de aire exterior por ocupación (Rp, Ra, Ez)",
+      "access": "Norma comercial"
+    },
+    {
+      "id": "ASHRAE_DFDB",
+      "title": "ASHRAE Duct Fitting Database",
+      "type": "Diseño",
+      "use": "Coeficientes de pérdida de accesorios (Cb, Cs, codos segmentados, transiciones)",
+      "access": "Software comercial"
+    },
+    {
+      "id": "AMCA210",
+      "title": "ANSI/AMCA 210 – ANSI/ASHRAE 51: Laboratory Methods of Testing Fans for Certified Aerodynamic Performance Rating",
+      "type": "Método de ensayo",
+      "use": "Definición de presión total/estática del ventilador, eficiencia, curvas certificadas",
+      "access": "Norma comercial"
+    },
+    {
+      "id": "AMCA99",
+      "title": "AMCA Publication 99 — Standards Handbook",
+      "type": "Referencia de ventiladores",
+      "use": "Leyes de semejanza, terminología, convenciones",
+      "access": "Publicación comercial"
+    },
+    {
+      "id": "AMCA201",
+      "title": "AMCA Publication 201 — Fans and Systems",
+      "type": "Aplicación",
+      "use": "Efecto del sistema (conexiones de entrada y salida del ventilador)",
+      "access": "Publicación comercial"
+    },
+    {
+      "id": "AMCA203",
+      "title": "AMCA Publication 203 — Field Performance Measurement of Fan Systems",
+      "type": "Aplicación / medición",
+      "use": "Pérdidas de transmisión, mediciones en campo",
+      "access": "Publicación comercial"
+    },
+    {
+      "id": "AMCA500",
+      "title": "ANSI/AMCA 500 — Test Methods for Louvers, Dampers and Shutters",
+      "type": "Método de ensayo",
+      "use": "Pérdida de presión de compuertas y persianas",
+      "access": "Norma comercial"
+    },
+    {
+      "id": "IEC60072",
+      "title": "IEC 60072-1 — Dimensions and output series for rotating electrical machines",
+      "type": "Norma de producto",
+      "use": "Serie de potencias normalizadas de motores",
+      "access": "Norma comercial"
+    },
+    {
+      "id": "IEC60034",
+      "title": "IEC 60034-30-1 — Efficiency classes of line operated AC motors (IE code)",
+      "type": "Norma de producto",
+      "use": "Eficiencia mínima de motores por clase IE",
+      "access": "Norma comercial"
+    },
+    {
+      "id": "NOM010",
+      "title": "NOM-010-STPS-2014 — Agentes químicos contaminantes del ambiente laboral",
+      "type": "Normativa mexicana",
+      "use": "Valores límite de exposición (VLE) para definir concentraciones objetivo",
+      "access": "DOF (gratuita)"
+    },
+    {
+      "id": "Z95",
+      "title": "ANSI/AIHA Z9.5 — Laboratory Ventilation",
+      "type": "Norma de diseño",
+      "use": "Altura mínima de chimenea y velocidad de descarga en laboratorios",
+      "access": "Norma comercial"
+    },
+    {
+      "id": "Idelchik",
+      "title": "Idelchik, I. E. — Handbook of Hydraulic Resistance",
+      "type": "Texto técnico",
+      "use": "Coeficientes de codos y accesorios",
+      "access": "Libro"
+    },
+    {
+      "id": "Crane",
+      "title": "Crane Co. — Flow of Fluids Through Valves, Fittings and Pipe (Technical Paper 410)",
+      "type": "Texto técnico",
+      "use": "Reducciones y expansiones",
+      "access": "Libro"
+    },
+    {
+      "id": "White",
+      "title": "White, F. M. — Fluid Mechanics; Viscous Fluid Flow",
+      "type": "Texto técnico",
+      "use": "Rugosidades, Colebrook, ley de Sutherland",
+      "access": "Libro"
+    },
+    {
+      "id": "Colebrook",
+      "title": "Colebrook, C. F. (1939) J. Inst. Civil Engineers 11:133-156",
+      "type": "Artículo",
+      "use": "Factor de fricción turbulento",
+      "access": "Artículo"
+    },
+    {
+      "id": "SwameeJain",
+      "title": "Swamee, P. K.; Jain, A. K. (1976) J. Hydraulics Division ASCE 102(5)",
+      "type": "Artículo",
+      "use": "Factor de fricción explícito",
+      "access": "Artículo"
+    },
+    {
+      "id": "Churchill",
+      "title": "Churchill, S. W. (1977) Chemical Engineering 84(24):91-92",
+      "type": "Artículo",
+      "use": "Factor de fricción en todos los regímenes",
+      "access": "Artículo"
+    },
+    {
+      "id": "HylandWexler",
+      "title": "Hyland, R. W.; Wexler, A. (1983) ASHRAE Transactions 89(2A)",
+      "type": "Artículo",
+      "use": "Presión de saturación del vapor",
+      "access": "Artículo"
+    }
+  ]
+}

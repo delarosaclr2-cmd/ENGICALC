@@ -1,0 +1,53 @@
+{
+  "_meta": {
+    "descripcion": "Rangos de velocidad de captura (ACGIH). Usar el extremo bajo con corrientes de aire favorables, contaminantes de baja toxicidad, producción intermitente o campana grande; el extremo alto con corrientes perturbadoras, alta toxicidad, alta producción o campana pequeña.",
+    "fuente": "ACGIH, Industrial Ventilation Manual (tabla de velocidades de captura)",
+    "advertencia": "Verificar en la edición vigente."
+  },
+  "ranges": [
+    {
+      "id": "no_velocity",
+      "condition": "Liberación prácticamente sin velocidad en aire tranquilo",
+      "examples": "Evaporación desde tanques, desengrase",
+      "v_min_m_s": 0.25,
+      "v_max_m_s": 0.5,
+      "fpm": [
+        50,
+        100
+      ]
+    },
+    {
+      "id": "low_velocity",
+      "condition": "Liberación a baja velocidad en aire moderadamente quieto",
+      "examples": "Cabinas de pintura, llenado intermitente de recipientes, transferencias de banda a baja velocidad, soldadura, electrodeposición, decapado",
+      "v_min_m_s": 0.5,
+      "v_max_m_s": 1.0,
+      "fpm": [
+        100,
+        200
+      ]
+    },
+    {
+      "id": "active",
+      "condition": "Generación activa en zona de movimiento rápido de aire",
+      "examples": "Pintura por aspersión en cabinas poco profundas, llenado de barriles, carga de transportadores, trituradoras",
+      "v_min_m_s": 1.0,
+      "v_max_m_s": 2.5,
+      "fpm": [
+        200,
+        500
+      ]
+    },
+    {
+      "id": "high_velocity",
+      "condition": "Liberación a alta velocidad inicial en zona de movimiento muy rápido",
+      "examples": "Esmerilado, chorro abrasivo, desbaste",
+      "v_min_m_s": 2.5,
+      "v_max_m_s": 10.0,
+      "fpm": [
+        500,
+        2000
+      ]
+    }
+  ]
+}

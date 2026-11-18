@@ -1,0 +1,184 @@
+{
+  "_meta": {
+    "descripcion": "Configuración y criterios de evaluación. Cada criterio declara su base: 'física' (resultado imposible), 'referencia' (fuente técnica citada) o 'hipótesis' (criterio del proyecto, configurable). Las alertas CRÍTICAS solo se emiten con base física o referencia.",
+    "version": 1
+  },
+  "app": {
+    "default_units": "SI",
+    "autosave_minutes": 3,
+    "recent_files_max": 8,
+    "flow_unit_SI": "m³/h"
+  },
+  "solver": {
+    "friction_method": "colebrook",
+    "network_tolerance": 1e-06,
+    "max_iterations": 400,
+    "balance_strategy": "acgih",
+    "force_flow_increase": false,
+    "diameter_rounding": "down",
+    "system_curve_points": 25
+  },
+  "criteria": {
+    "p_altitude_tolerance_pct": {
+      "value": 5.0,
+      "unit": "%",
+      "basis": "hipótesis",
+      "source": "Variación barométrica meteorológica típica; hipótesis del proyecto (configurable, no normativo)",
+      "level": "MEDIO"
+    },
+    "density_measured_tolerance_pct": {
+      "value": 2.0,
+      "unit": "%",
+      "basis": "hipótesis",
+      "source": "hipótesis del proyecto (configurable, no normativo)",
+      "level": "ALTO"
+    },
+    "imbalance_ignore_pct": {
+      "value": 5.0,
+      "unit": "%",
+      "basis": "referencia",
+      "source": "Práctica de equilibrado por diseño (ACGIH): diferencias pequeñas se aceptan; verificar umbral en la edición vigente",
+      "level": "INFO"
+    },
+    "imbalance_flow_increase_max_pct": {
+      "value": 20.0,
+      "unit": "%",
+      "basis": "referencia",
+      "source": "Práctica de equilibrado por diseño asociada al método ACGIH (aumentar caudal hasta este límite; por encima, rediseñar). Verificar en la edición vigente",
+      "level": "ALTO"
+    },
+    "velocity_over_range_pct": {
+      "value": 25.0,
+      "unit": "%",
+      "basis": "hipótesis",
+      "source": "Exceso sobre el límite superior del rango de diseño de la clase de contaminante; hipótesis del proyecto (configurable, no normativo)",
+      "level": "MEDIO"
+    },
+    "transport_density_correction": {
+      "value": true,
+      "unit": "-",
+      "basis": "referencia",
+      "source": "ACGIH 31.ª ed., ec. 5.1: V_min,corr = V_min/√df",
+      "level": "ALTO"
+    },
+    "stack_exit_velocity_min_m_s": {
+      "value": 10.16,
+      "unit": "m/s",
+      "basis": "referencia",
+      "source": "ASHRAE Handbook—HVAC Applications (2019), cap. 46: mantener la velocidad de descarga sobre 2000 fpm",
+      "level": "MEDIO"
+    },
+    "stack_exit_velocity_noise_m_s": {
+      "value": 15.24,
+      "unit": "m/s",
+      "basis": "referencia",
+      "source": "ASHRAE HVAC Applications (2019), cap. 46: sobre 3000–4000 fpm ruido, vibración y energía son relevantes",
+      "level": "BAJO"
+    },
+    "stack_height_min_m": {
+      "value": 3.05,
+      "unit": "m",
+      "basis": "referencia",
+      "source": "ANSI/AIHA Z9.5 (laboratorios): mínimo 10 ft sobre la cubierta para proteger a trabajadores; no garantiza evitar reingreso",
+      "level": "MEDIO"
+    },
+    "fan_stall_margin_pct": {
+      "value": 10.0,
+      "unit": "%",
+      "basis": "hipótesis",
+      "source": "Distancia mínima entre el caudal de operación y el caudal de presión máxima (zona de pendiente positiva). hipótesis del proyecto (configurable, no normativo); prevalece el rango del fabricante",
+      "level": "ALTO"
+    },
+    "fan_eta_ratio_min": {
+      "value": 0.9,
+      "unit": "-",
+      "basis": "hipótesis",
+      "source": "η_operación/η_máx mínima cuando el fabricante no publica rango recomendado. hipótesis del proyecto (configurable, no normativo)",
+      "level": "MEDIO"
+    },
+    "fan_low_efficiency": {
+      "value": 0.5,
+      "unit": "-",
+      "basis": "hipótesis",
+      "source": "hipótesis del proyecto (configurable, no normativo)",
+      "level": "MEDIO"
+    },
+    "fan_pressure_margin_pct": {
+      "value": 0.0,
+      "unit": "%",
+      "basis": "hipótesis",
+      "source": "Margen sobre la presión del sistema exigido al ventilador; hipótesis del proyecto (configurable, no normativo)",
+      "level": "MEDIO"
+    },
+    "flow_deficit_tolerance_pct": {
+      "value": 5.0,
+      "unit": "%",
+      "basis": "hipótesis",
+      "source": "Déficit de caudal admisible en una campana en operación frente al requerido; hipótesis del proyecto (configurable, no normativo)",
+      "level": "ALTO"
+    },
+    "motor_design_margin_pct": {
+      "value": 10.0,
+      "unit": "%",
+      "basis": "hipótesis",
+      "source": "Margen de selección de motor aplicado una sola vez; hipótesis del proyecto (configurable, no normativo)",
+      "level": "INFO"
+    },
+    "hood_x_over_d_max": {
+      "value": 1.5,
+      "unit": "-",
+      "basis": "referencia",
+      "source": "Validez de la ecuación de DallaValle (ACGIH): X ≤ 1.5·D",
+      "level": "MEDIO"
+    },
+    "hood_slot_aspect_max": {
+      "value": 0.2,
+      "unit": "-",
+      "basis": "referencia",
+      "source": "ACGIH: ranura si W/L ≤ 0.2",
+      "level": "MEDIO"
+    },
+    "cross_draft_ratio_max": {
+      "value": 0.5,
+      "unit": "-",
+      "basis": "hipótesis",
+      "source": "Corriente cruzada / velocidad de captura; hipótesis del proyecto (configurable, no normativo)",
+      "level": "MEDIO"
+    },
+    "condensation_margin_K": {
+      "value": 2.0,
+      "unit": "K",
+      "basis": "hipótesis",
+      "source": "Margen entre la temperatura superficial mínima del ducto y el punto de rocío del aire transportado; hipótesis del proyecto (configurable, no normativo)",
+      "level": "MEDIO"
+    },
+    "rect_aspect_max": {
+      "value": 4.0,
+      "unit": "-",
+      "basis": "hipótesis",
+      "source": "Relación de aspecto máxima recomendada por economía y fricción; hipótesis del proyecto (configurable, no normativo)",
+      "level": "BAJO"
+    },
+    "fitting_loss_share_max_pct": {
+      "value": 30.0,
+      "unit": "%",
+      "basis": "hipótesis",
+      "source": "Participación máxima de un solo componente local en la pérdida total; hipótesis del proyecto (configurable, no normativo)",
+      "level": "BAJO"
+    }
+  },
+  "comparator_weights": {
+    "energy": 0.3,
+    "performance": 0.25,
+    "risk": 0.25,
+    "installation": 0.1,
+    "maintenance": 0.1,
+    "_nota": "Pesos del comparador multicriterio (suman 1). Las alternativas con alertas CRÍTICAS o déficit de caudal quedan no elegibles antes de puntuar."
+  },
+  "report": {
+    "company": "",
+    "logo_path": "",
+    "include_traces": true,
+    "include_ip_equivalents": true
+  }
+}
