@@ -1,0 +1,1031 @@
+{
+  "inputs": {
+    "orient": "vertical",
+    "fluido": "newton",
+    "T": 3,
+    "Htk": 3.3,
+    "H": 3,
+    "D": 1.05,
+    "C": 1,
+    "Vov": 0,
+    "nb": 4,
+    "Wb": 0.25,
+    "thH": 10,
+    "thV": 7.5,
+    "rho": 1000,
+    "mu": 0.001,
+    "N": 60,
+    "Top": 45,
+    "imp": "rushton",
+    "manNp": false,
+    "Np": 5.5,
+    "Nq": 0.72,
+    "chkSol": false,
+    "dp": 0.00025,
+    "rhos": 2500,
+    "Xs": 10,
+    "Sz": 6.7,
+    "Cm": 3.5,
+    "ca": 1.18,
+    "cb": 2.42,
+    "cavMod": "ww",
+    "alp": 0.4,
+    "fs": 1.25,
+    "eta": 0.95,
+    "freq": "60",
+    "nmot": "1750",
+    "Lsh": 3.1,
+    "mimp": 45,
+    "mat": "m1045",
+    "autoD": true,
+    "dsel": 0.11,
+    "fh": 0.1,
+    "Sy": 310000000,
+    "Su": 565000000,
+    "Emod": 200000000000,
+    "rhom": 7850,
+    "Km": 1.5,
+    "Kt": 1,
+    "ndef": 1000,
+    "kadd": 0.9,
+    "chkKey": true,
+    "chkMot": true,
+    "chkBuo": true,
+    "fac": 1.5
+  },
+  "fields": [
+    {
+      "id": "orient",
+      "label": "Orientación Vertical (superior) Horizontal (lateral)",
+      "group": "Configuración",
+      "type": "select-one",
+      "quantity": "",
+      "unit": "",
+      "options": [
+        [
+          "vertical",
+          "Vertical (superior)"
+        ],
+        [
+          "horizontal",
+          "Horizontal (lateral)"
+        ]
+      ],
+      "min": null,
+      "max": null
+    },
+    {
+      "id": "fluido",
+      "label": "Tipo de fluido Newtoniano Suspensión fibrosa",
+      "group": "Configuración",
+      "type": "select-one",
+      "quantity": "",
+      "unit": "",
+      "options": [
+        [
+          "newton",
+          "Newtoniano"
+        ],
+        [
+          "fibra",
+          "Suspensión fibrosa"
+        ]
+      ],
+      "min": null,
+      "max": null
+    },
+    {
+      "id": "T",
+      "label": "Ø interior del tanque, T",
+      "group": "Geometría del tanque",
+      "type": "number",
+      "quantity": "len",
+      "unit": "m",
+      "options": [],
+      "min": 0.01,
+      "max": null
+    },
+    {
+      "id": "Htk",
+      "label": "Altura total del tanque, Ht",
+      "group": "Geometría del tanque",
+      "type": "number",
+      "quantity": "len",
+      "unit": "m",
+      "options": [],
+      "min": 0.01,
+      "max": null
+    },
+    {
+      "id": "H",
+      "label": "Nivel de operación del líquido, H",
+      "group": "Geometría del tanque",
+      "type": "number",
+      "quantity": "len",
+      "unit": "m",
+      "options": [],
+      "min": 0.01,
+      "max": null
+    },
+    {
+      "id": "D",
+      "label": "Ø del impulsor, D",
+      "group": "Geometría del tanque",
+      "type": "number",
+      "quantity": "len",
+      "unit": "m",
+      "options": [],
+      "min": 0.005,
+      "max": null
+    },
+    {
+      "id": "C",
+      "label": "Altura del impulsor sobre el fondo, C",
+      "group": "Geometría del tanque",
+      "type": "number",
+      "quantity": "len",
+      "unit": "m",
+      "options": [],
+      "min": 0,
+      "max": null
+    },
+    {
+      "id": "Vov",
+      "label": "Volumen de operación (0 = calcular)",
+      "group": "Geometría del tanque",
+      "type": "number",
+      "quantity": "",
+      "unit": "m³",
+      "options": [],
+      "min": 0,
+      "max": null
+    },
+    {
+      "id": "nb",
+      "label": "Número de baffles (mamparas)",
+      "group": "Geometría del tanque",
+      "type": "number",
+      "quantity": "",
+      "unit": "",
+      "options": [],
+      "min": 0,
+      "max": 8
+    },
+    {
+      "id": "Wb",
+      "label": "Ancho de baffle, Wb (≈T/12)",
+      "group": "Geometría del tanque",
+      "type": "number",
+      "quantity": "len",
+      "unit": "m",
+      "options": [],
+      "min": 0,
+      "max": null
+    },
+    {
+      "id": "thH",
+      "label": "Ángulo de desplazamiento horizontal, θh",
+      "group": "Geometría del tanque",
+      "type": "number",
+      "quantity": "",
+      "unit": "°",
+      "options": [],
+      "min": 0,
+      "max": 45
+    },
+    {
+      "id": "thV",
+      "label": "Ángulo de inclinación vertical, θv",
+      "group": "Geometría del tanque",
+      "type": "number",
+      "quantity": "",
+      "unit": "°",
+      "options": [],
+      "min": 0,
+      "max": 45
+    },
+    {
+      "id": "rho",
+      "label": "Densidad del fluido, ρ",
+      "group": "Fluido y operación",
+      "type": "number",
+      "quantity": "dens",
+      "unit": "kg/m³",
+      "options": [],
+      "min": 0.1,
+      "max": null
+    },
+    {
+      "id": "mu",
+      "label": "Viscosidad dinámica, μ",
+      "group": "Fluido y operación",
+      "type": "number",
+      "quantity": "visc",
+      "unit": "Pa·s",
+      "options": [],
+      "min": 1e-09,
+      "max": null
+    },
+    {
+      "id": "N",
+      "label": "Velocidad de giro del impulsor, N",
+      "group": "Fluido y operación",
+      "type": "number",
+      "quantity": "",
+      "unit": "rpm",
+      "options": [],
+      "min": 0.01,
+      "max": null
+    },
+    {
+      "id": "Top",
+      "label": "Temperatura de operación (informativa)",
+      "group": "Fluido y operación",
+      "type": "number",
+      "quantity": "",
+      "unit": "°C",
+      "options": [],
+      "min": null,
+      "max": null
+    },
+    {
+      "id": "imp",
+      "label": "Tipo de impulsor",
+      "group": "Selección del impulsor",
+      "type": "select-one",
+      "quantity": "",
+      "unit": "",
+      "options": [
+        [
+          "rushton",
+          "Turbina Rushton — disco con 6 palas planas (radial)"
+        ],
+        [
+          "pbt45",
+          "Turbina de palas inclinadas 45° — 4 palas (axial)"
+        ],
+        [
+          "hydro",
+          "Hidrofoil de alta eficiencia — 3 palas (axial)"
+        ],
+        [
+          "prop",
+          "Hélice marina — 3 palas, paso 1.0 (axial)"
+        ],
+        [
+          "anchor",
+          "Ancla (proximidad — régimen laminar/viscoso)"
+        ],
+        [
+          "helical",
+          "Listón helicoidal (helical ribbon — régimen laminar)"
+        ]
+      ],
+      "min": null,
+      "max": null
+    },
+    {
+      "id": "manNp",
+      "label": "Capturar coeficientes manualmente",
+      "group": "Selección del impulsor",
+      "type": "checkbox",
+      "quantity": "",
+      "unit": "",
+      "options": [],
+      "min": null,
+      "max": null
+    },
+    {
+      "id": "Np",
+      "label": "Número de potencia, Np",
+      "group": "Selección del impulsor",
+      "type": "number",
+      "quantity": "",
+      "unit": "",
+      "options": [],
+      "min": 0.001,
+      "max": null
+    },
+    {
+      "id": "Nq",
+      "label": "Número de flujo (bombeo), Nq",
+      "group": "Selección del impulsor",
+      "type": "number",
+      "quantity": "",
+      "unit": "",
+      "options": [],
+      "min": 0.001,
+      "max": null
+    },
+    {
+      "id": "chkSol",
+      "label": "Incluir sólidos particulados en suspensión",
+      "group": "Suspensión de sólidos",
+      "type": "checkbox",
+      "quantity": "",
+      "unit": "",
+      "options": [],
+      "min": null,
+      "max": null
+    },
+    {
+      "id": "dp",
+      "label": "Ø de partícula (medio), dp",
+      "group": "Suspensión de sólidos",
+      "type": "number",
+      "quantity": "lenS",
+      "unit": "mm",
+      "options": [],
+      "min": 1e-09,
+      "max": null
+    },
+    {
+      "id": "rhos",
+      "label": "Densidad del sólido, ρs",
+      "group": "Suspensión de sólidos",
+      "type": "number",
+      "quantity": "dens",
+      "unit": "kg/m³",
+      "options": [],
+      "min": 0.1,
+      "max": null
+    },
+    {
+      "id": "Xs",
+      "label": "Carga de sólidos, X (kg sólido /100 kg líquido)",
+      "group": "Suspensión de sólidos",
+      "type": "number",
+      "quantity": "",
+      "unit": "",
+      "options": [],
+      "min": 0.001,
+      "max": null
+    },
+    {
+      "id": "Sz",
+      "label": "Constante de Zwietering, S ref.",
+      "group": "Suspensión de sólidos",
+      "type": "number",
+      "quantity": "",
+      "unit": "",
+      "options": [],
+      "min": 0.1,
+      "max": null
+    },
+    {
+      "id": "Cm",
+      "label": "Consistencia (fibra en peso), Cm",
+      "group": "Suspensión fibrosa",
+      "type": "number",
+      "quantity": "",
+      "unit": "",
+      "options": [],
+      "min": 0.01,
+      "max": 20
+    },
+    {
+      "id": "ca",
+      "label": "Coeficiente a de τy=a·Cmb ref.",
+      "group": "Suspensión fibrosa",
+      "type": "number",
+      "quantity": "",
+      "unit": "",
+      "options": [],
+      "min": 0.001,
+      "max": null
+    },
+    {
+      "id": "cb",
+      "label": "Exponente b de τy=a·Cmb ref.",
+      "group": "Suspensión fibrosa",
+      "type": "number",
+      "quantity": "",
+      "unit": "",
+      "options": [],
+      "min": 0.1,
+      "max": null
+    },
+    {
+      "id": "cavMod",
+      "label": "Modelo de geometría de caverna",
+      "group": "Suspensión fibrosa",
+      "type": "select-one",
+      "quantity": "",
+      "unit": "",
+      "options": [
+        [
+          "ww",
+          "Wichterle–Wein — caverna esférica/toroidal, D_c/D = 0.3·(N_p·Re_y)^½"
+        ],
+        [
+          "cil",
+          "Solomon–Elson–Nienow — caverna cilíndrica, (D_c/D)³ = 4N_p·Re_y/(π²·α)"
+        ]
+      ],
+      "min": null,
+      "max": null
+    },
+    {
+      "id": "alp",
+      "label": "Relación de aspecto de la caverna, α = Hc/Dc ref.",
+      "group": "Suspensión fibrosa",
+      "type": "number",
+      "quantity": "",
+      "unit": "",
+      "options": [],
+      "min": 0.05,
+      "max": 2
+    },
+    {
+      "id": "fs",
+      "label": "Factor de servicio de proceso, fs (1.15–1.5)",
+      "group": "Motor y reductor",
+      "type": "number",
+      "quantity": "",
+      "unit": "",
+      "options": [],
+      "min": 1,
+      "max": 3
+    },
+    {
+      "id": "eta",
+      "label": "Eficiencia del reductor, η",
+      "group": "Motor y reductor",
+      "type": "number",
+      "quantity": "",
+      "unit": "",
+      "options": [],
+      "min": 0.3,
+      "max": 1
+    },
+    {
+      "id": "freq",
+      "label": "Frecuencia de red",
+      "group": "Motor y reductor",
+      "type": "select-one",
+      "quantity": "",
+      "unit": "",
+      "options": [
+        [
+          "60",
+          "60 Hz"
+        ],
+        [
+          "50",
+          "50 Hz"
+        ]
+      ],
+      "min": null,
+      "max": null
+    },
+    {
+      "id": "nmot",
+      "label": "Velocidad del motor (plena carga)",
+      "group": "Motor y reductor",
+      "type": "select-one",
+      "quantity": "",
+      "unit": "rpm",
+      "options": [
+        [
+          "3550",
+          "3550 rpm"
+        ],
+        [
+          "1750",
+          "1750 rpm"
+        ],
+        [
+          "1160",
+          "1160 rpm"
+        ],
+        [
+          "870",
+          "870 rpm"
+        ],
+        [
+          "690",
+          "690 rpm"
+        ],
+        [
+          "575",
+          "575 rpm"
+        ]
+      ],
+      "min": null,
+      "max": null
+    },
+    {
+      "id": "Lsh",
+      "label": "Longitud libre de flecha (voladizo desde el cabezal), L",
+      "group": "Flecha de agitación",
+      "type": "number",
+      "quantity": "len",
+      "unit": "m",
+      "options": [],
+      "min": 0.05,
+      "max": null
+    },
+    {
+      "id": "mimp",
+      "label": "Masa del impulsor (o suma de impulsores), mi",
+      "group": "Flecha de agitación",
+      "type": "number",
+      "quantity": "mass",
+      "unit": "kg",
+      "options": [],
+      "min": 0,
+      "max": null
+    },
+    {
+      "id": "mat",
+      "label": "Material de la flecha",
+      "group": "Flecha de agitación",
+      "type": "select-one",
+      "quantity": "",
+      "unit": "",
+      "options": [
+        [
+          "m1045",
+          "AISI 1045 — normalizado"
+        ],
+        [
+          "m4140",
+          "AISI 4140 — temple y revenido"
+        ],
+        [
+          "m316",
+          "Acero inoxidable AISI 316 / 316L — recocido"
+        ],
+        [
+          "m2205",
+          "Acero dúplex 2205 (UNS S32205)"
+        ],
+        [
+          "mti2",
+          "Titanio Grado 2 (ASTM B348)"
+        ],
+        [
+          "mcust",
+          "Personalizado — capturar S y, S u, E, ρ"
+        ]
+      ],
+      "min": null,
+      "max": null
+    },
+    {
+      "id": "autoD",
+      "label": "Adoptar automáticamente el Ø comercial siguiente",
+      "group": "Flecha de agitación",
+      "type": "checkbox",
+      "quantity": "",
+      "unit": "",
+      "options": [],
+      "min": null,
+      "max": null
+    },
+    {
+      "id": "dsel",
+      "label": "Ø de flecha adoptado, d",
+      "group": "Flecha de agitación",
+      "type": "number",
+      "quantity": "lenS",
+      "unit": "mm",
+      "options": [],
+      "min": 0.001,
+      "max": null
+    },
+    {
+      "id": "fh",
+      "label": "Fracción de carga hidráulica radial, fh ref.",
+      "group": "Flecha de agitación",
+      "type": "number",
+      "quantity": "",
+      "unit": "",
+      "options": [],
+      "min": 0.005,
+      "max": 1
+    },
+    {
+      "id": "Sy",
+      "label": "Esfuerzo de cedencia, Sy ref.",
+      "group": "Flecha de agitación",
+      "type": "number",
+      "quantity": "str",
+      "unit": "MPa",
+      "options": [],
+      "min": 1000000,
+      "max": null
+    },
+    {
+      "id": "Su",
+      "label": "Resistencia última, Su ref.",
+      "group": "Flecha de agitación",
+      "type": "number",
+      "quantity": "str",
+      "unit": "MPa",
+      "options": [],
+      "min": 1000000,
+      "max": null
+    },
+    {
+      "id": "Emod",
+      "label": "Módulo de elasticidad, E",
+      "group": "Flecha de agitación",
+      "type": "number",
+      "quantity": "modE",
+      "unit": "GPa",
+      "options": [],
+      "min": 100000000,
+      "max": null
+    },
+    {
+      "id": "rhom",
+      "label": "Densidad del material, ρm",
+      "group": "Flecha de agitación",
+      "type": "number",
+      "quantity": "dens",
+      "unit": "kg/m³",
+      "options": [],
+      "min": 100,
+      "max": null
+    },
+    {
+      "id": "Km",
+      "label": "Factor de momento flector, Km ref.",
+      "group": "Flecha de agitación",
+      "type": "number",
+      "quantity": "",
+      "unit": "",
+      "options": [],
+      "min": 1,
+      "max": 3
+    },
+    {
+      "id": "Kt",
+      "label": "Factor de torsión, Kt ref.",
+      "group": "Flecha de agitación",
+      "type": "number",
+      "quantity": "",
+      "unit": "",
+      "options": [],
+      "min": 1,
+      "max": 3
+    },
+    {
+      "id": "ndef",
+      "label": "Límite de deflexión, L / nδ",
+      "group": "Flecha de agitación",
+      "type": "number",
+      "quantity": "",
+      "unit": "",
+      "options": [],
+      "min": 50,
+      "max": null
+    },
+    {
+      "id": "kadd",
+      "label": "Factor de masa añadida del fluido (0.85–0.95) ref.",
+      "group": "Flecha de agitación",
+      "type": "number",
+      "quantity": "",
+      "unit": "",
+      "options": [],
+      "min": 0.5,
+      "max": 1
+    },
+    {
+      "id": "chkKey",
+      "label": "Flecha con cuñero / chavetero (reduce 25 % el esfuerzo permisible)",
+      "group": "Flecha de agitación",
+      "type": "checkbox",
+      "quantity": "",
+      "unit": "",
+      "options": [],
+      "min": null,
+      "max": null
+    },
+    {
+      "id": "chkMot",
+      "label": "Dimensionar con la potencia nominal del motor (recomendado)",
+      "group": "Flecha de agitación",
+      "type": "checkbox",
+      "quantity": "",
+      "unit": "",
+      "options": [],
+      "min": null,
+      "max": null
+    },
+    {
+      "id": "chkBuo",
+      "label": "Descontar el empuje del líquido en el tramo sumergido",
+      "group": "Flecha de agitación",
+      "type": "checkbox",
+      "quantity": "",
+      "unit": "",
+      "options": [],
+      "min": null,
+      "max": null
+    },
+    {
+      "id": "fac",
+      "label": "Factor de servicio del acoplamiento, fac",
+      "group": "Sello y acoplamiento",
+      "type": "number",
+      "quantity": "",
+      "unit": "",
+      "options": [],
+      "min": 1,
+      "max": 4
+    }
+  ],
+  "units": {
+    "len": {
+      "SI": {
+        "u": "m",
+        "f": 1
+      },
+      "US": {
+        "u": "in",
+        "f": 0.0254
+      }
+    },
+    "lenS": {
+      "SI": {
+        "u": "mm",
+        "f": 0.001
+      },
+      "US": {
+        "u": "in",
+        "f": 0.0254
+      }
+    },
+    "dens": {
+      "SI": {
+        "u": "kg/m³",
+        "f": 1
+      },
+      "US": {
+        "u": "lb/ft³",
+        "f": 16.018463
+      }
+    },
+    "visc": {
+      "SI": {
+        "u": "Pa·s",
+        "f": 1
+      },
+      "US": {
+        "u": "cP",
+        "f": 0.001
+      }
+    },
+    "str": {
+      "SI": {
+        "u": "MPa",
+        "f": 1000000
+      },
+      "US": {
+        "u": "ksi",
+        "f": 6894757
+      }
+    },
+    "mass": {
+      "SI": {
+        "u": "kg",
+        "f": 1
+      },
+      "US": {
+        "u": "lb",
+        "f": 0.45359237
+      }
+    },
+    "modE": {
+      "SI": {
+        "u": "GPa",
+        "f": 1000000000
+      },
+      "US": {
+        "u": "Mpsi",
+        "f": 6894757000
+      }
+    }
+  },
+  "impellers": {
+    "rushton": {
+      "n": "Turbina Rushton — disco con 6 palas planas (radial)",
+      "NpT": 5.5,
+      "Kp": 71,
+      "Nq": 0.72,
+      "S": 6.7,
+      "DT": "0.30 – 0.40",
+      "fl": "radial"
+    },
+    "pbt45": {
+      "n": "Turbina de palas inclinadas 45° — 4 palas (axial)",
+      "NpT": 1.3,
+      "Kp": 50,
+      "Nq": 0.79,
+      "S": 5.8,
+      "DT": "0.35 – 0.50",
+      "fl": "axial"
+    },
+    "hydro": {
+      "n": "Hidrofoil de alta eficiencia — 3 palas (axial)",
+      "NpT": 0.3,
+      "Kp": 35,
+      "Nq": 0.56,
+      "S": 6.9,
+      "DT": "0.40 – 0.55",
+      "fl": "axial"
+    },
+    "prop": {
+      "n": "Hélice marina — 3 palas, paso 1.0 (axial)",
+      "NpT": 0.34,
+      "Kp": 41,
+      "Nq": 0.5,
+      "S": 8,
+      "DT": "0.20 – 0.45",
+      "fl": "axial"
+    },
+    "anchor": {
+      "n": "Ancla (proximidad — régimen laminar/viscoso)",
+      "NpT": 0.35,
+      "Kp": 300,
+      "Nq": 0.2,
+      "S": null,
+      "DT": "0.90 – 0.98",
+      "fl": "tangencial"
+    },
+    "helical": {
+      "n": "Listón helicoidal (helical ribbon — régimen laminar)",
+      "NpT": 0.35,
+      "Kp": 350,
+      "Nq": 0.25,
+      "S": null,
+      "DT": "0.90 – 0.96",
+      "fl": "axial"
+    }
+  },
+  "materials": {
+    "m1045": {
+      "n": "AISI 1045 — normalizado",
+      "Sy": 310000000,
+      "Su": 565000000,
+      "E": 200000000000,
+      "rho": 7850
+    },
+    "m4140": {
+      "n": "AISI 4140 — temple y revenido",
+      "Sy": 655000000,
+      "Su": 950000000,
+      "E": 200000000000,
+      "rho": 7850
+    },
+    "m316": {
+      "n": "Acero inoxidable AISI 316 / 316L — recocido",
+      "Sy": 170000000,
+      "Su": 485000000,
+      "E": 193000000000,
+      "rho": 8000
+    },
+    "m2205": {
+      "n": "Acero dúplex 2205 (UNS S32205)",
+      "Sy": 450000000,
+      "Su": 620000000,
+      "E": 200000000000,
+      "rho": 7800
+    },
+    "mti2": {
+      "n": "Titanio Grado 2 (ASTM B348)",
+      "Sy": 275000000,
+      "Su": 345000000,
+      "E": 105000000000,
+      "rho": 4510
+    },
+    "mcust": {
+      "n": "Personalizado — capturar S y, S u, E, ρ",
+      "Sy": null,
+      "Su": null,
+      "E": null,
+      "rho": null
+    }
+  },
+  "IEC_KW": [
+    0.12,
+    0.18,
+    0.25,
+    0.37,
+    0.55,
+    0.75,
+    1.1,
+    1.5,
+    2.2,
+    3,
+    4,
+    5.5,
+    7.5,
+    11,
+    15,
+    18.5,
+    22,
+    30,
+    37,
+    45,
+    55,
+    75,
+    90,
+    110,
+    132,
+    160,
+    200,
+    250,
+    315,
+    355,
+    400,
+    450,
+    500
+  ],
+  "NEMA_HP": [
+    0.25,
+    0.33,
+    0.5,
+    0.75,
+    1,
+    1.5,
+    2,
+    3,
+    5,
+    7.5,
+    10,
+    15,
+    20,
+    25,
+    30,
+    40,
+    50,
+    60,
+    75,
+    100,
+    125,
+    150,
+    200,
+    250,
+    300,
+    350,
+    400,
+    450,
+    500,
+    600
+  ],
+  "D_COM": [
+    20,
+    25,
+    30,
+    35,
+    40,
+    45,
+    50,
+    55,
+    60,
+    65,
+    70,
+    75,
+    80,
+    85,
+    90,
+    95,
+    100,
+    110,
+    120,
+    130,
+    140,
+    150,
+    160,
+    180,
+    200,
+    220,
+    250,
+    280,
+    300,
+    320,
+    350
+  ],
+  "RPM": {
+    "50": [
+      2950,
+      1450,
+      960,
+      720,
+      575,
+      480
+    ],
+    "60": [
+      3550,
+      1750,
+      1160,
+      870,
+      690,
+      575
+    ]
+  }
+}
