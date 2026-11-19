@@ -1,0 +1,130 @@
+{
+  "_meta": {
+    "descripcion": "Velocidades mínimas de diseño en ductos (rangos citados del manual ACGIH, Industrial Ventilation, tabla de velocidades mínimas de transporte). Valores convertidos de fpm a m/s.",
+    "advertencia": "Verifique en la edición vigente del manual ACGIH. ACGIH (31.ª ed., ec. 5.1) recomienda corregir la velocidad mínima por densidad: V_min,corr = V_min/√df.",
+    "fuente": "ACGIH, Industrial Ventilation: A Manual of Recommended Practice for Design"
+  },
+  "classes": [
+    {
+      "id": "gases_vapors",
+      "name": "Vapores, gases, humo",
+      "examples": "Todo tipo de vapores, gases y humo",
+      "v_min_m_s": 0.0,
+      "v_range_m_s": [
+        5.08,
+        10.16
+      ],
+      "v_min_fpm": null,
+      "range_fpm": [
+        1000,
+        2000
+      ],
+      "note": "Cualquier velocidad; el óptimo económico suele estar en el rango indicado",
+      "status": "verificar en edición vigente"
+    },
+    {
+      "id": "fumes",
+      "name": "Humos metálicos (fumes)",
+      "examples": "Soldadura",
+      "v_min_m_s": 10.16,
+      "v_range_m_s": [
+        10.16,
+        12.7
+      ],
+      "range_fpm": [
+        2000,
+        2500
+      ],
+      "status": "verificar en edición vigente"
+    },
+    {
+      "id": "very_fine_light",
+      "name": "Polvo muy fino y ligero",
+      "examples": "Pelusa de algodón, harina de madera, polvo de litografía",
+      "v_min_m_s": 12.7,
+      "v_range_m_s": [
+        12.7,
+        15.24
+      ],
+      "range_fpm": [
+        2500,
+        3000
+      ],
+      "status": "verificar en edición vigente"
+    },
+    {
+      "id": "dry_dust_powders",
+      "name": "Polvos secos y polvos finos",
+      "examples": "Polvo fino de hule, baquelita, yute, virutas ligeras, jabón, cuero",
+      "v_min_m_s": 15.24,
+      "v_range_m_s": [
+        15.24,
+        20.32
+      ],
+      "range_fpm": [
+        3000,
+        4000
+      ],
+      "status": "verificar en edición vigente"
+    },
+    {
+      "id": "average_industrial",
+      "name": "Polvo industrial promedio",
+      "examples": "Esmerilado, pulido en seco, granito, harina de sílice, manejo general de materiales, corte de ladrillo, arcilla, fundición en general, caliza",
+      "v_min_m_s": 17.78,
+      "v_range_m_s": [
+        17.78,
+        20.32
+      ],
+      "range_fpm": [
+        3500,
+        4000
+      ],
+      "status": "verificar en edición vigente"
+    },
+    {
+      "id": "heavy_dust",
+      "name": "Polvo pesado",
+      "examples": "Aserrín pesado y húmedo, virutas metálicas, desmoldeo de fundición, chorro de arena, bloques de madera, latón, viruta de hierro colado, polvo de plomo",
+      "v_min_m_s": 20.32,
+      "v_range_m_s": [
+        20.32,
+        22.86
+      ],
+      "range_fpm": [
+        4000,
+        4500
+      ],
+      "status": "verificar en edición vigente"
+    },
+    {
+      "id": "heavy_moist",
+      "name": "Polvo pesado o húmedo",
+      "examples": "Polvo de plomo con virutas, cemento húmedo, pelusa de pulido pegajosa, cal viva",
+      "v_min_m_s": 22.86,
+      "v_range_m_s": [
+        22.86,
+        null
+      ],
+      "range_fpm": [
+        4500,
+        null
+      ],
+      "note": "4500 fpm y más",
+      "status": "verificar en edición vigente"
+    },
+    {
+      "id": "clean_air",
+      "name": "Aire limpio (HVAC general, sin transporte de partículas)",
+      "examples": "Inyección/extracción general",
+      "v_min_m_s": 0.0,
+      "v_range_m_s": [
+        null,
+        10.0
+      ],
+      "range_fpm": null,
+      "note": "Sin requisito de transporte. Límite superior = criterio del proyecto (hipótesis) por ruido y pérdidas; ASHRAE da límites acústicos en tablas del Handbook que deben consultarse",
+      "status": "hipótesis del proyecto"
+    }
+  ]
+}

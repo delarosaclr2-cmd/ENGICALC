@@ -1,0 +1,4194 @@
+{
+  "format_version": 1,
+  "app_version": "1.0.0",
+  "saved": "2026-11-18T12:50:48",
+  "info": {
+    "name": "Banco de pruebas — Nave industrial con 4 campanas",
+    "client": "Caso de validación interno",
+    "location": "Valle de México (altitud 2 240 m)",
+    "engineer": "",
+    "reviewer": "",
+    "date": "2026-11-18",
+    "revision": "0",
+    "ventilation_type": "Extracción localizada industrial (polvo y humos de soldadura)",
+    "description": "Nave con estación de vaciado de sacos, mesa de soldadura, cabina de llenado de sacos y punto de transferencia de banda conectados a un colector de mangas.",
+    "objective": "Capturar polvo industrial y humos de soldadura en su origen, transportarlos sin sedimentación al colector de mangas y descargar aire filtrado por chimenea."
+  },
+  "units": "SI",
+  "air": {
+    "mode": "custom",
+    "t_c": 25.0,
+    "altitude_m": 2240.0,
+    "p_pa": null,
+    "rh": 0.5,
+    "rho_measured": null,
+    "t_min_surface_c": 18.0
+  },
+  "airflow": {
+    "ach": {
+      "enabled": true,
+      "L": 40.0,
+      "W": 20.0,
+      "H": 8.0,
+      "ACH": 4.0,
+      "V": null
+    },
+    "dilution": {
+      "enabled": false,
+      "G_mg_s": 10.0,
+      "C_target": 5.0,
+      "C_bg": 0.0,
+      "K": 3.0,
+      "capture_eff": 0.0,
+      "C0": null,
+      "toxicity_known": false
+    },
+    "thermal": {
+      "enabled": true,
+      "sources_W": [
+        25000.0,
+        15000.0
+      ],
+      "t_in": 25.0,
+      "t_out": 31.0
+    },
+    "occupancy": {
+      "enabled": false,
+      "Rp": 0.0,
+      "Pz": 0.0,
+      "Ra": 0.0,
+      "Az": 0.0,
+      "Ez": 1.0
+    },
+    "purpose": "general",
+    "source_identifiable": true
+  },
+  "hoods": [
+    {
+      "id": "C1",
+      "name": "Estación de vaciado de sacos",
+      "type": "exterior_flanged",
+      "params": {
+        "W": 0.6,
+        "H": 0.45,
+        "X": 0.25,
+        "Vc": 1.0
+      },
+      "entry_id": "flanged_duct_end",
+      "entry": {
+        "kind": "fh",
+        "Fh": 0.49,
+        "Fs": 1.78,
+        "slot_area": null,
+        "plenum_loss": false,
+        "source": "ACGIH, Industrial Ventilation Manual — coeficiente de entrada Ce y factor de pérdida Fh"
+      },
+      "contaminant_class": "average_industrial",
+      "process": "Vaciado manual de sacos de 25 kg",
+      "cross_draft_m_s": null
+    },
+    {
+      "id": "C2",
+      "name": "Mesa de soldadura",
+      "type": "slot_flanged",
+      "params": {
+        "L": 1.0,
+        "Ws": 0.05,
+        "X": 0.3,
+        "Vc": 0.5
+      },
+      "entry_id": "flanged_duct_end",
+      "entry": {
+        "kind": "slot",
+        "Fh": 0.49,
+        "Fs": 1.78,
+        "slot_area": 0.05,
+        "plenum_loss": false,
+        "source": "ACGIH, Industrial Ventilation Manual — coeficiente de entrada Ce y factor de pérdida Fh"
+      },
+      "contaminant_class": "fumes",
+      "process": "Soldadura GMAW en banco",
+      "cross_draft_m_s": null
+    },
+    {
+      "id": "C3",
+      "name": "Cabina de llenado de sacos",
+      "type": "booth",
+      "params": {
+        "W": 1.0,
+        "H": 1.0,
+        "Vc": 0.75
+      },
+      "entry_id": "flanged_duct_end",
+      "entry": {
+        "kind": "fh",
+        "Fh": 0.49,
+        "Fs": 1.78,
+        "slot_area": null,
+        "plenum_loss": false,
+        "source": "ACGIH, Industrial Ventilation Manual — coeficiente de entrada Ce y factor de pérdida Fh"
+      },
+      "contaminant_class": "average_industrial",
+      "process": "Ensacadora",
+      "cross_draft_m_s": null
+    },
+    {
+      "id": "C4",
+      "name": "Transferencia de banda (encerramiento)",
+      "type": "enclosure",
+      "params": {
+        "A_open": 0.38,
+        "Vc": 1.0
+      },
+      "entry_id": "flanged_duct_end",
+      "entry": {
+        "kind": "fh",
+        "Fh": 0.49,
+        "Fs": 1.78,
+        "slot_area": null,
+        "plenum_loss": false,
+        "source": "ACGIH, Industrial Ventilation Manual — coeficiente de entrada Ce y factor de pérdida Fh"
+      },
+      "contaminant_class": "average_industrial",
+      "process": "Punto de transferencia",
+      "cross_draft_m_s": null
+    }
+  ],
+  "network": {
+    "nodes": [
+      {
+        "id": "H1",
+        "kind": "hood",
+        "label": "Vaciado",
+        "hood_id": "C1",
+        "q_design": null,
+        "temperature_c": null,
+        "exit_K": 1.0,
+        "stack_height_above_roof_m": null,
+        "fan_outlet_area_m2": null,
+        "x": null,
+        "y": null
+      },
+      {
+        "id": "H2",
+        "kind": "hood",
+        "label": "Soldadura",
+        "hood_id": "C2",
+        "q_design": null,
+        "temperature_c": null,
+        "exit_K": 1.0,
+        "stack_height_above_roof_m": null,
+        "fan_outlet_area_m2": null,
+        "x": null,
+        "y": null
+      },
+      {
+        "id": "H3",
+        "kind": "hood",
+        "label": "Llenado",
+        "hood_id": "C3",
+        "q_design": null,
+        "temperature_c": null,
+        "exit_K": 1.0,
+        "stack_height_above_roof_m": null,
+        "fan_outlet_area_m2": null,
+        "x": null,
+        "y": null
+      },
+      {
+        "id": "H4",
+        "kind": "hood",
+        "label": "Banda",
+        "hood_id": "C4",
+        "q_design": null,
+        "temperature_c": null,
+        "exit_K": 1.0,
+        "stack_height_above_roof_m": null,
+        "fan_outlet_area_m2": null,
+        "x": null,
+        "y": null
+      },
+      {
+        "id": "J1",
+        "kind": "junction",
+        "label": "Unión 1",
+        "hood_id": null,
+        "q_design": null,
+        "temperature_c": null,
+        "exit_K": 1.0,
+        "stack_height_above_roof_m": null,
+        "fan_outlet_area_m2": null,
+        "x": null,
+        "y": null
+      },
+      {
+        "id": "J2",
+        "kind": "junction",
+        "label": "Unión 2",
+        "hood_id": null,
+        "q_design": null,
+        "temperature_c": null,
+        "exit_K": 1.0,
+        "stack_height_above_roof_m": null,
+        "fan_outlet_area_m2": null,
+        "x": null,
+        "y": null
+      },
+      {
+        "id": "J3",
+        "kind": "junction",
+        "label": "Unión 3",
+        "hood_id": null,
+        "q_design": null,
+        "temperature_c": null,
+        "exit_K": 1.0,
+        "stack_height_above_roof_m": null,
+        "fan_outlet_area_m2": null,
+        "x": null,
+        "y": null
+      },
+      {
+        "id": "COL",
+        "kind": "junction",
+        "label": "Salida colector",
+        "hood_id": null,
+        "q_design": null,
+        "temperature_c": null,
+        "exit_K": 1.0,
+        "stack_height_above_roof_m": null,
+        "fan_outlet_area_m2": null,
+        "x": null,
+        "y": null
+      },
+      {
+        "id": "FAN",
+        "kind": "fan",
+        "label": "Ventilador",
+        "hood_id": null,
+        "q_design": null,
+        "temperature_c": null,
+        "exit_K": 1.0,
+        "stack_height_above_roof_m": null,
+        "fan_outlet_area_m2": null,
+        "x": null,
+        "y": null
+      },
+      {
+        "id": "OUT",
+        "kind": "outlet",
+        "label": "Chimenea",
+        "hood_id": null,
+        "q_design": null,
+        "temperature_c": null,
+        "exit_K": 1.0,
+        "stack_height_above_roof_m": 3.5,
+        "fan_outlet_area_m2": null,
+        "x": null,
+        "y": null
+      }
+    ],
+    "segments": [
+      {
+        "id": "R1",
+        "from_node": "H1",
+        "to_node": "J1",
+        "shape": "circular",
+        "D": 0.2,
+        "a": null,
+        "b": null,
+        "length": 6.0,
+        "material_id": "galv_ashrae",
+        "roughness_m": null,
+        "fittings": [
+          {
+            "fitting_id": "elbow90_RD2.0",
+            "qty": 2,
+            "K_override": null,
+            "params": {},
+            "area_ref_m2": null,
+            "note": ""
+          }
+        ],
+        "equipment": [],
+        "hood_entry": null,
+        "damper_K": 0.0,
+        "contaminant_class": null,
+        "label": ""
+      },
+      {
+        "id": "R2",
+        "from_node": "H2",
+        "to_node": "J1",
+        "shape": "circular",
+        "D": 0.16,
+        "a": null,
+        "b": null,
+        "length": 4.0,
+        "material_id": "galv_ashrae",
+        "roughness_m": null,
+        "fittings": [
+          {
+            "fitting_id": "elbow90_RD2.0",
+            "qty": 1,
+            "K_override": null,
+            "params": {},
+            "area_ref_m2": null,
+            "note": ""
+          },
+          {
+            "fitting_id": "elbow45_RD2.0",
+            "qty": 1,
+            "K_override": null,
+            "params": {},
+            "area_ref_m2": null,
+            "note": ""
+          },
+          {
+            "fitting_id": "branch_entry_30",
+            "qty": 1,
+            "K_override": null,
+            "params": {},
+            "area_ref_m2": null,
+            "note": ""
+          }
+        ],
+        "equipment": [],
+        "hood_entry": null,
+        "damper_K": 0.0,
+        "contaminant_class": null,
+        "label": ""
+      },
+      {
+        "id": "M1",
+        "from_node": "J1",
+        "to_node": "J2",
+        "shape": "circular",
+        "D": 0.25,
+        "a": null,
+        "b": null,
+        "length": 8.0,
+        "material_id": "galv_ashrae",
+        "roughness_m": null,
+        "fittings": [],
+        "equipment": [],
+        "hood_entry": null,
+        "damper_K": 0.0,
+        "contaminant_class": null,
+        "label": ""
+      },
+      {
+        "id": "R3",
+        "from_node": "H3",
+        "to_node": "J2",
+        "shape": "circular",
+        "D": 0.2,
+        "a": null,
+        "b": null,
+        "length": 5.0,
+        "material_id": "galv_ashrae",
+        "roughness_m": null,
+        "fittings": [
+          {
+            "fitting_id": "elbow90_RD2.0",
+            "qty": 2,
+            "K_override": null,
+            "params": {},
+            "area_ref_m2": null,
+            "note": ""
+          },
+          {
+            "fitting_id": "branch_entry_30",
+            "qty": 1,
+            "K_override": null,
+            "params": {},
+            "area_ref_m2": null,
+            "note": ""
+          }
+        ],
+        "equipment": [],
+        "hood_entry": null,
+        "damper_K": 0.0,
+        "contaminant_class": null,
+        "label": ""
+      },
+      {
+        "id": "M2",
+        "from_node": "J2",
+        "to_node": "J3",
+        "shape": "circular",
+        "D": 0.315,
+        "a": null,
+        "b": null,
+        "length": 8.0,
+        "material_id": "galv_ashrae",
+        "roughness_m": null,
+        "fittings": [],
+        "equipment": [],
+        "hood_entry": null,
+        "damper_K": 0.0,
+        "contaminant_class": null,
+        "label": ""
+      },
+      {
+        "id": "R4",
+        "from_node": "H4",
+        "to_node": "J3",
+        "shape": "circular",
+        "D": 0.15,
+        "a": null,
+        "b": null,
+        "length": 12.0,
+        "material_id": "galv_ashrae",
+        "roughness_m": null,
+        "fittings": [
+          {
+            "fitting_id": "elbow90_RD2.0",
+            "qty": 1,
+            "K_override": null,
+            "params": {},
+            "area_ref_m2": null,
+            "note": ""
+          },
+          {
+            "fitting_id": "branch_entry_45",
+            "qty": 1,
+            "K_override": null,
+            "params": {},
+            "area_ref_m2": null,
+            "note": ""
+          }
+        ],
+        "equipment": [],
+        "hood_entry": null,
+        "damper_K": 0.0,
+        "contaminant_class": null,
+        "label": ""
+      },
+      {
+        "id": "M3",
+        "from_node": "J3",
+        "to_node": "COL",
+        "shape": "circular",
+        "D": 0.355,
+        "a": null,
+        "b": null,
+        "length": 12.0,
+        "material_id": "galv_ashrae",
+        "roughness_m": null,
+        "fittings": [
+          {
+            "fitting_id": "elbow90_RD2.0",
+            "qty": 2,
+            "K_override": null,
+            "params": {},
+            "area_ref_m2": null,
+            "note": ""
+          }
+        ],
+        "equipment": [
+          {
+            "name": "Colector de mangas",
+            "eq_type": "Colector de polvo (mangas)",
+            "model": "filter",
+            "dp_fixed": 0.0,
+            "dp_ref": 0.0,
+            "q_ref": 2.3,
+            "n_exp": 1.0,
+            "table": [],
+            "dp_clean": 600.0,
+            "dp_dirty": 1500.0,
+            "state": "sucio",
+            "state_fraction": 1.0,
+            "source": "Hipótesis del banco de pruebas (sustituir por dato del fabricante)"
+          }
+        ],
+        "hood_entry": null,
+        "damper_K": 0.0,
+        "contaminant_class": null,
+        "label": ""
+      },
+      {
+        "id": "M4",
+        "from_node": "COL",
+        "to_node": "FAN",
+        "shape": "circular",
+        "D": 0.5,
+        "a": null,
+        "b": null,
+        "length": 3.0,
+        "material_id": "galv_ashrae",
+        "roughness_m": null,
+        "fittings": [
+          {
+            "fitting_id": "elbow90_RD2.0",
+            "qty": 1,
+            "K_override": null,
+            "params": {},
+            "area_ref_m2": null,
+            "note": ""
+          }
+        ],
+        "equipment": [],
+        "hood_entry": null,
+        "damper_K": 0.0,
+        "contaminant_class": null,
+        "label": ""
+      },
+      {
+        "id": "D1",
+        "from_node": "FAN",
+        "to_node": "OUT",
+        "shape": "circular",
+        "D": 0.45,
+        "a": null,
+        "b": null,
+        "length": 10.0,
+        "material_id": "galv_ashrae",
+        "roughness_m": null,
+        "fittings": [],
+        "equipment": [],
+        "hood_entry": null,
+        "damper_K": 0.0,
+        "contaminant_class": null,
+        "label": ""
+      }
+    ]
+  },
+  "network_settings": {
+    "contaminant_class": "average_industrial",
+    "strategy": "acgih",
+    "filter_state_design": "sucio",
+    "roof_height_m": 9.0
+  },
+  "fans": [
+    {
+      "id": "BI-560",
+      "manufacturer": "EJEMPLO (curva sintética)",
+      "model": "EJEMPLO BI-560 (inclinado hacia atrás)",
+      "fan_type": "Centrífugo",
+      "rpm": 2200,
+      "rho_ref": 1.2,
+      "diameter_m": null,
+      "outlet_area_m2": 0.16,
+      "pressure_basis": "total",
+      "points": [
+        {
+          "Q": 0.5,
+          "P": 3300,
+          "eta": 0.45,
+          "W": 3666.6666666666665
+        },
+        {
+          "Q": 1.0,
+          "P": 3450,
+          "eta": 0.62,
+          "W": 5564.5161290322585
+        },
+        {
+          "Q": 1.5,
+          "P": 3450,
+          "eta": 0.72,
+          "W": 7187.5
+        },
+        {
+          "Q": 2.0,
+          "P": 3300,
+          "eta": 0.78,
+          "W": 8461.538461538461
+        },
+        {
+          "Q": 2.5,
+          "P": 3020,
+          "eta": 0.8,
+          "W": 9437.5
+        },
+        {
+          "Q": 3.0,
+          "P": 2620,
+          "eta": 0.78,
+          "W": 10076.923076923076
+        },
+        {
+          "Q": 3.5,
+          "P": 2100,
+          "eta": 0.7,
+          "W": 10500.0
+        },
+        {
+          "Q": 4.0,
+          "P": 1450,
+          "eta": 0.55,
+          "W": 10545.454545454544
+        }
+      ],
+      "max_rpm": 2600,
+      "q_min_rec": null,
+      "q_max_rec": null,
+      "certified": false,
+      "source": "Curva sintética de demostración — NO es dato de fabricante",
+      "notes": "Rodete de álabes inclinados hacia atrás; lado limpio."
+    },
+    {
+      "id": "RT-500",
+      "manufacturer": "EJEMPLO (curva sintética)",
+      "model": "EJEMPLO RT-500 (punta radial)",
+      "fan_type": "Centrífugo",
+      "rpm": 2600,
+      "rho_ref": 1.2,
+      "diameter_m": null,
+      "outlet_area_m2": 0.14,
+      "pressure_basis": "total",
+      "points": [
+        {
+          "Q": 0.5,
+          "P": 3400,
+          "eta": 0.4,
+          "W": 4250.0
+        },
+        {
+          "Q": 1.0,
+          "P": 3420,
+          "eta": 0.55,
+          "W": 6218.181818181818
+        },
+        {
+          "Q": 1.5,
+          "P": 3380,
+          "eta": 0.63,
+          "W": 8047.619047619048
+        },
+        {
+          "Q": 2.0,
+          "P": 3280,
+          "eta": 0.67,
+          "W": 9791.044776119403
+        },
+        {
+          "Q": 2.5,
+          "P": 3120,
+          "eta": 0.68,
+          "W": 11470.588235294117
+        },
+        {
+          "Q": 3.0,
+          "P": 2900,
+          "eta": 0.66,
+          "W": 13181.818181818182
+        },
+        {
+          "Q": 3.5,
+          "P": 2600,
+          "eta": 0.6,
+          "W": 15166.666666666668
+        },
+        {
+          "Q": 4.0,
+          "P": 2200,
+          "eta": 0.5,
+          "W": 17600.0
+        }
+      ],
+      "max_rpm": 3000,
+      "q_min_rec": null,
+      "q_max_rec": null,
+      "certified": false,
+      "source": "Curva sintética de demostración — NO es dato de fabricante",
+      "notes": "Rodete de punta radial; mayor tolerancia a la abrasión, menor eficiencia."
+    },
+    {
+      "id": "BI-450",
+      "manufacturer": "EJEMPLO (curva sintética)",
+      "model": "EJEMPLO BI-450 (subdimensionado)",
+      "fan_type": "Centrífugo",
+      "rpm": 2200,
+      "rho_ref": 1.2,
+      "diameter_m": null,
+      "outlet_area_m2": 0.12,
+      "pressure_basis": "total",
+      "points": [
+        {
+          "Q": 0.5,
+          "P": 2600,
+          "eta": 0.45,
+          "W": 2888.8888888888887
+        },
+        {
+          "Q": 1.0,
+          "P": 2700,
+          "eta": 0.62,
+          "W": 4354.8387096774195
+        },
+        {
+          "Q": 1.5,
+          "P": 2650,
+          "eta": 0.72,
+          "W": 5520.833333333334
+        },
+        {
+          "Q": 2.0,
+          "P": 2450,
+          "eta": 0.78,
+          "W": 6282.051282051282
+        },
+        {
+          "Q": 2.5,
+          "P": 2150,
+          "eta": 0.79,
+          "W": 6803.79746835443
+        },
+        {
+          "Q": 3.0,
+          "P": 1750,
+          "eta": 0.76,
+          "W": 6907.894736842105
+        },
+        {
+          "Q": 3.5,
+          "P": 1250,
+          "eta": 0.66,
+          "W": 6628.787878787878
+        },
+        {
+          "Q": 4.0,
+          "P": 700,
+          "eta": 0.5,
+          "W": 5600.0
+        }
+      ],
+      "max_rpm": 2600,
+      "q_min_rec": null,
+      "q_max_rec": null,
+      "certified": false,
+      "source": "Curva sintética de demostración — NO es dato de fabricante",
+      "notes": "Ventilador pequeño para demostrar el déficit de caudal."
+    }
+  ],
+  "fan_selection": {
+    "selected_id": "BI-560",
+    "rpm": null,
+    "diameter_m": null,
+    "use_operating_solution": true
+  },
+  "power": {
+    "eta_fan_user": 0.75,
+    "eta_basis": "total",
+    "drive_type": "Bandas",
+    "eta_drive": 0.95,
+    "eta_motor": 0.917,
+    "use_vfd": false,
+    "eta_vfd": 0.97,
+    "margin": 0.1,
+    "service_factor": 1.15,
+    "motor_standard": "IEC",
+    "motor_selected_kw": null,
+    "hours_per_year": 4800.0,
+    "tariff": 2.4,
+    "currency": "MXN",
+    "profile": [
+      [
+        1.0,
+        0.6
+      ],
+      [
+        0.85,
+        0.3
+      ],
+      [
+        0.7,
+        0.1
+      ]
+    ]
+  },
+  "duct_tool": {
+    "method": "velocity",
+    "Q": 2.3,
+    "V_target": 21.0,
+    "dp_per_m": 4.0,
+    "shape": "circular",
+    "aspect": 2.0,
+    "material_id": "galv_ashrae",
+    "rounding": "down",
+    "length": 10.0,
+    "regain_R": 0.75,
+    "regain_sections": [
+      [
+        0.8,
+        6.0,
+        0.3
+      ],
+      [
+        0.6,
+        6.0,
+        0.3
+      ],
+      [
+        0.4,
+        6.0,
+        0.3
+      ]
+    ]
+  },
+  "alternatives": [
+    {
+      "name": "A — Diseño base (BI-560, 2 200 rpm)",
+      "project": {
+        "format_version": 1,
+        "app_version": "1.0.0",
+        "saved": "2026-11-18T12:50:48",
+        "info": {
+          "name": "Banco de pruebas — Nave industrial con 4 campanas",
+          "client": "Caso de validación interno",
+          "location": "Valle de México (altitud 2 240 m)",
+          "engineer": "",
+          "reviewer": "",
+          "date": "2026-11-18",
+          "revision": "0",
+          "ventilation_type": "Extracción localizada industrial (polvo y humos de soldadura)",
+          "description": "Nave con estación de vaciado de sacos, mesa de soldadura, cabina de llenado de sacos y punto de transferencia de banda conectados a un colector de mangas.",
+          "objective": "Capturar polvo industrial y humos de soldadura en su origen, transportarlos sin sedimentación al colector de mangas y descargar aire filtrado por chimenea."
+        },
+        "units": "SI",
+        "air": {
+          "mode": "custom",
+          "t_c": 25.0,
+          "altitude_m": 2240.0,
+          "p_pa": null,
+          "rh": 0.5,
+          "rho_measured": null,
+          "t_min_surface_c": 18.0
+        },
+        "airflow": {
+          "ach": {
+            "enabled": true,
+            "L": 40.0,
+            "W": 20.0,
+            "H": 8.0,
+            "ACH": 4.0,
+            "V": null
+          },
+          "dilution": {
+            "enabled": false,
+            "G_mg_s": 10.0,
+            "C_target": 5.0,
+            "C_bg": 0.0,
+            "K": 3.0,
+            "capture_eff": 0.0,
+            "C0": null,
+            "toxicity_known": false
+          },
+          "thermal": {
+            "enabled": true,
+            "sources_W": [
+              25000.0,
+              15000.0
+            ],
+            "t_in": 25.0,
+            "t_out": 31.0
+          },
+          "occupancy": {
+            "enabled": false,
+            "Rp": 0.0,
+            "Pz": 0.0,
+            "Ra": 0.0,
+            "Az": 0.0,
+            "Ez": 1.0
+          },
+          "purpose": "general",
+          "source_identifiable": true
+        },
+        "hoods": [
+          {
+            "id": "C1",
+            "name": "Estación de vaciado de sacos",
+            "type": "exterior_flanged",
+            "params": {
+              "W": 0.6,
+              "H": 0.45,
+              "X": 0.25,
+              "Vc": 1.0
+            },
+            "entry_id": "flanged_duct_end",
+            "entry": {
+              "kind": "fh",
+              "Fh": 0.49,
+              "Fs": 1.78,
+              "slot_area": null,
+              "plenum_loss": false,
+              "source": "ACGIH, Industrial Ventilation Manual — coeficiente de entrada Ce y factor de pérdida Fh"
+            },
+            "contaminant_class": "average_industrial",
+            "process": "Vaciado manual de sacos de 25 kg",
+            "cross_draft_m_s": null
+          },
+          {
+            "id": "C2",
+            "name": "Mesa de soldadura",
+            "type": "slot_flanged",
+            "params": {
+              "L": 1.0,
+              "Ws": 0.05,
+              "X": 0.3,
+              "Vc": 0.5
+            },
+            "entry_id": "flanged_duct_end",
+            "entry": {
+              "kind": "slot",
+              "Fh": 0.49,
+              "Fs": 1.78,
+              "slot_area": 0.05,
+              "plenum_loss": false,
+              "source": "ACGIH, Industrial Ventilation Manual — coeficiente de entrada Ce y factor de pérdida Fh"
+            },
+            "contaminant_class": "fumes",
+            "process": "Soldadura GMAW en banco",
+            "cross_draft_m_s": null
+          },
+          {
+            "id": "C3",
+            "name": "Cabina de llenado de sacos",
+            "type": "booth",
+            "params": {
+              "W": 1.0,
+              "H": 1.0,
+              "Vc": 0.75
+            },
+            "entry_id": "flanged_duct_end",
+            "entry": {
+              "kind": "fh",
+              "Fh": 0.49,
+              "Fs": 1.78,
+              "slot_area": null,
+              "plenum_loss": false,
+              "source": "ACGIH, Industrial Ventilation Manual — coeficiente de entrada Ce y factor de pérdida Fh"
+            },
+            "contaminant_class": "average_industrial",
+            "process": "Ensacadora",
+            "cross_draft_m_s": null
+          },
+          {
+            "id": "C4",
+            "name": "Transferencia de banda (encerramiento)",
+            "type": "enclosure",
+            "params": {
+              "A_open": 0.38,
+              "Vc": 1.0
+            },
+            "entry_id": "flanged_duct_end",
+            "entry": {
+              "kind": "fh",
+              "Fh": 0.49,
+              "Fs": 1.78,
+              "slot_area": null,
+              "plenum_loss": false,
+              "source": "ACGIH, Industrial Ventilation Manual — coeficiente de entrada Ce y factor de pérdida Fh"
+            },
+            "contaminant_class": "average_industrial",
+            "process": "Punto de transferencia",
+            "cross_draft_m_s": null
+          }
+        ],
+        "network": {
+          "nodes": [
+            {
+              "id": "H1",
+              "kind": "hood",
+              "label": "Vaciado",
+              "hood_id": "C1",
+              "q_design": null,
+              "temperature_c": null,
+              "exit_K": 1.0,
+              "stack_height_above_roof_m": null,
+              "fan_outlet_area_m2": null,
+              "x": null,
+              "y": null
+            },
+            {
+              "id": "H2",
+              "kind": "hood",
+              "label": "Soldadura",
+              "hood_id": "C2",
+              "q_design": null,
+              "temperature_c": null,
+              "exit_K": 1.0,
+              "stack_height_above_roof_m": null,
+              "fan_outlet_area_m2": null,
+              "x": null,
+              "y": null
+            },
+            {
+              "id": "H3",
+              "kind": "hood",
+              "label": "Llenado",
+              "hood_id": "C3",
+              "q_design": null,
+              "temperature_c": null,
+              "exit_K": 1.0,
+              "stack_height_above_roof_m": null,
+              "fan_outlet_area_m2": null,
+              "x": null,
+              "y": null
+            },
+            {
+              "id": "H4",
+              "kind": "hood",
+              "label": "Banda",
+              "hood_id": "C4",
+              "q_design": null,
+              "temperature_c": null,
+              "exit_K": 1.0,
+              "stack_height_above_roof_m": null,
+              "fan_outlet_area_m2": null,
+              "x": null,
+              "y": null
+            },
+            {
+              "id": "J1",
+              "kind": "junction",
+              "label": "Unión 1",
+              "hood_id": null,
+              "q_design": null,
+              "temperature_c": null,
+              "exit_K": 1.0,
+              "stack_height_above_roof_m": null,
+              "fan_outlet_area_m2": null,
+              "x": null,
+              "y": null
+            },
+            {
+              "id": "J2",
+              "kind": "junction",
+              "label": "Unión 2",
+              "hood_id": null,
+              "q_design": null,
+              "temperature_c": null,
+              "exit_K": 1.0,
+              "stack_height_above_roof_m": null,
+              "fan_outlet_area_m2": null,
+              "x": null,
+              "y": null
+            },
+            {
+              "id": "J3",
+              "kind": "junction",
+              "label": "Unión 3",
+              "hood_id": null,
+              "q_design": null,
+              "temperature_c": null,
+              "exit_K": 1.0,
+              "stack_height_above_roof_m": null,
+              "fan_outlet_area_m2": null,
+              "x": null,
+              "y": null
+            },
+            {
+              "id": "COL",
+              "kind": "junction",
+              "label": "Salida colector",
+              "hood_id": null,
+              "q_design": null,
+              "temperature_c": null,
+              "exit_K": 1.0,
+              "stack_height_above_roof_m": null,
+              "fan_outlet_area_m2": null,
+              "x": null,
+              "y": null
+            },
+            {
+              "id": "FAN",
+              "kind": "fan",
+              "label": "Ventilador",
+              "hood_id": null,
+              "q_design": null,
+              "temperature_c": null,
+              "exit_K": 1.0,
+              "stack_height_above_roof_m": null,
+              "fan_outlet_area_m2": null,
+              "x": null,
+              "y": null
+            },
+            {
+              "id": "OUT",
+              "kind": "outlet",
+              "label": "Chimenea",
+              "hood_id": null,
+              "q_design": null,
+              "temperature_c": null,
+              "exit_K": 1.0,
+              "stack_height_above_roof_m": 3.5,
+              "fan_outlet_area_m2": null,
+              "x": null,
+              "y": null
+            }
+          ],
+          "segments": [
+            {
+              "id": "R1",
+              "from_node": "H1",
+              "to_node": "J1",
+              "shape": "circular",
+              "D": 0.2,
+              "a": null,
+              "b": null,
+              "length": 6.0,
+              "material_id": "galv_ashrae",
+              "roughness_m": null,
+              "fittings": [
+                {
+                  "fitting_id": "elbow90_RD2.0",
+                  "qty": 2,
+                  "K_override": null,
+                  "params": {},
+                  "area_ref_m2": null,
+                  "note": ""
+                }
+              ],
+              "equipment": [],
+              "hood_entry": null,
+              "damper_K": 0.0,
+              "contaminant_class": null,
+              "label": ""
+            },
+            {
+              "id": "R2",
+              "from_node": "H2",
+              "to_node": "J1",
+              "shape": "circular",
+              "D": 0.16,
+              "a": null,
+              "b": null,
+              "length": 4.0,
+              "material_id": "galv_ashrae",
+              "roughness_m": null,
+              "fittings": [
+                {
+                  "fitting_id": "elbow90_RD2.0",
+                  "qty": 1,
+                  "K_override": null,
+                  "params": {},
+                  "area_ref_m2": null,
+                  "note": ""
+                },
+                {
+                  "fitting_id": "elbow45_RD2.0",
+                  "qty": 1,
+                  "K_override": null,
+                  "params": {},
+                  "area_ref_m2": null,
+                  "note": ""
+                },
+                {
+                  "fitting_id": "branch_entry_30",
+                  "qty": 1,
+                  "K_override": null,
+                  "params": {},
+                  "area_ref_m2": null,
+                  "note": ""
+                }
+              ],
+              "equipment": [],
+              "hood_entry": null,
+              "damper_K": 0.0,
+              "contaminant_class": null,
+              "label": ""
+            },
+            {
+              "id": "M1",
+              "from_node": "J1",
+              "to_node": "J2",
+              "shape": "circular",
+              "D": 0.25,
+              "a": null,
+              "b": null,
+              "length": 8.0,
+              "material_id": "galv_ashrae",
+              "roughness_m": null,
+              "fittings": [],
+              "equipment": [],
+              "hood_entry": null,
+              "damper_K": 0.0,
+              "contaminant_class": null,
+              "label": ""
+            },
+            {
+              "id": "R3",
+              "from_node": "H3",
+              "to_node": "J2",
+              "shape": "circular",
+              "D": 0.2,
+              "a": null,
+              "b": null,
+              "length": 5.0,
+              "material_id": "galv_ashrae",
+              "roughness_m": null,
+              "fittings": [
+                {
+                  "fitting_id": "elbow90_RD2.0",
+                  "qty": 2,
+                  "K_override": null,
+                  "params": {},
+                  "area_ref_m2": null,
+                  "note": ""
+                },
+                {
+                  "fitting_id": "branch_entry_30",
+                  "qty": 1,
+                  "K_override": null,
+                  "params": {},
+                  "area_ref_m2": null,
+                  "note": ""
+                }
+              ],
+              "equipment": [],
+              "hood_entry": null,
+              "damper_K": 0.0,
+              "contaminant_class": null,
+              "label": ""
+            },
+            {
+              "id": "M2",
+              "from_node": "J2",
+              "to_node": "J3",
+              "shape": "circular",
+              "D": 0.315,
+              "a": null,
+              "b": null,
+              "length": 8.0,
+              "material_id": "galv_ashrae",
+              "roughness_m": null,
+              "fittings": [],
+              "equipment": [],
+              "hood_entry": null,
+              "damper_K": 0.0,
+              "contaminant_class": null,
+              "label": ""
+            },
+            {
+              "id": "R4",
+              "from_node": "H4",
+              "to_node": "J3",
+              "shape": "circular",
+              "D": 0.15,
+              "a": null,
+              "b": null,
+              "length": 12.0,
+              "material_id": "galv_ashrae",
+              "roughness_m": null,
+              "fittings": [
+                {
+                  "fitting_id": "elbow90_RD2.0",
+                  "qty": 1,
+                  "K_override": null,
+                  "params": {},
+                  "area_ref_m2": null,
+                  "note": ""
+                },
+                {
+                  "fitting_id": "branch_entry_45",
+                  "qty": 1,
+                  "K_override": null,
+                  "params": {},
+                  "area_ref_m2": null,
+                  "note": ""
+                }
+              ],
+              "equipment": [],
+              "hood_entry": null,
+              "damper_K": 0.0,
+              "contaminant_class": null,
+              "label": ""
+            },
+            {
+              "id": "M3",
+              "from_node": "J3",
+              "to_node": "COL",
+              "shape": "circular",
+              "D": 0.355,
+              "a": null,
+              "b": null,
+              "length": 12.0,
+              "material_id": "galv_ashrae",
+              "roughness_m": null,
+              "fittings": [
+                {
+                  "fitting_id": "elbow90_RD2.0",
+                  "qty": 2,
+                  "K_override": null,
+                  "params": {},
+                  "area_ref_m2": null,
+                  "note": ""
+                }
+              ],
+              "equipment": [
+                {
+                  "name": "Colector de mangas",
+                  "eq_type": "Colector de polvo (mangas)",
+                  "model": "filter",
+                  "dp_fixed": 0.0,
+                  "dp_ref": 0.0,
+                  "q_ref": 2.3,
+                  "n_exp": 1.0,
+                  "table": [],
+                  "dp_clean": 600.0,
+                  "dp_dirty": 1500.0,
+                  "state": "sucio",
+                  "state_fraction": 1.0,
+                  "source": "Hipótesis del banco de pruebas (sustituir por dato del fabricante)"
+                }
+              ],
+              "hood_entry": null,
+              "damper_K": 0.0,
+              "contaminant_class": null,
+              "label": ""
+            },
+            {
+              "id": "M4",
+              "from_node": "COL",
+              "to_node": "FAN",
+              "shape": "circular",
+              "D": 0.5,
+              "a": null,
+              "b": null,
+              "length": 3.0,
+              "material_id": "galv_ashrae",
+              "roughness_m": null,
+              "fittings": [
+                {
+                  "fitting_id": "elbow90_RD2.0",
+                  "qty": 1,
+                  "K_override": null,
+                  "params": {},
+                  "area_ref_m2": null,
+                  "note": ""
+                }
+              ],
+              "equipment": [],
+              "hood_entry": null,
+              "damper_K": 0.0,
+              "contaminant_class": null,
+              "label": ""
+            },
+            {
+              "id": "D1",
+              "from_node": "FAN",
+              "to_node": "OUT",
+              "shape": "circular",
+              "D": 0.45,
+              "a": null,
+              "b": null,
+              "length": 10.0,
+              "material_id": "galv_ashrae",
+              "roughness_m": null,
+              "fittings": [],
+              "equipment": [],
+              "hood_entry": null,
+              "damper_K": 0.0,
+              "contaminant_class": null,
+              "label": ""
+            }
+          ]
+        },
+        "network_settings": {
+          "contaminant_class": "average_industrial",
+          "strategy": "acgih",
+          "filter_state_design": "sucio",
+          "roof_height_m": 9.0
+        },
+        "fans": [
+          {
+            "id": "BI-560",
+            "manufacturer": "EJEMPLO (curva sintética)",
+            "model": "EJEMPLO BI-560 (inclinado hacia atrás)",
+            "fan_type": "Centrífugo",
+            "rpm": 2200,
+            "rho_ref": 1.2,
+            "diameter_m": null,
+            "outlet_area_m2": 0.16,
+            "pressure_basis": "total",
+            "points": [
+              {
+                "Q": 0.5,
+                "P": 3300,
+                "eta": 0.45,
+                "W": 3666.6666666666665
+              },
+              {
+                "Q": 1.0,
+                "P": 3450,
+                "eta": 0.62,
+                "W": 5564.5161290322585
+              },
+              {
+                "Q": 1.5,
+                "P": 3450,
+                "eta": 0.72,
+                "W": 7187.5
+              },
+              {
+                "Q": 2.0,
+                "P": 3300,
+                "eta": 0.78,
+                "W": 8461.538461538461
+              },
+              {
+                "Q": 2.5,
+                "P": 3020,
+                "eta": 0.8,
+                "W": 9437.5
+              },
+              {
+                "Q": 3.0,
+                "P": 2620,
+                "eta": 0.78,
+                "W": 10076.923076923076
+              },
+              {
+                "Q": 3.5,
+                "P": 2100,
+                "eta": 0.7,
+                "W": 10500.0
+              },
+              {
+                "Q": 4.0,
+                "P": 1450,
+                "eta": 0.55,
+                "W": 10545.454545454544
+              }
+            ],
+            "max_rpm": 2600,
+            "q_min_rec": null,
+            "q_max_rec": null,
+            "certified": false,
+            "source": "Curva sintética de demostración — NO es dato de fabricante",
+            "notes": "Rodete de álabes inclinados hacia atrás; lado limpio."
+          },
+          {
+            "id": "RT-500",
+            "manufacturer": "EJEMPLO (curva sintética)",
+            "model": "EJEMPLO RT-500 (punta radial)",
+            "fan_type": "Centrífugo",
+            "rpm": 2600,
+            "rho_ref": 1.2,
+            "diameter_m": null,
+            "outlet_area_m2": 0.14,
+            "pressure_basis": "total",
+            "points": [
+              {
+                "Q": 0.5,
+                "P": 3400,
+                "eta": 0.4,
+                "W": 4250.0
+              },
+              {
+                "Q": 1.0,
+                "P": 3420,
+                "eta": 0.55,
+                "W": 6218.181818181818
+              },
+              {
+                "Q": 1.5,
+                "P": 3380,
+                "eta": 0.63,
+                "W": 8047.619047619048
+              },
+              {
+                "Q": 2.0,
+                "P": 3280,
+                "eta": 0.67,
+                "W": 9791.044776119403
+              },
+              {
+                "Q": 2.5,
+                "P": 3120,
+                "eta": 0.68,
+                "W": 11470.588235294117
+              },
+              {
+                "Q": 3.0,
+                "P": 2900,
+                "eta": 0.66,
+                "W": 13181.818181818182
+              },
+              {
+                "Q": 3.5,
+                "P": 2600,
+                "eta": 0.6,
+                "W": 15166.666666666668
+              },
+              {
+                "Q": 4.0,
+                "P": 2200,
+                "eta": 0.5,
+                "W": 17600.0
+              }
+            ],
+            "max_rpm": 3000,
+            "q_min_rec": null,
+            "q_max_rec": null,
+            "certified": false,
+            "source": "Curva sintética de demostración — NO es dato de fabricante",
+            "notes": "Rodete de punta radial; mayor tolerancia a la abrasión, menor eficiencia."
+          },
+          {
+            "id": "BI-450",
+            "manufacturer": "EJEMPLO (curva sintética)",
+            "model": "EJEMPLO BI-450 (subdimensionado)",
+            "fan_type": "Centrífugo",
+            "rpm": 2200,
+            "rho_ref": 1.2,
+            "diameter_m": null,
+            "outlet_area_m2": 0.12,
+            "pressure_basis": "total",
+            "points": [
+              {
+                "Q": 0.5,
+                "P": 2600,
+                "eta": 0.45,
+                "W": 2888.8888888888887
+              },
+              {
+                "Q": 1.0,
+                "P": 2700,
+                "eta": 0.62,
+                "W": 4354.8387096774195
+              },
+              {
+                "Q": 1.5,
+                "P": 2650,
+                "eta": 0.72,
+                "W": 5520.833333333334
+              },
+              {
+                "Q": 2.0,
+                "P": 2450,
+                "eta": 0.78,
+                "W": 6282.051282051282
+              },
+              {
+                "Q": 2.5,
+                "P": 2150,
+                "eta": 0.79,
+                "W": 6803.79746835443
+              },
+              {
+                "Q": 3.0,
+                "P": 1750,
+                "eta": 0.76,
+                "W": 6907.894736842105
+              },
+              {
+                "Q": 3.5,
+                "P": 1250,
+                "eta": 0.66,
+                "W": 6628.787878787878
+              },
+              {
+                "Q": 4.0,
+                "P": 700,
+                "eta": 0.5,
+                "W": 5600.0
+              }
+            ],
+            "max_rpm": 2600,
+            "q_min_rec": null,
+            "q_max_rec": null,
+            "certified": false,
+            "source": "Curva sintética de demostración — NO es dato de fabricante",
+            "notes": "Ventilador pequeño para demostrar el déficit de caudal."
+          }
+        ],
+        "fan_selection": {
+          "selected_id": "BI-560",
+          "rpm": null,
+          "diameter_m": null,
+          "use_operating_solution": true
+        },
+        "power": {
+          "eta_fan_user": 0.75,
+          "eta_basis": "total",
+          "drive_type": "Bandas",
+          "eta_drive": 0.95,
+          "eta_motor": 0.917,
+          "use_vfd": false,
+          "eta_vfd": 0.97,
+          "margin": 0.1,
+          "service_factor": 1.15,
+          "motor_standard": "IEC",
+          "motor_selected_kw": null,
+          "hours_per_year": 4800.0,
+          "tariff": 2.4,
+          "currency": "MXN",
+          "profile": [
+            [
+              1.0,
+              0.6
+            ],
+            [
+              0.85,
+              0.3
+            ],
+            [
+              0.7,
+              0.1
+            ]
+          ]
+        },
+        "duct_tool": {
+          "method": "velocity",
+          "Q": 2.3,
+          "V_target": 21.0,
+          "dp_per_m": 4.0,
+          "shape": "circular",
+          "aspect": 2.0,
+          "material_id": "galv_ashrae",
+          "rounding": "down",
+          "length": 10.0,
+          "regain_R": 0.75,
+          "regain_sections": [
+            [
+              0.8,
+              6.0,
+              0.3
+            ],
+            [
+              0.6,
+              6.0,
+              0.3
+            ],
+            [
+              0.4,
+              6.0,
+              0.3
+            ]
+          ]
+        },
+        "alternatives": [],
+        "notes": ""
+      },
+      "complexity": 3,
+      "maintenance": 3,
+      "capex_index": null,
+      "notes": "Diámetros para velocidad de transporte corregida por densidad."
+    },
+    {
+      "name": "B — Principal un diámetro mayor y rpm ajustadas",
+      "project": {
+        "format_version": 1,
+        "app_version": "1.0.0",
+        "saved": "2026-11-18T12:50:48",
+        "info": {
+          "name": "Banco de pruebas — Nave industrial con 4 campanas",
+          "client": "Caso de validación interno",
+          "location": "Valle de México (altitud 2 240 m)",
+          "engineer": "",
+          "reviewer": "",
+          "date": "2026-11-18",
+          "revision": "0",
+          "ventilation_type": "Extracción localizada industrial (polvo y humos de soldadura)",
+          "description": "Nave con estación de vaciado de sacos, mesa de soldadura, cabina de llenado de sacos y punto de transferencia de banda conectados a un colector de mangas.",
+          "objective": "Capturar polvo industrial y humos de soldadura en su origen, transportarlos sin sedimentación al colector de mangas y descargar aire filtrado por chimenea."
+        },
+        "units": "SI",
+        "air": {
+          "mode": "custom",
+          "t_c": 25.0,
+          "altitude_m": 2240.0,
+          "p_pa": null,
+          "rh": 0.5,
+          "rho_measured": null,
+          "t_min_surface_c": 18.0
+        },
+        "airflow": {
+          "ach": {
+            "enabled": true,
+            "L": 40.0,
+            "W": 20.0,
+            "H": 8.0,
+            "ACH": 4.0,
+            "V": null
+          },
+          "dilution": {
+            "enabled": false,
+            "G_mg_s": 10.0,
+            "C_target": 5.0,
+            "C_bg": 0.0,
+            "K": 3.0,
+            "capture_eff": 0.0,
+            "C0": null,
+            "toxicity_known": false
+          },
+          "thermal": {
+            "enabled": true,
+            "sources_W": [
+              25000.0,
+              15000.0
+            ],
+            "t_in": 25.0,
+            "t_out": 31.0
+          },
+          "occupancy": {
+            "enabled": false,
+            "Rp": 0.0,
+            "Pz": 0.0,
+            "Ra": 0.0,
+            "Az": 0.0,
+            "Ez": 1.0
+          },
+          "purpose": "general",
+          "source_identifiable": true
+        },
+        "hoods": [
+          {
+            "id": "C1",
+            "name": "Estación de vaciado de sacos",
+            "type": "exterior_flanged",
+            "params": {
+              "W": 0.6,
+              "H": 0.45,
+              "X": 0.25,
+              "Vc": 1.0
+            },
+            "entry_id": "flanged_duct_end",
+            "entry": {
+              "kind": "fh",
+              "Fh": 0.49,
+              "Fs": 1.78,
+              "slot_area": null,
+              "plenum_loss": false,
+              "source": "ACGIH, Industrial Ventilation Manual — coeficiente de entrada Ce y factor de pérdida Fh"
+            },
+            "contaminant_class": "average_industrial",
+            "process": "Vaciado manual de sacos de 25 kg",
+            "cross_draft_m_s": null
+          },
+          {
+            "id": "C2",
+            "name": "Mesa de soldadura",
+            "type": "slot_flanged",
+            "params": {
+              "L": 1.0,
+              "Ws": 0.05,
+              "X": 0.3,
+              "Vc": 0.5
+            },
+            "entry_id": "flanged_duct_end",
+            "entry": {
+              "kind": "slot",
+              "Fh": 0.49,
+              "Fs": 1.78,
+              "slot_area": 0.05,
+              "plenum_loss": false,
+              "source": "ACGIH, Industrial Ventilation Manual — coeficiente de entrada Ce y factor de pérdida Fh"
+            },
+            "contaminant_class": "fumes",
+            "process": "Soldadura GMAW en banco",
+            "cross_draft_m_s": null
+          },
+          {
+            "id": "C3",
+            "name": "Cabina de llenado de sacos",
+            "type": "booth",
+            "params": {
+              "W": 1.0,
+              "H": 1.0,
+              "Vc": 0.75
+            },
+            "entry_id": "flanged_duct_end",
+            "entry": {
+              "kind": "fh",
+              "Fh": 0.49,
+              "Fs": 1.78,
+              "slot_area": null,
+              "plenum_loss": false,
+              "source": "ACGIH, Industrial Ventilation Manual — coeficiente de entrada Ce y factor de pérdida Fh"
+            },
+            "contaminant_class": "average_industrial",
+            "process": "Ensacadora",
+            "cross_draft_m_s": null
+          },
+          {
+            "id": "C4",
+            "name": "Transferencia de banda (encerramiento)",
+            "type": "enclosure",
+            "params": {
+              "A_open": 0.38,
+              "Vc": 1.0
+            },
+            "entry_id": "flanged_duct_end",
+            "entry": {
+              "kind": "fh",
+              "Fh": 0.49,
+              "Fs": 1.78,
+              "slot_area": null,
+              "plenum_loss": false,
+              "source": "ACGIH, Industrial Ventilation Manual — coeficiente de entrada Ce y factor de pérdida Fh"
+            },
+            "contaminant_class": "average_industrial",
+            "process": "Punto de transferencia",
+            "cross_draft_m_s": null
+          }
+        ],
+        "network": {
+          "nodes": [
+            {
+              "id": "H1",
+              "kind": "hood",
+              "label": "Vaciado",
+              "hood_id": "C1",
+              "q_design": null,
+              "temperature_c": null,
+              "exit_K": 1.0,
+              "stack_height_above_roof_m": null,
+              "fan_outlet_area_m2": null,
+              "x": null,
+              "y": null
+            },
+            {
+              "id": "H2",
+              "kind": "hood",
+              "label": "Soldadura",
+              "hood_id": "C2",
+              "q_design": null,
+              "temperature_c": null,
+              "exit_K": 1.0,
+              "stack_height_above_roof_m": null,
+              "fan_outlet_area_m2": null,
+              "x": null,
+              "y": null
+            },
+            {
+              "id": "H3",
+              "kind": "hood",
+              "label": "Llenado",
+              "hood_id": "C3",
+              "q_design": null,
+              "temperature_c": null,
+              "exit_K": 1.0,
+              "stack_height_above_roof_m": null,
+              "fan_outlet_area_m2": null,
+              "x": null,
+              "y": null
+            },
+            {
+              "id": "H4",
+              "kind": "hood",
+              "label": "Banda",
+              "hood_id": "C4",
+              "q_design": null,
+              "temperature_c": null,
+              "exit_K": 1.0,
+              "stack_height_above_roof_m": null,
+              "fan_outlet_area_m2": null,
+              "x": null,
+              "y": null
+            },
+            {
+              "id": "J1",
+              "kind": "junction",
+              "label": "Unión 1",
+              "hood_id": null,
+              "q_design": null,
+              "temperature_c": null,
+              "exit_K": 1.0,
+              "stack_height_above_roof_m": null,
+              "fan_outlet_area_m2": null,
+              "x": null,
+              "y": null
+            },
+            {
+              "id": "J2",
+              "kind": "junction",
+              "label": "Unión 2",
+              "hood_id": null,
+              "q_design": null,
+              "temperature_c": null,
+              "exit_K": 1.0,
+              "stack_height_above_roof_m": null,
+              "fan_outlet_area_m2": null,
+              "x": null,
+              "y": null
+            },
+            {
+              "id": "J3",
+              "kind": "junction",
+              "label": "Unión 3",
+              "hood_id": null,
+              "q_design": null,
+              "temperature_c": null,
+              "exit_K": 1.0,
+              "stack_height_above_roof_m": null,
+              "fan_outlet_area_m2": null,
+              "x": null,
+              "y": null
+            },
+            {
+              "id": "COL",
+              "kind": "junction",
+              "label": "Salida colector",
+              "hood_id": null,
+              "q_design": null,
+              "temperature_c": null,
+              "exit_K": 1.0,
+              "stack_height_above_roof_m": null,
+              "fan_outlet_area_m2": null,
+              "x": null,
+              "y": null
+            },
+            {
+              "id": "FAN",
+              "kind": "fan",
+              "label": "Ventilador",
+              "hood_id": null,
+              "q_design": null,
+              "temperature_c": null,
+              "exit_K": 1.0,
+              "stack_height_above_roof_m": null,
+              "fan_outlet_area_m2": null,
+              "x": null,
+              "y": null
+            },
+            {
+              "id": "OUT",
+              "kind": "outlet",
+              "label": "Chimenea",
+              "hood_id": null,
+              "q_design": null,
+              "temperature_c": null,
+              "exit_K": 1.0,
+              "stack_height_above_roof_m": 3.5,
+              "fan_outlet_area_m2": null,
+              "x": null,
+              "y": null
+            }
+          ],
+          "segments": [
+            {
+              "id": "R1",
+              "from_node": "H1",
+              "to_node": "J1",
+              "shape": "circular",
+              "D": 0.2,
+              "a": null,
+              "b": null,
+              "length": 6.0,
+              "material_id": "galv_ashrae",
+              "roughness_m": null,
+              "fittings": [
+                {
+                  "fitting_id": "elbow90_RD2.0",
+                  "qty": 2,
+                  "K_override": null,
+                  "params": {},
+                  "area_ref_m2": null,
+                  "note": ""
+                }
+              ],
+              "equipment": [],
+              "hood_entry": null,
+              "damper_K": 0.0,
+              "contaminant_class": null,
+              "label": ""
+            },
+            {
+              "id": "R2",
+              "from_node": "H2",
+              "to_node": "J1",
+              "shape": "circular",
+              "D": 0.16,
+              "a": null,
+              "b": null,
+              "length": 4.0,
+              "material_id": "galv_ashrae",
+              "roughness_m": null,
+              "fittings": [
+                {
+                  "fitting_id": "elbow90_RD2.0",
+                  "qty": 1,
+                  "K_override": null,
+                  "params": {},
+                  "area_ref_m2": null,
+                  "note": ""
+                },
+                {
+                  "fitting_id": "elbow45_RD2.0",
+                  "qty": 1,
+                  "K_override": null,
+                  "params": {},
+                  "area_ref_m2": null,
+                  "note": ""
+                },
+                {
+                  "fitting_id": "branch_entry_30",
+                  "qty": 1,
+                  "K_override": null,
+                  "params": {},
+                  "area_ref_m2": null,
+                  "note": ""
+                }
+              ],
+              "equipment": [],
+              "hood_entry": null,
+              "damper_K": 0.0,
+              "contaminant_class": null,
+              "label": ""
+            },
+            {
+              "id": "M1",
+              "from_node": "J1",
+              "to_node": "J2",
+              "shape": "circular",
+              "D": 0.28,
+              "a": null,
+              "b": null,
+              "length": 8.0,
+              "material_id": "galv_ashrae",
+              "roughness_m": null,
+              "fittings": [],
+              "equipment": [],
+              "hood_entry": null,
+              "damper_K": 0.0,
+              "contaminant_class": null,
+              "label": ""
+            },
+            {
+              "id": "R3",
+              "from_node": "H3",
+              "to_node": "J2",
+              "shape": "circular",
+              "D": 0.2,
+              "a": null,
+              "b": null,
+              "length": 5.0,
+              "material_id": "galv_ashrae",
+              "roughness_m": null,
+              "fittings": [
+                {
+                  "fitting_id": "elbow90_RD2.0",
+                  "qty": 2,
+                  "K_override": null,
+                  "params": {},
+                  "area_ref_m2": null,
+                  "note": ""
+                },
+                {
+                  "fitting_id": "branch_entry_30",
+                  "qty": 1,
+                  "K_override": null,
+                  "params": {},
+                  "area_ref_m2": null,
+                  "note": ""
+                }
+              ],
+              "equipment": [],
+              "hood_entry": null,
+              "damper_K": 0.0,
+              "contaminant_class": null,
+              "label": ""
+            },
+            {
+              "id": "M2",
+              "from_node": "J2",
+              "to_node": "J3",
+              "shape": "circular",
+              "D": 0.355,
+              "a": null,
+              "b": null,
+              "length": 8.0,
+              "material_id": "galv_ashrae",
+              "roughness_m": null,
+              "fittings": [],
+              "equipment": [],
+              "hood_entry": null,
+              "damper_K": 0.0,
+              "contaminant_class": null,
+              "label": ""
+            },
+            {
+              "id": "R4",
+              "from_node": "H4",
+              "to_node": "J3",
+              "shape": "circular",
+              "D": 0.15,
+              "a": null,
+              "b": null,
+              "length": 12.0,
+              "material_id": "galv_ashrae",
+              "roughness_m": null,
+              "fittings": [
+                {
+                  "fitting_id": "elbow90_RD2.0",
+                  "qty": 1,
+                  "K_override": null,
+                  "params": {},
+                  "area_ref_m2": null,
+                  "note": ""
+                },
+                {
+                  "fitting_id": "branch_entry_45",
+                  "qty": 1,
+                  "K_override": null,
+                  "params": {},
+                  "area_ref_m2": null,
+                  "note": ""
+                }
+              ],
+              "equipment": [],
+              "hood_entry": null,
+              "damper_K": 0.0,
+              "contaminant_class": null,
+              "label": ""
+            },
+            {
+              "id": "M3",
+              "from_node": "J3",
+              "to_node": "COL",
+              "shape": "circular",
+              "D": 0.4,
+              "a": null,
+              "b": null,
+              "length": 12.0,
+              "material_id": "galv_ashrae",
+              "roughness_m": null,
+              "fittings": [
+                {
+                  "fitting_id": "elbow90_RD2.0",
+                  "qty": 2,
+                  "K_override": null,
+                  "params": {},
+                  "area_ref_m2": null,
+                  "note": ""
+                }
+              ],
+              "equipment": [
+                {
+                  "name": "Colector de mangas",
+                  "eq_type": "Colector de polvo (mangas)",
+                  "model": "filter",
+                  "dp_fixed": 0.0,
+                  "dp_ref": 0.0,
+                  "q_ref": 2.3,
+                  "n_exp": 1.0,
+                  "table": [],
+                  "dp_clean": 600.0,
+                  "dp_dirty": 1500.0,
+                  "state": "sucio",
+                  "state_fraction": 1.0,
+                  "source": "Hipótesis del banco de pruebas (sustituir por dato del fabricante)"
+                }
+              ],
+              "hood_entry": null,
+              "damper_K": 0.0,
+              "contaminant_class": null,
+              "label": ""
+            },
+            {
+              "id": "M4",
+              "from_node": "COL",
+              "to_node": "FAN",
+              "shape": "circular",
+              "D": 0.5,
+              "a": null,
+              "b": null,
+              "length": 3.0,
+              "material_id": "galv_ashrae",
+              "roughness_m": null,
+              "fittings": [
+                {
+                  "fitting_id": "elbow90_RD2.0",
+                  "qty": 1,
+                  "K_override": null,
+                  "params": {},
+                  "area_ref_m2": null,
+                  "note": ""
+                }
+              ],
+              "equipment": [],
+              "hood_entry": null,
+              "damper_K": 0.0,
+              "contaminant_class": null,
+              "label": ""
+            },
+            {
+              "id": "D1",
+              "from_node": "FAN",
+              "to_node": "OUT",
+              "shape": "circular",
+              "D": 0.45,
+              "a": null,
+              "b": null,
+              "length": 10.0,
+              "material_id": "galv_ashrae",
+              "roughness_m": null,
+              "fittings": [],
+              "equipment": [],
+              "hood_entry": null,
+              "damper_K": 0.0,
+              "contaminant_class": null,
+              "label": ""
+            }
+          ]
+        },
+        "network_settings": {
+          "contaminant_class": "average_industrial",
+          "strategy": "acgih",
+          "filter_state_design": "sucio",
+          "roof_height_m": 9.0
+        },
+        "fans": [
+          {
+            "id": "BI-560",
+            "manufacturer": "EJEMPLO (curva sintética)",
+            "model": "EJEMPLO BI-560 (inclinado hacia atrás)",
+            "fan_type": "Centrífugo",
+            "rpm": 2200,
+            "rho_ref": 1.2,
+            "diameter_m": null,
+            "outlet_area_m2": 0.16,
+            "pressure_basis": "total",
+            "points": [
+              {
+                "Q": 0.5,
+                "P": 3300,
+                "eta": 0.45,
+                "W": 3666.6666666666665
+              },
+              {
+                "Q": 1.0,
+                "P": 3450,
+                "eta": 0.62,
+                "W": 5564.5161290322585
+              },
+              {
+                "Q": 1.5,
+                "P": 3450,
+                "eta": 0.72,
+                "W": 7187.5
+              },
+              {
+                "Q": 2.0,
+                "P": 3300,
+                "eta": 0.78,
+                "W": 8461.538461538461
+              },
+              {
+                "Q": 2.5,
+                "P": 3020,
+                "eta": 0.8,
+                "W": 9437.5
+              },
+              {
+                "Q": 3.0,
+                "P": 2620,
+                "eta": 0.78,
+                "W": 10076.923076923076
+              },
+              {
+                "Q": 3.5,
+                "P": 2100,
+                "eta": 0.7,
+                "W": 10500.0
+              },
+              {
+                "Q": 4.0,
+                "P": 1450,
+                "eta": 0.55,
+                "W": 10545.454545454544
+              }
+            ],
+            "max_rpm": 2600,
+            "q_min_rec": null,
+            "q_max_rec": null,
+            "certified": false,
+            "source": "Curva sintética de demostración — NO es dato de fabricante",
+            "notes": "Rodete de álabes inclinados hacia atrás; lado limpio."
+          },
+          {
+            "id": "RT-500",
+            "manufacturer": "EJEMPLO (curva sintética)",
+            "model": "EJEMPLO RT-500 (punta radial)",
+            "fan_type": "Centrífugo",
+            "rpm": 2600,
+            "rho_ref": 1.2,
+            "diameter_m": null,
+            "outlet_area_m2": 0.14,
+            "pressure_basis": "total",
+            "points": [
+              {
+                "Q": 0.5,
+                "P": 3400,
+                "eta": 0.4,
+                "W": 4250.0
+              },
+              {
+                "Q": 1.0,
+                "P": 3420,
+                "eta": 0.55,
+                "W": 6218.181818181818
+              },
+              {
+                "Q": 1.5,
+                "P": 3380,
+                "eta": 0.63,
+                "W": 8047.619047619048
+              },
+              {
+                "Q": 2.0,
+                "P": 3280,
+                "eta": 0.67,
+                "W": 9791.044776119403
+              },
+              {
+                "Q": 2.5,
+                "P": 3120,
+                "eta": 0.68,
+                "W": 11470.588235294117
+              },
+              {
+                "Q": 3.0,
+                "P": 2900,
+                "eta": 0.66,
+                "W": 13181.818181818182
+              },
+              {
+                "Q": 3.5,
+                "P": 2600,
+                "eta": 0.6,
+                "W": 15166.666666666668
+              },
+              {
+                "Q": 4.0,
+                "P": 2200,
+                "eta": 0.5,
+                "W": 17600.0
+              }
+            ],
+            "max_rpm": 3000,
+            "q_min_rec": null,
+            "q_max_rec": null,
+            "certified": false,
+            "source": "Curva sintética de demostración — NO es dato de fabricante",
+            "notes": "Rodete de punta radial; mayor tolerancia a la abrasión, menor eficiencia."
+          },
+          {
+            "id": "BI-450",
+            "manufacturer": "EJEMPLO (curva sintética)",
+            "model": "EJEMPLO BI-450 (subdimensionado)",
+            "fan_type": "Centrífugo",
+            "rpm": 2200,
+            "rho_ref": 1.2,
+            "diameter_m": null,
+            "outlet_area_m2": 0.12,
+            "pressure_basis": "total",
+            "points": [
+              {
+                "Q": 0.5,
+                "P": 2600,
+                "eta": 0.45,
+                "W": 2888.8888888888887
+              },
+              {
+                "Q": 1.0,
+                "P": 2700,
+                "eta": 0.62,
+                "W": 4354.8387096774195
+              },
+              {
+                "Q": 1.5,
+                "P": 2650,
+                "eta": 0.72,
+                "W": 5520.833333333334
+              },
+              {
+                "Q": 2.0,
+                "P": 2450,
+                "eta": 0.78,
+                "W": 6282.051282051282
+              },
+              {
+                "Q": 2.5,
+                "P": 2150,
+                "eta": 0.79,
+                "W": 6803.79746835443
+              },
+              {
+                "Q": 3.0,
+                "P": 1750,
+                "eta": 0.76,
+                "W": 6907.894736842105
+              },
+              {
+                "Q": 3.5,
+                "P": 1250,
+                "eta": 0.66,
+                "W": 6628.787878787878
+              },
+              {
+                "Q": 4.0,
+                "P": 700,
+                "eta": 0.5,
+                "W": 5600.0
+              }
+            ],
+            "max_rpm": 2600,
+            "q_min_rec": null,
+            "q_max_rec": null,
+            "certified": false,
+            "source": "Curva sintética de demostración — NO es dato de fabricante",
+            "notes": "Ventilador pequeño para demostrar el déficit de caudal."
+          }
+        ],
+        "fan_selection": {
+          "selected_id": "BI-560",
+          "rpm": 2230.0,
+          "diameter_m": null,
+          "use_operating_solution": true
+        },
+        "power": {
+          "eta_fan_user": 0.75,
+          "eta_basis": "total",
+          "drive_type": "Bandas",
+          "eta_drive": 0.95,
+          "eta_motor": 0.917,
+          "use_vfd": false,
+          "eta_vfd": 0.97,
+          "margin": 0.1,
+          "service_factor": 1.15,
+          "motor_standard": "IEC",
+          "motor_selected_kw": null,
+          "hours_per_year": 4800.0,
+          "tariff": 2.4,
+          "currency": "MXN",
+          "profile": [
+            [
+              1.0,
+              0.6
+            ],
+            [
+              0.85,
+              0.3
+            ],
+            [
+              0.7,
+              0.1
+            ]
+          ]
+        },
+        "duct_tool": {
+          "method": "velocity",
+          "Q": 2.3,
+          "V_target": 21.0,
+          "dp_per_m": 4.0,
+          "shape": "circular",
+          "aspect": 2.0,
+          "material_id": "galv_ashrae",
+          "rounding": "down",
+          "length": 10.0,
+          "regain_R": 0.75,
+          "regain_sections": [
+            [
+              0.8,
+              6.0,
+              0.3
+            ],
+            [
+              0.6,
+              6.0,
+              0.3
+            ],
+            [
+              0.4,
+              6.0,
+              0.3
+            ]
+          ]
+        },
+        "alternatives": [],
+        "notes": ""
+      },
+      "complexity": 3,
+      "maintenance": 4,
+      "capex_index": null,
+      "notes": "Menor velocidad en el principal; rpm ajustadas a su punto de diseño."
+    },
+    {
+      "name": "C — Ventilador de punta radial RT-500",
+      "project": {
+        "format_version": 1,
+        "app_version": "1.0.0",
+        "saved": "2026-11-18T12:50:48",
+        "info": {
+          "name": "Banco de pruebas — Nave industrial con 4 campanas",
+          "client": "Caso de validación interno",
+          "location": "Valle de México (altitud 2 240 m)",
+          "engineer": "",
+          "reviewer": "",
+          "date": "2026-11-18",
+          "revision": "0",
+          "ventilation_type": "Extracción localizada industrial (polvo y humos de soldadura)",
+          "description": "Nave con estación de vaciado de sacos, mesa de soldadura, cabina de llenado de sacos y punto de transferencia de banda conectados a un colector de mangas.",
+          "objective": "Capturar polvo industrial y humos de soldadura en su origen, transportarlos sin sedimentación al colector de mangas y descargar aire filtrado por chimenea."
+        },
+        "units": "SI",
+        "air": {
+          "mode": "custom",
+          "t_c": 25.0,
+          "altitude_m": 2240.0,
+          "p_pa": null,
+          "rh": 0.5,
+          "rho_measured": null,
+          "t_min_surface_c": 18.0
+        },
+        "airflow": {
+          "ach": {
+            "enabled": true,
+            "L": 40.0,
+            "W": 20.0,
+            "H": 8.0,
+            "ACH": 4.0,
+            "V": null
+          },
+          "dilution": {
+            "enabled": false,
+            "G_mg_s": 10.0,
+            "C_target": 5.0,
+            "C_bg": 0.0,
+            "K": 3.0,
+            "capture_eff": 0.0,
+            "C0": null,
+            "toxicity_known": false
+          },
+          "thermal": {
+            "enabled": true,
+            "sources_W": [
+              25000.0,
+              15000.0
+            ],
+            "t_in": 25.0,
+            "t_out": 31.0
+          },
+          "occupancy": {
+            "enabled": false,
+            "Rp": 0.0,
+            "Pz": 0.0,
+            "Ra": 0.0,
+            "Az": 0.0,
+            "Ez": 1.0
+          },
+          "purpose": "general",
+          "source_identifiable": true
+        },
+        "hoods": [
+          {
+            "id": "C1",
+            "name": "Estación de vaciado de sacos",
+            "type": "exterior_flanged",
+            "params": {
+              "W": 0.6,
+              "H": 0.45,
+              "X": 0.25,
+              "Vc": 1.0
+            },
+            "entry_id": "flanged_duct_end",
+            "entry": {
+              "kind": "fh",
+              "Fh": 0.49,
+              "Fs": 1.78,
+              "slot_area": null,
+              "plenum_loss": false,
+              "source": "ACGIH, Industrial Ventilation Manual — coeficiente de entrada Ce y factor de pérdida Fh"
+            },
+            "contaminant_class": "average_industrial",
+            "process": "Vaciado manual de sacos de 25 kg",
+            "cross_draft_m_s": null
+          },
+          {
+            "id": "C2",
+            "name": "Mesa de soldadura",
+            "type": "slot_flanged",
+            "params": {
+              "L": 1.0,
+              "Ws": 0.05,
+              "X": 0.3,
+              "Vc": 0.5
+            },
+            "entry_id": "flanged_duct_end",
+            "entry": {
+              "kind": "slot",
+              "Fh": 0.49,
+              "Fs": 1.78,
+              "slot_area": 0.05,
+              "plenum_loss": false,
+              "source": "ACGIH, Industrial Ventilation Manual — coeficiente de entrada Ce y factor de pérdida Fh"
+            },
+            "contaminant_class": "fumes",
+            "process": "Soldadura GMAW en banco",
+            "cross_draft_m_s": null
+          },
+          {
+            "id": "C3",
+            "name": "Cabina de llenado de sacos",
+            "type": "booth",
+            "params": {
+              "W": 1.0,
+              "H": 1.0,
+              "Vc": 0.75
+            },
+            "entry_id": "flanged_duct_end",
+            "entry": {
+              "kind": "fh",
+              "Fh": 0.49,
+              "Fs": 1.78,
+              "slot_area": null,
+              "plenum_loss": false,
+              "source": "ACGIH, Industrial Ventilation Manual — coeficiente de entrada Ce y factor de pérdida Fh"
+            },
+            "contaminant_class": "average_industrial",
+            "process": "Ensacadora",
+            "cross_draft_m_s": null
+          },
+          {
+            "id": "C4",
+            "name": "Transferencia de banda (encerramiento)",
+            "type": "enclosure",
+            "params": {
+              "A_open": 0.38,
+              "Vc": 1.0
+            },
+            "entry_id": "flanged_duct_end",
+            "entry": {
+              "kind": "fh",
+              "Fh": 0.49,
+              "Fs": 1.78,
+              "slot_area": null,
+              "plenum_loss": false,
+              "source": "ACGIH, Industrial Ventilation Manual — coeficiente de entrada Ce y factor de pérdida Fh"
+            },
+            "contaminant_class": "average_industrial",
+            "process": "Punto de transferencia",
+            "cross_draft_m_s": null
+          }
+        ],
+        "network": {
+          "nodes": [
+            {
+              "id": "H1",
+              "kind": "hood",
+              "label": "Vaciado",
+              "hood_id": "C1",
+              "q_design": null,
+              "temperature_c": null,
+              "exit_K": 1.0,
+              "stack_height_above_roof_m": null,
+              "fan_outlet_area_m2": null,
+              "x": null,
+              "y": null
+            },
+            {
+              "id": "H2",
+              "kind": "hood",
+              "label": "Soldadura",
+              "hood_id": "C2",
+              "q_design": null,
+              "temperature_c": null,
+              "exit_K": 1.0,
+              "stack_height_above_roof_m": null,
+              "fan_outlet_area_m2": null,
+              "x": null,
+              "y": null
+            },
+            {
+              "id": "H3",
+              "kind": "hood",
+              "label": "Llenado",
+              "hood_id": "C3",
+              "q_design": null,
+              "temperature_c": null,
+              "exit_K": 1.0,
+              "stack_height_above_roof_m": null,
+              "fan_outlet_area_m2": null,
+              "x": null,
+              "y": null
+            },
+            {
+              "id": "H4",
+              "kind": "hood",
+              "label": "Banda",
+              "hood_id": "C4",
+              "q_design": null,
+              "temperature_c": null,
+              "exit_K": 1.0,
+              "stack_height_above_roof_m": null,
+              "fan_outlet_area_m2": null,
+              "x": null,
+              "y": null
+            },
+            {
+              "id": "J1",
+              "kind": "junction",
+              "label": "Unión 1",
+              "hood_id": null,
+              "q_design": null,
+              "temperature_c": null,
+              "exit_K": 1.0,
+              "stack_height_above_roof_m": null,
+              "fan_outlet_area_m2": null,
+              "x": null,
+              "y": null
+            },
+            {
+              "id": "J2",
+              "kind": "junction",
+              "label": "Unión 2",
+              "hood_id": null,
+              "q_design": null,
+              "temperature_c": null,
+              "exit_K": 1.0,
+              "stack_height_above_roof_m": null,
+              "fan_outlet_area_m2": null,
+              "x": null,
+              "y": null
+            },
+            {
+              "id": "J3",
+              "kind": "junction",
+              "label": "Unión 3",
+              "hood_id": null,
+              "q_design": null,
+              "temperature_c": null,
+              "exit_K": 1.0,
+              "stack_height_above_roof_m": null,
+              "fan_outlet_area_m2": null,
+              "x": null,
+              "y": null
+            },
+            {
+              "id": "COL",
+              "kind": "junction",
+              "label": "Salida colector",
+              "hood_id": null,
+              "q_design": null,
+              "temperature_c": null,
+              "exit_K": 1.0,
+              "stack_height_above_roof_m": null,
+              "fan_outlet_area_m2": null,
+              "x": null,
+              "y": null
+            },
+            {
+              "id": "FAN",
+              "kind": "fan",
+              "label": "Ventilador",
+              "hood_id": null,
+              "q_design": null,
+              "temperature_c": null,
+              "exit_K": 1.0,
+              "stack_height_above_roof_m": null,
+              "fan_outlet_area_m2": null,
+              "x": null,
+              "y": null
+            },
+            {
+              "id": "OUT",
+              "kind": "outlet",
+              "label": "Chimenea",
+              "hood_id": null,
+              "q_design": null,
+              "temperature_c": null,
+              "exit_K": 1.0,
+              "stack_height_above_roof_m": 3.5,
+              "fan_outlet_area_m2": null,
+              "x": null,
+              "y": null
+            }
+          ],
+          "segments": [
+            {
+              "id": "R1",
+              "from_node": "H1",
+              "to_node": "J1",
+              "shape": "circular",
+              "D": 0.2,
+              "a": null,
+              "b": null,
+              "length": 6.0,
+              "material_id": "galv_ashrae",
+              "roughness_m": null,
+              "fittings": [
+                {
+                  "fitting_id": "elbow90_RD2.0",
+                  "qty": 2,
+                  "K_override": null,
+                  "params": {},
+                  "area_ref_m2": null,
+                  "note": ""
+                }
+              ],
+              "equipment": [],
+              "hood_entry": null,
+              "damper_K": 0.0,
+              "contaminant_class": null,
+              "label": ""
+            },
+            {
+              "id": "R2",
+              "from_node": "H2",
+              "to_node": "J1",
+              "shape": "circular",
+              "D": 0.16,
+              "a": null,
+              "b": null,
+              "length": 4.0,
+              "material_id": "galv_ashrae",
+              "roughness_m": null,
+              "fittings": [
+                {
+                  "fitting_id": "elbow90_RD2.0",
+                  "qty": 1,
+                  "K_override": null,
+                  "params": {},
+                  "area_ref_m2": null,
+                  "note": ""
+                },
+                {
+                  "fitting_id": "elbow45_RD2.0",
+                  "qty": 1,
+                  "K_override": null,
+                  "params": {},
+                  "area_ref_m2": null,
+                  "note": ""
+                },
+                {
+                  "fitting_id": "branch_entry_30",
+                  "qty": 1,
+                  "K_override": null,
+                  "params": {},
+                  "area_ref_m2": null,
+                  "note": ""
+                }
+              ],
+              "equipment": [],
+              "hood_entry": null,
+              "damper_K": 0.0,
+              "contaminant_class": null,
+              "label": ""
+            },
+            {
+              "id": "M1",
+              "from_node": "J1",
+              "to_node": "J2",
+              "shape": "circular",
+              "D": 0.25,
+              "a": null,
+              "b": null,
+              "length": 8.0,
+              "material_id": "galv_ashrae",
+              "roughness_m": null,
+              "fittings": [],
+              "equipment": [],
+              "hood_entry": null,
+              "damper_K": 0.0,
+              "contaminant_class": null,
+              "label": ""
+            },
+            {
+              "id": "R3",
+              "from_node": "H3",
+              "to_node": "J2",
+              "shape": "circular",
+              "D": 0.2,
+              "a": null,
+              "b": null,
+              "length": 5.0,
+              "material_id": "galv_ashrae",
+              "roughness_m": null,
+              "fittings": [
+                {
+                  "fitting_id": "elbow90_RD2.0",
+                  "qty": 2,
+                  "K_override": null,
+                  "params": {},
+                  "area_ref_m2": null,
+                  "note": ""
+                },
+                {
+                  "fitting_id": "branch_entry_30",
+                  "qty": 1,
+                  "K_override": null,
+                  "params": {},
+                  "area_ref_m2": null,
+                  "note": ""
+                }
+              ],
+              "equipment": [],
+              "hood_entry": null,
+              "damper_K": 0.0,
+              "contaminant_class": null,
+              "label": ""
+            },
+            {
+              "id": "M2",
+              "from_node": "J2",
+              "to_node": "J3",
+              "shape": "circular",
+              "D": 0.315,
+              "a": null,
+              "b": null,
+              "length": 8.0,
+              "material_id": "galv_ashrae",
+              "roughness_m": null,
+              "fittings": [],
+              "equipment": [],
+              "hood_entry": null,
+              "damper_K": 0.0,
+              "contaminant_class": null,
+              "label": ""
+            },
+            {
+              "id": "R4",
+              "from_node": "H4",
+              "to_node": "J3",
+              "shape": "circular",
+              "D": 0.15,
+              "a": null,
+              "b": null,
+              "length": 12.0,
+              "material_id": "galv_ashrae",
+              "roughness_m": null,
+              "fittings": [
+                {
+                  "fitting_id": "elbow90_RD2.0",
+                  "qty": 1,
+                  "K_override": null,
+                  "params": {},
+                  "area_ref_m2": null,
+                  "note": ""
+                },
+                {
+                  "fitting_id": "branch_entry_45",
+                  "qty": 1,
+                  "K_override": null,
+                  "params": {},
+                  "area_ref_m2": null,
+                  "note": ""
+                }
+              ],
+              "equipment": [],
+              "hood_entry": null,
+              "damper_K": 0.0,
+              "contaminant_class": null,
+              "label": ""
+            },
+            {
+              "id": "M3",
+              "from_node": "J3",
+              "to_node": "COL",
+              "shape": "circular",
+              "D": 0.355,
+              "a": null,
+              "b": null,
+              "length": 12.0,
+              "material_id": "galv_ashrae",
+              "roughness_m": null,
+              "fittings": [
+                {
+                  "fitting_id": "elbow90_RD2.0",
+                  "qty": 2,
+                  "K_override": null,
+                  "params": {},
+                  "area_ref_m2": null,
+                  "note": ""
+                }
+              ],
+              "equipment": [
+                {
+                  "name": "Colector de mangas",
+                  "eq_type": "Colector de polvo (mangas)",
+                  "model": "filter",
+                  "dp_fixed": 0.0,
+                  "dp_ref": 0.0,
+                  "q_ref": 2.3,
+                  "n_exp": 1.0,
+                  "table": [],
+                  "dp_clean": 600.0,
+                  "dp_dirty": 1500.0,
+                  "state": "sucio",
+                  "state_fraction": 1.0,
+                  "source": "Hipótesis del banco de pruebas (sustituir por dato del fabricante)"
+                }
+              ],
+              "hood_entry": null,
+              "damper_K": 0.0,
+              "contaminant_class": null,
+              "label": ""
+            },
+            {
+              "id": "M4",
+              "from_node": "COL",
+              "to_node": "FAN",
+              "shape": "circular",
+              "D": 0.5,
+              "a": null,
+              "b": null,
+              "length": 3.0,
+              "material_id": "galv_ashrae",
+              "roughness_m": null,
+              "fittings": [
+                {
+                  "fitting_id": "elbow90_RD2.0",
+                  "qty": 1,
+                  "K_override": null,
+                  "params": {},
+                  "area_ref_m2": null,
+                  "note": ""
+                }
+              ],
+              "equipment": [],
+              "hood_entry": null,
+              "damper_K": 0.0,
+              "contaminant_class": null,
+              "label": ""
+            },
+            {
+              "id": "D1",
+              "from_node": "FAN",
+              "to_node": "OUT",
+              "shape": "circular",
+              "D": 0.45,
+              "a": null,
+              "b": null,
+              "length": 10.0,
+              "material_id": "galv_ashrae",
+              "roughness_m": null,
+              "fittings": [],
+              "equipment": [],
+              "hood_entry": null,
+              "damper_K": 0.0,
+              "contaminant_class": null,
+              "label": ""
+            }
+          ]
+        },
+        "network_settings": {
+          "contaminant_class": "average_industrial",
+          "strategy": "acgih",
+          "filter_state_design": "sucio",
+          "roof_height_m": 9.0
+        },
+        "fans": [
+          {
+            "id": "BI-560",
+            "manufacturer": "EJEMPLO (curva sintética)",
+            "model": "EJEMPLO BI-560 (inclinado hacia atrás)",
+            "fan_type": "Centrífugo",
+            "rpm": 2200,
+            "rho_ref": 1.2,
+            "diameter_m": null,
+            "outlet_area_m2": 0.16,
+            "pressure_basis": "total",
+            "points": [
+              {
+                "Q": 0.5,
+                "P": 3300,
+                "eta": 0.45,
+                "W": 3666.6666666666665
+              },
+              {
+                "Q": 1.0,
+                "P": 3450,
+                "eta": 0.62,
+                "W": 5564.5161290322585
+              },
+              {
+                "Q": 1.5,
+                "P": 3450,
+                "eta": 0.72,
+                "W": 7187.5
+              },
+              {
+                "Q": 2.0,
+                "P": 3300,
+                "eta": 0.78,
+                "W": 8461.538461538461
+              },
+              {
+                "Q": 2.5,
+                "P": 3020,
+                "eta": 0.8,
+                "W": 9437.5
+              },
+              {
+                "Q": 3.0,
+                "P": 2620,
+                "eta": 0.78,
+                "W": 10076.923076923076
+              },
+              {
+                "Q": 3.5,
+                "P": 2100,
+                "eta": 0.7,
+                "W": 10500.0
+              },
+              {
+                "Q": 4.0,
+                "P": 1450,
+                "eta": 0.55,
+                "W": 10545.454545454544
+              }
+            ],
+            "max_rpm": 2600,
+            "q_min_rec": null,
+            "q_max_rec": null,
+            "certified": false,
+            "source": "Curva sintética de demostración — NO es dato de fabricante",
+            "notes": "Rodete de álabes inclinados hacia atrás; lado limpio."
+          },
+          {
+            "id": "RT-500",
+            "manufacturer": "EJEMPLO (curva sintética)",
+            "model": "EJEMPLO RT-500 (punta radial)",
+            "fan_type": "Centrífugo",
+            "rpm": 2600,
+            "rho_ref": 1.2,
+            "diameter_m": null,
+            "outlet_area_m2": 0.14,
+            "pressure_basis": "total",
+            "points": [
+              {
+                "Q": 0.5,
+                "P": 3400,
+                "eta": 0.4,
+                "W": 4250.0
+              },
+              {
+                "Q": 1.0,
+                "P": 3420,
+                "eta": 0.55,
+                "W": 6218.181818181818
+              },
+              {
+                "Q": 1.5,
+                "P": 3380,
+                "eta": 0.63,
+                "W": 8047.619047619048
+              },
+              {
+                "Q": 2.0,
+                "P": 3280,
+                "eta": 0.67,
+                "W": 9791.044776119403
+              },
+              {
+                "Q": 2.5,
+                "P": 3120,
+                "eta": 0.68,
+                "W": 11470.588235294117
+              },
+              {
+                "Q": 3.0,
+                "P": 2900,
+                "eta": 0.66,
+                "W": 13181.818181818182
+              },
+              {
+                "Q": 3.5,
+                "P": 2600,
+                "eta": 0.6,
+                "W": 15166.666666666668
+              },
+              {
+                "Q": 4.0,
+                "P": 2200,
+                "eta": 0.5,
+                "W": 17600.0
+              }
+            ],
+            "max_rpm": 3000,
+            "q_min_rec": null,
+            "q_max_rec": null,
+            "certified": false,
+            "source": "Curva sintética de demostración — NO es dato de fabricante",
+            "notes": "Rodete de punta radial; mayor tolerancia a la abrasión, menor eficiencia."
+          },
+          {
+            "id": "BI-450",
+            "manufacturer": "EJEMPLO (curva sintética)",
+            "model": "EJEMPLO BI-450 (subdimensionado)",
+            "fan_type": "Centrífugo",
+            "rpm": 2200,
+            "rho_ref": 1.2,
+            "diameter_m": null,
+            "outlet_area_m2": 0.12,
+            "pressure_basis": "total",
+            "points": [
+              {
+                "Q": 0.5,
+                "P": 2600,
+                "eta": 0.45,
+                "W": 2888.8888888888887
+              },
+              {
+                "Q": 1.0,
+                "P": 2700,
+                "eta": 0.62,
+                "W": 4354.8387096774195
+              },
+              {
+                "Q": 1.5,
+                "P": 2650,
+                "eta": 0.72,
+                "W": 5520.833333333334
+              },
+              {
+                "Q": 2.0,
+                "P": 2450,
+                "eta": 0.78,
+                "W": 6282.051282051282
+              },
+              {
+                "Q": 2.5,
+                "P": 2150,
+                "eta": 0.79,
+                "W": 6803.79746835443
+              },
+              {
+                "Q": 3.0,
+                "P": 1750,
+                "eta": 0.76,
+                "W": 6907.894736842105
+              },
+              {
+                "Q": 3.5,
+                "P": 1250,
+                "eta": 0.66,
+                "W": 6628.787878787878
+              },
+              {
+                "Q": 4.0,
+                "P": 700,
+                "eta": 0.5,
+                "W": 5600.0
+              }
+            ],
+            "max_rpm": 2600,
+            "q_min_rec": null,
+            "q_max_rec": null,
+            "certified": false,
+            "source": "Curva sintética de demostración — NO es dato de fabricante",
+            "notes": "Ventilador pequeño para demostrar el déficit de caudal."
+          }
+        ],
+        "fan_selection": {
+          "selected_id": "RT-500",
+          "rpm": null,
+          "diameter_m": null,
+          "use_operating_solution": true
+        },
+        "power": {
+          "eta_fan_user": 0.75,
+          "eta_basis": "total",
+          "drive_type": "Bandas",
+          "eta_drive": 0.95,
+          "eta_motor": 0.917,
+          "use_vfd": false,
+          "eta_vfd": 0.97,
+          "margin": 0.1,
+          "service_factor": 1.15,
+          "motor_standard": "IEC",
+          "motor_selected_kw": null,
+          "hours_per_year": 4800.0,
+          "tariff": 2.4,
+          "currency": "MXN",
+          "profile": [
+            [
+              1.0,
+              0.6
+            ],
+            [
+              0.85,
+              0.3
+            ],
+            [
+              0.7,
+              0.1
+            ]
+          ]
+        },
+        "duct_tool": {
+          "method": "velocity",
+          "Q": 2.3,
+          "V_target": 21.0,
+          "dp_per_m": 4.0,
+          "shape": "circular",
+          "aspect": 2.0,
+          "material_id": "galv_ashrae",
+          "rounding": "down",
+          "length": 10.0,
+          "regain_R": 0.75,
+          "regain_sections": [
+            [
+              0.8,
+              6.0,
+              0.3
+            ],
+            [
+              0.6,
+              6.0,
+              0.3
+            ],
+            [
+              0.4,
+              6.0,
+              0.3
+            ]
+          ]
+        },
+        "alternatives": [],
+        "notes": ""
+      },
+      "complexity": 3,
+      "maintenance": 2,
+      "capex_index": null,
+      "notes": "Mayor robustez ante abrasión; menor eficiencia."
+    },
+    {
+      "name": "D — Ventilador pequeño BI-450",
+      "project": {
+        "format_version": 1,
+        "app_version": "1.0.0",
+        "saved": "2026-11-18T12:50:48",
+        "info": {
+          "name": "Banco de pruebas — Nave industrial con 4 campanas",
+          "client": "Caso de validación interno",
+          "location": "Valle de México (altitud 2 240 m)",
+          "engineer": "",
+          "reviewer": "",
+          "date": "2026-11-18",
+          "revision": "0",
+          "ventilation_type": "Extracción localizada industrial (polvo y humos de soldadura)",
+          "description": "Nave con estación de vaciado de sacos, mesa de soldadura, cabina de llenado de sacos y punto de transferencia de banda conectados a un colector de mangas.",
+          "objective": "Capturar polvo industrial y humos de soldadura en su origen, transportarlos sin sedimentación al colector de mangas y descargar aire filtrado por chimenea."
+        },
+        "units": "SI",
+        "air": {
+          "mode": "custom",
+          "t_c": 25.0,
+          "altitude_m": 2240.0,
+          "p_pa": null,
+          "rh": 0.5,
+          "rho_measured": null,
+          "t_min_surface_c": 18.0
+        },
+        "airflow": {
+          "ach": {
+            "enabled": true,
+            "L": 40.0,
+            "W": 20.0,
+            "H": 8.0,
+            "ACH": 4.0,
+            "V": null
+          },
+          "dilution": {
+            "enabled": false,
+            "G_mg_s": 10.0,
+            "C_target": 5.0,
+            "C_bg": 0.0,
+            "K": 3.0,
+            "capture_eff": 0.0,
+            "C0": null,
+            "toxicity_known": false
+          },
+          "thermal": {
+            "enabled": true,
+            "sources_W": [
+              25000.0,
+              15000.0
+            ],
+            "t_in": 25.0,
+            "t_out": 31.0
+          },
+          "occupancy": {
+            "enabled": false,
+            "Rp": 0.0,
+            "Pz": 0.0,
+            "Ra": 0.0,
+            "Az": 0.0,
+            "Ez": 1.0
+          },
+          "purpose": "general",
+          "source_identifiable": true
+        },
+        "hoods": [
+          {
+            "id": "C1",
+            "name": "Estación de vaciado de sacos",
+            "type": "exterior_flanged",
+            "params": {
+              "W": 0.6,
+              "H": 0.45,
+              "X": 0.25,
+              "Vc": 1.0
+            },
+            "entry_id": "flanged_duct_end",
+            "entry": {
+              "kind": "fh",
+              "Fh": 0.49,
+              "Fs": 1.78,
+              "slot_area": null,
+              "plenum_loss": false,
+              "source": "ACGIH, Industrial Ventilation Manual — coeficiente de entrada Ce y factor de pérdida Fh"
+            },
+            "contaminant_class": "average_industrial",
+            "process": "Vaciado manual de sacos de 25 kg",
+            "cross_draft_m_s": null
+          },
+          {
+            "id": "C2",
+            "name": "Mesa de soldadura",
+            "type": "slot_flanged",
+            "params": {
+              "L": 1.0,
+              "Ws": 0.05,
+              "X": 0.3,
+              "Vc": 0.5
+            },
+            "entry_id": "flanged_duct_end",
+            "entry": {
+              "kind": "slot",
+              "Fh": 0.49,
+              "Fs": 1.78,
+              "slot_area": 0.05,
+              "plenum_loss": false,
+              "source": "ACGIH, Industrial Ventilation Manual — coeficiente de entrada Ce y factor de pérdida Fh"
+            },
+            "contaminant_class": "fumes",
+            "process": "Soldadura GMAW en banco",
+            "cross_draft_m_s": null
+          },
+          {
+            "id": "C3",
+            "name": "Cabina de llenado de sacos",
+            "type": "booth",
+            "params": {
+              "W": 1.0,
+              "H": 1.0,
+              "Vc": 0.75
+            },
+            "entry_id": "flanged_duct_end",
+            "entry": {
+              "kind": "fh",
+              "Fh": 0.49,
+              "Fs": 1.78,
+              "slot_area": null,
+              "plenum_loss": false,
+              "source": "ACGIH, Industrial Ventilation Manual — coeficiente de entrada Ce y factor de pérdida Fh"
+            },
+            "contaminant_class": "average_industrial",
+            "process": "Ensacadora",
+            "cross_draft_m_s": null
+          },
+          {
+            "id": "C4",
+            "name": "Transferencia de banda (encerramiento)",
+            "type": "enclosure",
+            "params": {
+              "A_open": 0.38,
+              "Vc": 1.0
+            },
+            "entry_id": "flanged_duct_end",
+            "entry": {
+              "kind": "fh",
+              "Fh": 0.49,
+              "Fs": 1.78,
+              "slot_area": null,
+              "plenum_loss": false,
+              "source": "ACGIH, Industrial Ventilation Manual — coeficiente de entrada Ce y factor de pérdida Fh"
+            },
+            "contaminant_class": "average_industrial",
+            "process": "Punto de transferencia",
+            "cross_draft_m_s": null
+          }
+        ],
+        "network": {
+          "nodes": [
+            {
+              "id": "H1",
+              "kind": "hood",
+              "label": "Vaciado",
+              "hood_id": "C1",
+              "q_design": null,
+              "temperature_c": null,
+              "exit_K": 1.0,
+              "stack_height_above_roof_m": null,
+              "fan_outlet_area_m2": null,
+              "x": null,
+              "y": null
+            },
+            {
+              "id": "H2",
+              "kind": "hood",
+              "label": "Soldadura",
+              "hood_id": "C2",
+              "q_design": null,
+              "temperature_c": null,
+              "exit_K": 1.0,
+              "stack_height_above_roof_m": null,
+              "fan_outlet_area_m2": null,
+              "x": null,
+              "y": null
+            },
+            {
+              "id": "H3",
+              "kind": "hood",
+              "label": "Llenado",
+              "hood_id": "C3",
+              "q_design": null,
+              "temperature_c": null,
+              "exit_K": 1.0,
+              "stack_height_above_roof_m": null,
+              "fan_outlet_area_m2": null,
+              "x": null,
+              "y": null
+            },
+            {
+              "id": "H4",
+              "kind": "hood",
+              "label": "Banda",
+              "hood_id": "C4",
+              "q_design": null,
+              "temperature_c": null,
+              "exit_K": 1.0,
+              "stack_height_above_roof_m": null,
+              "fan_outlet_area_m2": null,
+              "x": null,
+              "y": null
+            },
+            {
+              "id": "J1",
+              "kind": "junction",
+              "label": "Unión 1",
+              "hood_id": null,
+              "q_design": null,
+              "temperature_c": null,
+              "exit_K": 1.0,
+              "stack_height_above_roof_m": null,
+              "fan_outlet_area_m2": null,
+              "x": null,
+              "y": null
+            },
+            {
+              "id": "J2",
+              "kind": "junction",
+              "label": "Unión 2",
+              "hood_id": null,
+              "q_design": null,
+              "temperature_c": null,
+              "exit_K": 1.0,
+              "stack_height_above_roof_m": null,
+              "fan_outlet_area_m2": null,
+              "x": null,
+              "y": null
+            },
+            {
+              "id": "J3",
+              "kind": "junction",
+              "label": "Unión 3",
+              "hood_id": null,
+              "q_design": null,
+              "temperature_c": null,
+              "exit_K": 1.0,
+              "stack_height_above_roof_m": null,
+              "fan_outlet_area_m2": null,
+              "x": null,
+              "y": null
+            },
+            {
+              "id": "COL",
+              "kind": "junction",
+              "label": "Salida colector",
+              "hood_id": null,
+              "q_design": null,
+              "temperature_c": null,
+              "exit_K": 1.0,
+              "stack_height_above_roof_m": null,
+              "fan_outlet_area_m2": null,
+              "x": null,
+              "y": null
+            },
+            {
+              "id": "FAN",
+              "kind": "fan",
+              "label": "Ventilador",
+              "hood_id": null,
+              "q_design": null,
+              "temperature_c": null,
+              "exit_K": 1.0,
+              "stack_height_above_roof_m": null,
+              "fan_outlet_area_m2": null,
+              "x": null,
+              "y": null
+            },
+            {
+              "id": "OUT",
+              "kind": "outlet",
+              "label": "Chimenea",
+              "hood_id": null,
+              "q_design": null,
+              "temperature_c": null,
+              "exit_K": 1.0,
+              "stack_height_above_roof_m": 3.5,
+              "fan_outlet_area_m2": null,
+              "x": null,
+              "y": null
+            }
+          ],
+          "segments": [
+            {
+              "id": "R1",
+              "from_node": "H1",
+              "to_node": "J1",
+              "shape": "circular",
+              "D": 0.2,
+              "a": null,
+              "b": null,
+              "length": 6.0,
+              "material_id": "galv_ashrae",
+              "roughness_m": null,
+              "fittings": [
+                {
+                  "fitting_id": "elbow90_RD2.0",
+                  "qty": 2,
+                  "K_override": null,
+                  "params": {},
+                  "area_ref_m2": null,
+                  "note": ""
+                }
+              ],
+              "equipment": [],
+              "hood_entry": null,
+              "damper_K": 0.0,
+              "contaminant_class": null,
+              "label": ""
+            },
+            {
+              "id": "R2",
+              "from_node": "H2",
+              "to_node": "J1",
+              "shape": "circular",
+              "D": 0.16,
+              "a": null,
+              "b": null,
+              "length": 4.0,
+              "material_id": "galv_ashrae",
+              "roughness_m": null,
+              "fittings": [
+                {
+                  "fitting_id": "elbow90_RD2.0",
+                  "qty": 1,
+                  "K_override": null,
+                  "params": {},
+                  "area_ref_m2": null,
+                  "note": ""
+                },
+                {
+                  "fitting_id": "elbow45_RD2.0",
+                  "qty": 1,
+                  "K_override": null,
+                  "params": {},
+                  "area_ref_m2": null,
+                  "note": ""
+                },
+                {
+                  "fitting_id": "branch_entry_30",
+                  "qty": 1,
+                  "K_override": null,
+                  "params": {},
+                  "area_ref_m2": null,
+                  "note": ""
+                }
+              ],
+              "equipment": [],
+              "hood_entry": null,
+              "damper_K": 0.0,
+              "contaminant_class": null,
+              "label": ""
+            },
+            {
+              "id": "M1",
+              "from_node": "J1",
+              "to_node": "J2",
+              "shape": "circular",
+              "D": 0.25,
+              "a": null,
+              "b": null,
+              "length": 8.0,
+              "material_id": "galv_ashrae",
+              "roughness_m": null,
+              "fittings": [],
+              "equipment": [],
+              "hood_entry": null,
+              "damper_K": 0.0,
+              "contaminant_class": null,
+              "label": ""
+            },
+            {
+              "id": "R3",
+              "from_node": "H3",
+              "to_node": "J2",
+              "shape": "circular",
+              "D": 0.2,
+              "a": null,
+              "b": null,
+              "length": 5.0,
+              "material_id": "galv_ashrae",
+              "roughness_m": null,
+              "fittings": [
+                {
+                  "fitting_id": "elbow90_RD2.0",
+                  "qty": 2,
+                  "K_override": null,
+                  "params": {},
+                  "area_ref_m2": null,
+                  "note": ""
+                },
+                {
+                  "fitting_id": "branch_entry_30",
+                  "qty": 1,
+                  "K_override": null,
+                  "params": {},
+                  "area_ref_m2": null,
+                  "note": ""
+                }
+              ],
+              "equipment": [],
+              "hood_entry": null,
+              "damper_K": 0.0,
+              "contaminant_class": null,
+              "label": ""
+            },
+            {
+              "id": "M2",
+              "from_node": "J2",
+              "to_node": "J3",
+              "shape": "circular",
+              "D": 0.315,
+              "a": null,
+              "b": null,
+              "length": 8.0,
+              "material_id": "galv_ashrae",
+              "roughness_m": null,
+              "fittings": [],
+              "equipment": [],
+              "hood_entry": null,
+              "damper_K": 0.0,
+              "contaminant_class": null,
+              "label": ""
+            },
+            {
+              "id": "R4",
+              "from_node": "H4",
+              "to_node": "J3",
+              "shape": "circular",
+              "D": 0.15,
+              "a": null,
+              "b": null,
+              "length": 12.0,
+              "material_id": "galv_ashrae",
+              "roughness_m": null,
+              "fittings": [
+                {
+                  "fitting_id": "elbow90_RD2.0",
+                  "qty": 1,
+                  "K_override": null,
+                  "params": {},
+                  "area_ref_m2": null,
+                  "note": ""
+                },
+                {
+                  "fitting_id": "branch_entry_45",
+                  "qty": 1,
+                  "K_override": null,
+                  "params": {},
+                  "area_ref_m2": null,
+                  "note": ""
+                }
+              ],
+              "equipment": [],
+              "hood_entry": null,
+              "damper_K": 0.0,
+              "contaminant_class": null,
+              "label": ""
+            },
+            {
+              "id": "M3",
+              "from_node": "J3",
+              "to_node": "COL",
+              "shape": "circular",
+              "D": 0.355,
+              "a": null,
+              "b": null,
+              "length": 12.0,
+              "material_id": "galv_ashrae",
+              "roughness_m": null,
+              "fittings": [
+                {
+                  "fitting_id": "elbow90_RD2.0",
+                  "qty": 2,
+                  "K_override": null,
+                  "params": {},
+                  "area_ref_m2": null,
+                  "note": ""
+                }
+              ],
+              "equipment": [
+                {
+                  "name": "Colector de mangas",
+                  "eq_type": "Colector de polvo (mangas)",
+                  "model": "filter",
+                  "dp_fixed": 0.0,
+                  "dp_ref": 0.0,
+                  "q_ref": 2.3,
+                  "n_exp": 1.0,
+                  "table": [],
+                  "dp_clean": 600.0,
+                  "dp_dirty": 1500.0,
+                  "state": "sucio",
+                  "state_fraction": 1.0,
+                  "source": "Hipótesis del banco de pruebas (sustituir por dato del fabricante)"
+                }
+              ],
+              "hood_entry": null,
+              "damper_K": 0.0,
+              "contaminant_class": null,
+              "label": ""
+            },
+            {
+              "id": "M4",
+              "from_node": "COL",
+              "to_node": "FAN",
+              "shape": "circular",
+              "D": 0.5,
+              "a": null,
+              "b": null,
+              "length": 3.0,
+              "material_id": "galv_ashrae",
+              "roughness_m": null,
+              "fittings": [
+                {
+                  "fitting_id": "elbow90_RD2.0",
+                  "qty": 1,
+                  "K_override": null,
+                  "params": {},
+                  "area_ref_m2": null,
+                  "note": ""
+                }
+              ],
+              "equipment": [],
+              "hood_entry": null,
+              "damper_K": 0.0,
+              "contaminant_class": null,
+              "label": ""
+            },
+            {
+              "id": "D1",
+              "from_node": "FAN",
+              "to_node": "OUT",
+              "shape": "circular",
+              "D": 0.45,
+              "a": null,
+              "b": null,
+              "length": 10.0,
+              "material_id": "galv_ashrae",
+              "roughness_m": null,
+              "fittings": [],
+              "equipment": [],
+              "hood_entry": null,
+              "damper_K": 0.0,
+              "contaminant_class": null,
+              "label": ""
+            }
+          ]
+        },
+        "network_settings": {
+          "contaminant_class": "average_industrial",
+          "strategy": "acgih",
+          "filter_state_design": "sucio",
+          "roof_height_m": 9.0
+        },
+        "fans": [
+          {
+            "id": "BI-560",
+            "manufacturer": "EJEMPLO (curva sintética)",
+            "model": "EJEMPLO BI-560 (inclinado hacia atrás)",
+            "fan_type": "Centrífugo",
+            "rpm": 2200,
+            "rho_ref": 1.2,
+            "diameter_m": null,
+            "outlet_area_m2": 0.16,
+            "pressure_basis": "total",
+            "points": [
+              {
+                "Q": 0.5,
+                "P": 3300,
+                "eta": 0.45,
+                "W": 3666.6666666666665
+              },
+              {
+                "Q": 1.0,
+                "P": 3450,
+                "eta": 0.62,
+                "W": 5564.5161290322585
+              },
+              {
+                "Q": 1.5,
+                "P": 3450,
+                "eta": 0.72,
+                "W": 7187.5
+              },
+              {
+                "Q": 2.0,
+                "P": 3300,
+                "eta": 0.78,
+                "W": 8461.538461538461
+              },
+              {
+                "Q": 2.5,
+                "P": 3020,
+                "eta": 0.8,
+                "W": 9437.5
+              },
+              {
+                "Q": 3.0,
+                "P": 2620,
+                "eta": 0.78,
+                "W": 10076.923076923076
+              },
+              {
+                "Q": 3.5,
+                "P": 2100,
+                "eta": 0.7,
+                "W": 10500.0
+              },
+              {
+                "Q": 4.0,
+                "P": 1450,
+                "eta": 0.55,
+                "W": 10545.454545454544
+              }
+            ],
+            "max_rpm": 2600,
+            "q_min_rec": null,
+            "q_max_rec": null,
+            "certified": false,
+            "source": "Curva sintética de demostración — NO es dato de fabricante",
+            "notes": "Rodete de álabes inclinados hacia atrás; lado limpio."
+          },
+          {
+            "id": "RT-500",
+            "manufacturer": "EJEMPLO (curva sintética)",
+            "model": "EJEMPLO RT-500 (punta radial)",
+            "fan_type": "Centrífugo",
+            "rpm": 2600,
+            "rho_ref": 1.2,
+            "diameter_m": null,
+            "outlet_area_m2": 0.14,
+            "pressure_basis": "total",
+            "points": [
+              {
+                "Q": 0.5,
+                "P": 3400,
+                "eta": 0.4,
+                "W": 4250.0
+              },
+              {
+                "Q": 1.0,
+                "P": 3420,
+                "eta": 0.55,
+                "W": 6218.181818181818
+              },
+              {
+                "Q": 1.5,
+                "P": 3380,
+                "eta": 0.63,
+                "W": 8047.619047619048
+              },
+              {
+                "Q": 2.0,
+                "P": 3280,
+                "eta": 0.67,
+                "W": 9791.044776119403
+              },
+              {
+                "Q": 2.5,
+                "P": 3120,
+                "eta": 0.68,
+                "W": 11470.588235294117
+              },
+              {
+                "Q": 3.0,
+                "P": 2900,
+                "eta": 0.66,
+                "W": 13181.818181818182
+              },
+              {
+                "Q": 3.5,
+                "P": 2600,
+                "eta": 0.6,
+                "W": 15166.666666666668
+              },
+              {
+                "Q": 4.0,
+                "P": 2200,
+                "eta": 0.5,
+                "W": 17600.0
+              }
+            ],
+            "max_rpm": 3000,
+            "q_min_rec": null,
+            "q_max_rec": null,
+            "certified": false,
+            "source": "Curva sintética de demostración — NO es dato de fabricante",
+            "notes": "Rodete de punta radial; mayor tolerancia a la abrasión, menor eficiencia."
+          },
+          {
+            "id": "BI-450",
+            "manufacturer": "EJEMPLO (curva sintética)",
+            "model": "EJEMPLO BI-450 (subdimensionado)",
+            "fan_type": "Centrífugo",
+            "rpm": 2200,
+            "rho_ref": 1.2,
+            "diameter_m": null,
+            "outlet_area_m2": 0.12,
+            "pressure_basis": "total",
+            "points": [
+              {
+                "Q": 0.5,
+                "P": 2600,
+                "eta": 0.45,
+                "W": 2888.8888888888887
+              },
+              {
+                "Q": 1.0,
+                "P": 2700,
+                "eta": 0.62,
+                "W": 4354.8387096774195
+              },
+              {
+                "Q": 1.5,
+                "P": 2650,
+                "eta": 0.72,
+                "W": 5520.833333333334
+              },
+              {
+                "Q": 2.0,
+                "P": 2450,
+                "eta": 0.78,
+                "W": 6282.051282051282
+              },
+              {
+                "Q": 2.5,
+                "P": 2150,
+                "eta": 0.79,
+                "W": 6803.79746835443
+              },
+              {
+                "Q": 3.0,
+                "P": 1750,
+                "eta": 0.76,
+                "W": 6907.894736842105
+              },
+              {
+                "Q": 3.5,
+                "P": 1250,
+                "eta": 0.66,
+                "W": 6628.787878787878
+              },
+              {
+                "Q": 4.0,
+                "P": 700,
+                "eta": 0.5,
+                "W": 5600.0
+              }
+            ],
+            "max_rpm": 2600,
+            "q_min_rec": null,
+            "q_max_rec": null,
+            "certified": false,
+            "source": "Curva sintética de demostración — NO es dato de fabricante",
+            "notes": "Ventilador pequeño para demostrar el déficit de caudal."
+          }
+        ],
+        "fan_selection": {
+          "selected_id": "BI-450",
+          "rpm": null,
+          "diameter_m": null,
+          "use_operating_solution": true
+        },
+        "power": {
+          "eta_fan_user": 0.75,
+          "eta_basis": "total",
+          "drive_type": "Bandas",
+          "eta_drive": 0.95,
+          "eta_motor": 0.917,
+          "use_vfd": false,
+          "eta_vfd": 0.97,
+          "margin": 0.1,
+          "service_factor": 1.15,
+          "motor_standard": "IEC",
+          "motor_selected_kw": null,
+          "hours_per_year": 4800.0,
+          "tariff": 2.4,
+          "currency": "MXN",
+          "profile": [
+            [
+              1.0,
+              0.6
+            ],
+            [
+              0.85,
+              0.3
+            ],
+            [
+              0.7,
+              0.1
+            ]
+          ]
+        },
+        "duct_tool": {
+          "method": "velocity",
+          "Q": 2.3,
+          "V_target": 21.0,
+          "dp_per_m": 4.0,
+          "shape": "circular",
+          "aspect": 2.0,
+          "material_id": "galv_ashrae",
+          "rounding": "down",
+          "length": 10.0,
+          "regain_R": 0.75,
+          "regain_sections": [
+            [
+              0.8,
+              6.0,
+              0.3
+            ],
+            [
+              0.6,
+              6.0,
+              0.3
+            ],
+            [
+              0.4,
+              6.0,
+              0.3
+            ]
+          ]
+        },
+        "alternatives": [],
+        "notes": ""
+      },
+      "complexity": 2,
+      "maintenance": 3,
+      "capex_index": null,
+      "notes": "Menor costo de equipo."
+    }
+  ],
+  "notes": ""
+}

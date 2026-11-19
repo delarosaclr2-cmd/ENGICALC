@@ -1,0 +1,80 @@
+{
+  "_meta": {
+    "descripcion": "Rugosidad absoluta de materiales de ducto (ε en mm). Editable. Cada valor indica su fuente y estado de verificación.",
+    "advertencia": "La rugosidad real depende de uniones, costuras, envejecimiento y fabricación; confirme con su referencia de diseño."
+  },
+  "materials": [
+    {
+      "id": "galv_ashrae",
+      "name": "Acero galvanizado — ducto HVAC (costura longitudinal o espiral)",
+      "roughness_mm": 0.09,
+      "t_max_c": 200,
+      "source": "ASHRAE Handbook—Fundamentals, cap. Duct Design (rugosidad 'medium smooth' de ducto galvanizado, 0.0003 ft). Temperatura: American Galvanizers Association (exposición continua ≈200 °C)",
+      "status": "verificar en edición vigente"
+    },
+    {
+      "id": "galv_moody",
+      "name": "Hierro galvanizado (tubería, diagrama de Moody)",
+      "roughness_mm": 0.15,
+      "t_max_c": 200,
+      "source": "White, F. M., Fluid Mechanics, Tabla 6.1 (hierro galvanizado nuevo)",
+      "status": "referencia de texto"
+    },
+    {
+      "id": "black_steel",
+      "name": "Acero negro / acero comercial nuevo",
+      "roughness_mm": 0.046,
+      "t_max_c": null,
+      "source": "White, F. M., Fluid Mechanics, Tabla 6.1 (acero comercial nuevo)",
+      "status": "referencia de texto"
+    },
+    {
+      "id": "stainless",
+      "name": "Acero inoxidable nuevo",
+      "roughness_mm": 0.002,
+      "t_max_c": null,
+      "source": "White, F. M., Fluid Mechanics, Tabla 6.1 (acero inoxidable nuevo). Ductos soldados pueden ser más rugosos",
+      "status": "referencia de texto — confirmar"
+    },
+    {
+      "id": "sheet_metal",
+      "name": "Lámina metálica lisa nueva (aplicable a aluminio)",
+      "roughness_mm": 0.05,
+      "t_max_c": null,
+      "source": "White, F. M., Fluid Mechanics, Tabla 6.1 (acero, lámina nueva). Para aluminio se adopta como hipótesis",
+      "status": "hipótesis — confirmar con fabricante"
+    },
+    {
+      "id": "pvc",
+      "name": "PVC (tubo/ducto plástico extruido)",
+      "roughness_mm": 0.0015,
+      "t_max_c": 60,
+      "source": "White, F. M., Fluid Mechanics, Tabla 6.1 (plástico, tubo estirado). Temperatura: práctica común para PVC, confirmar con fabricante",
+      "status": "referencia de texto"
+    },
+    {
+      "id": "polyethylene",
+      "name": "Polietileno",
+      "roughness_mm": 0.0015,
+      "t_max_c": null,
+      "source": "Se adopta el valor de plástico estirado (White, Tabla 6.1) como hipótesis",
+      "status": "hipótesis — confirmar con fabricante"
+    },
+    {
+      "id": "concrete_smooth",
+      "name": "Concreto alisado",
+      "roughness_mm": 0.04,
+      "t_max_c": null,
+      "source": "White, F. M., Fluid Mechanics, Tabla 6.1",
+      "status": "referencia de texto"
+    },
+    {
+      "id": "concrete_rough",
+      "name": "Concreto rugoso",
+      "roughness_mm": 2.0,
+      "t_max_c": null,
+      "source": "White, F. M., Fluid Mechanics, Tabla 6.1",
+      "status": "referencia de texto"
+    }
+  ]
+}
