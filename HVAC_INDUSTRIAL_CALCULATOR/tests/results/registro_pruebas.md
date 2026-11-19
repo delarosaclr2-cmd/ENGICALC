@@ -1,7 +1,7 @@
 # Registro de pruebas de validación matemática
 
-Fecha: 2026-11-18T17:40:11  
-Comprobaciones numéricas: 199 — aprobadas: 199 — fallidas: 0
+Fecha: 2026-11-19T15:47:17  
+Comprobaciones numéricas: 204 — aprobadas: 204 — fallidas: 0
 
 | Prueba | Comprobación | Esperado | Obtenido | Error abs. | Error rel. | Tolerancia | Referencia | Estado |
 |---|---|---|---|---|---|---|---|---|
@@ -139,6 +139,11 @@ Comprobaciones numéricas: 199 — aprobadas: 199 — fallidas: 0
 | test_reviewer_case_2400_rpm | dominio ajustado q_max = 0.30·2400/2000 | 0.36 | 0.36 | 0 | 0 | rel 1e-12 | Q ∝ N (ley de semejanza) | APROBADA |
 | test_gui_export_recalculates_when_autorecalc_disabled | t exportada | 35 | 35 | 0 | 0 | rel 0 | Entrada actual | APROBADA |
 | test_gui_export_recalculates_when_autorecalc_disabled | ρ exportada = ρ(35 °C) | 0.86025015 | 0.8603 | 4.98e-05 | 5.79e-05 | rel 0.001 | run_project a 35 °C (independiente de la GUI) | APROBADA |
+| test_static_curve_zero_efficiency_at_free_delivery_is_accepted | VP de salida en descarga libre | 60 | 60 | 0 | 0 | rel 1e-12 | VP = ½·ρ·v², v = Q/A | APROBADA |
+| test_static_curve_zero_efficiency_at_free_delivery_is_accepted | FTP en descarga libre | 60 | 60 | 0 | 0 | rel 1e-12 | FTP = FSP + VP_salida (curva en base estática) | APROBADA |
+| test_static_curve_zero_efficiency_at_free_delivery_is_accepted | η_t en descarga libre | 0.375 | 0.375 | 0 | 0 | rel 0.001 | η_t = Q·FTP/W, calculada a mano | APROBADA |
+| test_static_zero_efficiency_curve_does_not_block_motor | η_t en el punto de operación | 0.7027648 | 0.7027648 | 0 | 0 | rel 1e-09 | η_t = Q·FTP/W (definición) | APROBADA |
+| test_static_zero_efficiency_curve_does_not_block_motor | η_s en el punto de operación | 0.58575757 | 0.58575757 | 0 | 0 | rel 1e-09 | η_s = Q·FSP/W (definición) | APROBADA |
 | test_project_roundtrip | ida y vuelta JSON: n.º de alternativas | 4 | 4 | 0 | 0 | rel 0 | Persistencia | APROBADA |
 | test_flow_cfm | 1 cfm → m³/s | 0.00047194744 | 0.00047194744 | 0 | 0 | rel 1e-15 | Definición ft = 0.3048 m | APROBADA |
 | test_flow_cfm | 3600 m³/h → m³/s | 1 | 1 | 0 | 0 | rel 1e-15 | Definición | APROBADA |

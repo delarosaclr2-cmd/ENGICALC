@@ -1,9 +1,9 @@
 # Validación matemática y prueba de integración
 
-Ejecución: `python -m pytest` (132 pruebas, 199 comprobaciones numéricas registradas). El registro detallado de cada
+Ejecución: `python -m pytest` (140 pruebas, 204 comprobaciones numéricas registradas). El registro detallado de cada
 comprobación (entrada, esperado, obtenido, error absoluto, error relativo, tolerancia, referencia y estado) está en
 `tests/results/registro_pruebas.csv` y `tests/results/registro_pruebas.md`. Resultado de la última ejecución:
-**132/132 pruebas aprobadas; 199/199 comprobaciones dentro de tolerancia** (v1.0.1).
+**140/140 pruebas aprobadas; 204/204 comprobaciones dentro de tolerancia** (v1.0.1).
 
 Regla aplicada: los valores esperados provienen de referencias independientes del código y **nunca se ajustaron para
 aprobar**. Las discrepancias se investigaron; la sección 3 documenta las causas.
@@ -92,6 +92,20 @@ El comparador no elige la alternativa más económica.
      la huella no depende de la marca de guardado.
    - Efecto en el banco: sin cambios en diseño, operación, potencia, motor (11 kW) ni dictamen. En el comparador,
      D (BI-450) también se excluye por transporte en operación real, además del déficit de caudal.
+
+7. **Segunda revisión del PR**: se corrigió una regresión introducida por el punto 1 de la revisión
+   anterior. La validación rechazaba toda curva con un punto de eficiencia nula y caudal positivo, pero
+   en una curva en presión estática el extremo de descarga libre tiene FSP = 0 y, por definición,
+   η_s = Q·FSP/W = 0, con η_t > 0 por la presión dinámica de salida. Pruebas añadidas (8 casos, al final
+   de `tests/test_regresion_revision.py`):
+   - Curva estática sintética de 0.05 a 0.30 m³/s que termina en FSP = 0, W = 48 W y η_s = 0: se acepta.
+     Contraste independiente en ese punto: VP = ½·1.2·(0.30/0.03)² = 60 Pa, FTP = 60 Pa y
+     η_t = 0.30·60/48 = 0.375, calculados a mano.
+   - Caso completo con esa curva: hay punto de operación, se selecciona motor y no aparece alerta
+     CRÍTICA. η_t y η_s del punto de operación contrastadas contra sus definiciones.
+   - Se conserva el rechazo de η = 0 con caudal y presión positivos (exigiría potencia infinita), de
+     η < 0 y de η ≥ 100 %, en base total y en base estática.
+   - η = 0 a caudal nulo (cierre) se acepta, como antes.
 
 ## 4. Pruebas de interfaz y reportes
 

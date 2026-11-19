@@ -73,8 +73,16 @@ class FanCurve:
         cumplirse η_t = Q·FTP/W < 1 (conservación de la energía: el ventilador no puede
         entregar al aire más potencia que la que absorbe en el eje). Las leyes de
         semejanza conservan η, de modo que basta verificarlo a las condiciones del
-        catálogo. Las eficiencias declaradas deben estar en [0, 1) (η = 0 solo es
-        posible a caudal nulo).
+        catálogo.
+
+        Las eficiencias declaradas deben estar en [0, 1) y se interpretan en la base de
+        presión de la curva: η = Q·P/W con P = FTP en una curva total y P = FSP en una
+        curva estática. De ahí que η = 0 sea válida siempre que el numerador sea nulo,
+        es decir a caudal nulo (cierre) o a presión nula de la curva. Este último caso
+        es el extremo de descarga libre de una curva estática: FSP = 0 con Q > 0, donde
+        η_s = 0 mientras la presión dinámica de salida mantiene η_t > 0. En cambio
+        η = 0 con caudal y presión positivos exigiría potencia absorbida infinita y se
+        rechaza como error de datos.
         """
         errs = []
         if len(self.points) < 3:
@@ -96,9 +104,17 @@ class FanCurve:
             eta = pt.get("eta")
             if eta is not None and eta != "":
                 eta = float(eta)
-                if not (0.0 <= eta < 1.0) or (eta == 0.0 and Q > 0):
+                P_basis = float(pt["P"])     # presión en la base de la curva (FTP o FSP)
+                if not (0.0 <= eta < 1.0):
                     errs.append(f"Eficiencia físicamente imposible en Q = {Q:.4g} m³/s: η = {eta * 100:.1f} % "
-                                "(debe estar entre 0 y 100 %, y ser mayor que 0 si hay caudal).")
+                                "(debe estar entre 0 % y 100 %, sin alcanzar el 100 %).")
+                elif eta == 0.0 and Q > 0 and P_basis > 0:
+                    # η = Q·P/W: con Q > 0 y P > 0 solo sería nula con potencia absorbida infinita.
+                    basis = "estática (FSP)" if self.pressure_basis == "static" else "total (FTP)"
+                    errs.append(f"Eficiencia nula con caudal y presión positivos en Q = {Q:.4g} m³/s "
+                                f"(P = {P_basis:.4g} Pa en base {basis}): η = Q·P/W solo puede anularse a caudal "
+                                "nulo o a presión nula de la curva. Verifique la eficiencia o la presión de ese "
+                                "punto.")
             W = pt.get("W")
             if W is not None and W != "" and float(W) != 0.0:
                 W = float(W)

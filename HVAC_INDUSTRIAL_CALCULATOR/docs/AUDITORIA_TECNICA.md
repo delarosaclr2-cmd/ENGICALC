@@ -63,6 +63,21 @@ Los cuatro se reprodujeron de forma independiente antes de corregirlos.
 | 3 | Error de programación | El intervalo de muestreo de la curva del sistema se calculaba con el dominio de catálogo, antes de aplicar las rpm o el diámetro. A 2400 rpm se reportaba "sin intersección" aunque el solucionador converge a 0.350 m³/s | Falso CRÍTICO; selección de ventilador rechazada sin motivo | Las curvas se ajustan (Q ∝ N·D³) antes de muestrear, y el intervalo cubre el dominio ajustado de cada ventilador |
 | 4 | Error de programación (trazabilidad) | La exportación combinaba el proyecto actual con el último resultado. Con el recálculo automático desactivado, una exportación a 35 °C usaba resultados de 25 °C | Memoria de cálculo incoherente | Cada resultado guarda una huella SHA-256 de sus entradas (proyecto, configuración y base de datos; se excluye la marca de guardado). `generate_pdf` y `export_excel` rechazan resultados de otras entradas (`StaleResultsError`). La interfaz recalcula de forma síncrona antes de exportar PDF, Excel o PNG, y vuelve a ejecutar el comparador si cambiaron las alternativas. Un cálculo en segundo plano más antiguo ya no sobrescribe uno más reciente |
 
+### Segunda revisión (regresión corregida)
+
+La revisión del 19 de noviembre confirmó los cuatro puntos anteriores y detectó una regresión introducida por la
+corrección del punto 1.
+
+| # | Tipo | Hallazgo | Consecuencia | Corrección |
+|---|---|---|---|---|
+| 5 | Error de interpretación física (regresión) | La validación exigía η > 0 en todo punto con caudal positivo. En una curva en **presión estática** el extremo de descarga libre tiene FSP = 0 y, por definición, η_s = Q·FSP/W = 0, con η_t > 0 gracias a la presión dinámica de salida. Una curva así quedaba rechazada por completo y se bloqueaba la selección del motor | Curvas de catálogo válidas se declaraban incoherentes; falso CRÍTICO y pérdida de la selección de motor | La eficiencia se interpreta en la base de presión de la curva: η = 0 se admite cuando el numerador Q·P es nulo, es decir a caudal nulo o a presión nula de la curva. Se mantiene el rechazo de η = 0 con caudal y presión positivos (exigiría potencia absorbida infinita), de η < 0 y de η ≥ 100 % |
+
+El criterio queda así, idéntico en base total y estática, con P la presión de la curva en su propia base:
+
+- η debe estar en [0, 1).
+- η = 0 es válida si y solo si Q = 0 o P = 0.
+- La comprobación de coherencia η_t = Q·FTP/W < 1 frente a la potencia absorbida no cambia.
+
 Cambios de interfaz, documentados por separado de los de cálculo:
 
 - La memoria y el Excel muestran el motivo cuando la selección de motor está bloqueada.
@@ -81,7 +96,7 @@ Cambios de interfaz, documentados por separado de los de cálculo:
 | Ductos y fricción | CORREGIDA | VALIDADA BAJO CONDICIONES DOCUMENTADAS |
 | Accesorios | CORREGIDA | Fórmulas: VALIDADA; K tabulados: VALIDACIÓN PENDIENTE (fuente marcada) |
 | Red ramificada | NUEVA | VALIDADA BAJO CONDICIONES DOCUMENTADAS (árbol de extracción, un ventilador) |
-| Ventiladores | CORREGIDA (v1.0.1: intervalo con curva ajustada; coherencia Q·P·W) | VALIDADA BAJO CONDICIONES DOCUMENTADAS (curvas reales: requieren datos certificados) |
+| Ventiladores | CORREGIDA (v1.0.1: intervalo con curva ajustada; coherencia Q·P·W según la base de presión) | VALIDADA BAJO CONDICIONES DOCUMENTADAS (curvas reales: requieren datos certificados) |
 | Potencia | CORREGIDA (v1.0.1: bloqueo con η ≥ 100 %) | VALIDADA BAJO CONDICIONES DOCUMENTADAS |
 | Transporte en operación real | NUEVA (v1.0.1) | VALIDADA BAJO CONDICIONES DOCUMENTADAS (ventilador seleccionado, filtro en estado de diseño) |
 | Exportación (coherencia entradas–resultados) | CORREGIDA (v1.0.1) | VALIDADA (prueba de interfaz con recálculo automático desactivado) |

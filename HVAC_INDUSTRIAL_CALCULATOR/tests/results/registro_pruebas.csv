@@ -133,6 +133,11 @@ test_operating_point_found_after_speed_or_diameter_change[2300-0.42],Q operació
 test_reviewer_case_2400_rpm,dominio ajustado q_max = 0.30·2400/2000,"{""N"": 2400}",0.36,0.36,0.0,0.0,rel 1e-12,Q ∝ N (ley de semejanza),APROBADA
 test_gui_export_recalculates_when_autorecalc_disabled,t exportada,"{""t_c"": 35.0}",35.0,35.0,0.0,0.0,rel 0,Entrada actual,APROBADA
 test_gui_export_recalculates_when_autorecalc_disabled,ρ exportada = ρ(35 °C),"{""t_c"": 35.0}",0.8602501504652512,0.8603,4.984953474873599e-05,5.7947719883310385e-05,rel 0.001,run_project a 35 °C (independiente de la GUI),APROBADA
+test_static_curve_zero_efficiency_at_free_delivery_is_accepted,VP de salida en descarga libre,"{""Q"": 0.3, ""A"": 0.03, ""ρ"": 1.2}",60.0,60.0,0.0,0.0,rel 1e-12,"VP = ½·ρ·v², v = Q/A",APROBADA
+test_static_curve_zero_efficiency_at_free_delivery_is_accepted,FTP en descarga libre,"{""FSP"": 0.0, ""VP"": 60.0}",60.0,60.0,0.0,0.0,rel 1e-12,FTP = FSP + VP_salida (curva en base estática),APROBADA
+test_static_curve_zero_efficiency_at_free_delivery_is_accepted,η_t en descarga libre,"{""Q"": 0.3, ""FTP"": 60.0, ""W"": 48.0}",0.375,0.375,0.0,0.0,rel 0.001,"η_t = Q·FTP/W, calculada a mano",APROBADA
+test_static_zero_efficiency_curve_does_not_block_motor,η_t en el punto de operación,"{""Q"": 0.2106716003713482, ""FTP"": 177.5493189925026, ""W_vent"": 53.22491850810415}",0.702764799373027,0.702764799373027,0.0,0.0,rel 1e-09,η_t = Q·FTP/W (definición),APROBADA
+test_static_zero_efficiency_curve_does_not_block_motor,η_s en el punto de operación,"{""Q"": 0.2106716003713482, ""FSP"": 147.98814297932392, ""W_vent"": 53.22491850810415}",0.5857575697873731,0.5857575697873731,0.0,0.0,rel 1e-09,η_s = Q·FSP/W (definición),APROBADA
 test_project_roundtrip,ida y vuelta JSON: n.º de alternativas,{},4.0,4.0,0.0,0.0,rel 0,Persistencia,APROBADA
 test_flow_cfm,1 cfm → m³/s,"{""Q"": ""1 cfm""}",0.0004719474432000001,0.0004719474432000001,0.0,0.0,rel 1e-15,Definición ft = 0.3048 m,APROBADA
 test_flow_cfm,3600 m³/h → m³/s,"{""Q"": ""3600 m³/h""}",1.0,1.0,0.0,0.0,rel 1e-15,Definición,APROBADA

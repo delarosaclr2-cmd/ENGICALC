@@ -8,6 +8,11 @@
    ajustada a las rpm y al diámetro seleccionados.
 4. [P2] La exportación nunca combina entradas actuales con resultados anteriores.
 
+Segunda revisión:
+
+5. [P2] Eficiencia estática nula en descarga libre: una curva estática que termina en
+   FSP = 0 con caudal positivo es válida (η_s = Q·FSP/W = 0) y no debe rechazarse.
+
 Cada caso reproduce el escenario descrito en la revisión y lo contrasta con un
 cálculo independiente cuando aplica.
 """
@@ -328,3 +333,110 @@ def test_gui_discards_older_background_result(qapp, example_project, db, setting
     assert w.ctx.results is current
     w.dirty = False
     w.close()
+
+
+# ---------------------------------------------------------------------------
+# 5. Eficiencia estática nula en el extremo de descarga libre
+# ---------------------------------------------------------------------------
+
+# Curva sintética en PRESIÓN ESTÁTICA de un ventilador pequeño: termina en descarga libre
+# (FSP = 0) con caudal positivo, donde η_s = Q·FSP/W = 0 mientras η_t sigue siendo positiva
+# gracias a la presión dinámica de salida. ρ_ref = 1.2 kg/m³, área de descarga 0.03 m².
+_EST_Q = [0.05, 0.10, 0.15, 0.20, 0.25, 0.30]
+_EST_FSP = [250.0, 235.0, 205.0, 160.0, 95.0, 0.0]
+_EST_W = [41.7, 45.2, 49.6, 53.3, 52.8, 48.0]
+_EST_ETA_S = [0.30, 0.52, 0.62, 0.60, 0.45, 0.00]
+
+
+def _static_curve(**overrides) -> FanCurve:
+    """Curva estática de prueba. ``overrides`` modifica el último punto (descarga libre)."""
+    pts = [{"Q": q, "P": p, "W": w, "eta": e}
+           for q, p, w, e in zip(_EST_Q, _EST_FSP, _EST_W, _EST_ETA_S)]
+    pts[-1].update(overrides)
+    return FanCurve(id="EST", model="estática de prueba", rpm=2000, rho_ref=1.2, diameter_m=0.25,
+                    outlet_area_m2=0.03, pressure_basis="static", points=pts, max_rpm=2600,
+                    source="Curva sintética de prueba")
+
+
+def test_static_curve_zero_efficiency_at_free_delivery_is_accepted(check):
+    """FSP = 0 con Q > 0: η_s = 0 es correcta y la curva debe aceptarse."""
+    curve = _static_curve()
+    assert curve.validate() == [], curve.validate()
+    # Cálculo independiente en el punto de descarga libre: la presión total es la dinámica
+    # de salida, VP = ½·ρ·(Q/A)² = ½·1.2·(0.30/0.03)² = 60 Pa, de modo que η_t = Q·FTP/W > 0.
+    Q, W = _EST_Q[-1], _EST_W[-1]
+    vp = 0.5 * 1.2 * (Q / 0.03) ** 2
+    check("VP de salida en descarga libre", {"Q": Q, "A": 0.03, "ρ": 1.2}, 60.0, vp, 1e-12,
+          reference="VP = ½·ρ·v², v = Q/A")
+    check("FTP en descarga libre", {"FSP": 0.0, "VP": vp}, vp, curve.total_pressure_at_point(curve.points[-1]),
+          1e-12, reference="FTP = FSP + VP_salida (curva en base estática)")
+    check("η_t en descarga libre", {"Q": Q, "FTP": vp, "W": W}, Q * vp / W, 0.375, 1e-3,
+          reference="η_t = Q·FTP/W, calculada a mano")
+    fan = AdjustedFan(curve)                      # no debe lanzar FanCurveError
+    assert fan.eta_total(Q) > 0.0
+    assert curve.coherence_warnings() == []       # η_s declarada coherente con Q·FSP/W
+
+
+def test_zero_efficiency_with_positive_pressure_is_rejected():
+    """η = 0 con caudal Y presión positivos exigiría potencia infinita: sigue siendo error."""
+    errs = _static_curve(P=50.0, eta=0.0).validate()
+    assert errs and "Eficiencia nula" in errs[0] and "0.3" in errs[0]
+    with pytest.raises(FanCurveError):
+        AdjustedFan(_static_curve(P=50.0, eta=0.0))
+
+
+def test_zero_efficiency_at_shutoff_is_accepted():
+    """A caudal nulo (cierre) η = 0 siempre es válida, cualquiera que sea la presión."""
+    pts = [{"Q": 0.0, "P": 260.0, "W": 38.0, "eta": 0.0}]
+    pts += [{"Q": q, "P": p, "W": w, "eta": e}
+            for q, p, w, e in zip(_EST_Q, _EST_FSP, _EST_W, _EST_ETA_S)]
+    curve = FanCurve(id="EST0", model="con cierre", rpm=2000, rho_ref=1.2, diameter_m=0.25,
+                     outlet_area_m2=0.03, pressure_basis="static", points=pts)
+    assert curve.validate() == []
+
+
+def test_total_basis_curve_keeps_the_same_rule():
+    """En base total la regla es idéntica: η = 0 solo con FTP = 0 o caudal nulo."""
+    assert _static_curve(eta=0.0, P=0.0).validate() == []
+    total = FanCurve(id="TOT", model="total", rpm=2000, rho_ref=1.2, diameter_m=0.25,
+                     outlet_area_m2=0.03, pressure_basis="total",
+                     points=[{"Q": q, "P": p, "W": w, "eta": e}
+                             for q, p, w, e in zip(_EST_Q, _EST_FSP, _EST_W, _EST_ETA_S)])
+    assert total.validate() == []                 # FTP = 0 en el extremo: η_t = 0 coherente
+    total.points[-1]["P"] = 40.0                  # FTP > 0 con η = 0: incoherente
+    assert any("Eficiencia nula" in e for e in total.validate())
+
+
+@pytest.mark.parametrize("eta_bad", [-0.05, 1.0, 1.25])
+def test_efficiencies_outside_range_still_rejected(eta_bad):
+    """La protección contra eficiencias imposibles se conserva."""
+    errs = _static_curve(eta=eta_bad).validate()
+    assert errs and "físicamente imposible" in errs[0]
+
+
+def test_static_zero_efficiency_curve_does_not_block_motor(check, db, settings):
+    """Caso completo: la curva se acepta, hay punto de operación y SÍ se selecciona motor."""
+    p = Project()
+    m = NetworkModel()
+    for nd in [NetNode("H1", "hood", "Campana", q_design=0.15), NetNode("FAN", "fan", "Ventilador"),
+               NetNode("OUT", "outlet", "Descarga", exit_K=1.0)]:
+        m.nodes[nd.id] = nd
+    m.segments = [NetSegment("S1", "H1", "FAN", "circular", 0.15, length=6.0),
+                  NetSegment("D1", "FAN", "OUT", "circular", 0.15, length=2.0)]
+    p.network = m
+    p.network_settings = NetworkSettings("fumes", "none", "sucio")
+    p.fans = [_static_curve()]
+    p.fan_selection = FanSelection("EST", None, None)
+    p.power = PowerInputs()
+    r = run_project(p, db, settings)
+    fe = r.selected_fan
+    assert not fe.error and fe.op is not None
+    assert r.power is not None and r.power_blocked == "", r.power_blocked
+    assert not [a for a in r.alerts if a.level == "CRÍTICO" and a.module == "Selección de ventiladores"]
+    # contraste independiente de la cadena de potencias en el punto de operación
+    pw = r.power
+    check("η_t en el punto de operación", {"Q": pw.Q, "FTP": pw.FTP, "W_vent": pw.W_fan},
+          pw.Q * pw.FTP / pw.W_fan, pw.eta_total, 1e-9, reference="η_t = Q·FTP/W (definición)")
+    check("η_s en el punto de operación", {"Q": pw.Q, "FSP": pw.FSP, "W_vent": pw.W_fan},
+          pw.Q * pw.FSP / pw.W_fan, pw.eta_static, 1e-9, reference="η_s = Q·FSP/W (definición)")
+    assert 0.0 < pw.eta_total < 1.0 and pw.eta_static < pw.eta_total

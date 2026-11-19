@@ -2,8 +2,8 @@
 
 ## 1.0.1 — 2026-11-18 — Correcciones de la revisión del PR (commit 9769054)
 
-Antes de corregir se reprodujeron los cuatro hallazgos con los casos del revisor. Se añadieron 19 pruebas de
-regresión en `tests/test_regresion_revision.py`. Resultado: 132/132 pruebas y 199/199 comprobaciones numéricas.
+Antes de corregir se reprodujeron los hallazgos con los casos del revisor. Se añadieron 27 pruebas de regresión en
+`tests/test_regresion_revision.py`. Resultado: 140/140 pruebas y 204/204 comprobaciones numéricas.
 Detalle técnico en `docs/AUDITORIA_TECNICA.md` (sección 3 bis) y `docs/VALIDACION.md`.
 
 ### Cambios de cálculo y validación
@@ -46,6 +46,24 @@ Detalle técnico en `docs/AUDITORIA_TECNICA.md` (sección 3 bis) y `docs/VALIDAC
 - Se corrigió la doble viñeta en las conclusiones del comparador del PDF.
 - Archivos: `interface/main_window.py`, `interface/pages/report.py`, `interface/pages/base.py`,
   `interface/pages/fans_power.py`, `reports/tables.py`, `reports/pdf_report.py`.
+
+### Corrección posterior a la segunda revisión
+
+La segunda revisión confirmó los cuatro puntos y detectó una regresión introducida por el primero. La versión 1.0.1
+no se ha publicado todavía (es el contenido de este PR), por lo que la corrección se integra en esta misma entrada en
+lugar de abrir una versión nueva.
+
+- **[P2] Eficiencia estática nula en descarga libre** (`core/fan_curves.py`).
+  - Defecto: `FanCurve.validate()` rechazaba todo punto con η = 0 y caudal positivo. En una curva en presión
+    estática el extremo de descarga libre tiene FSP = 0 y η_s = Q·FSP/W = 0 por definición, con η_t > 0 por la
+    presión dinámica de salida. La curva completa quedaba rechazada y no se seleccionaba motor.
+  - Corrección: la eficiencia se interpreta en la base de presión de la curva. η = 0 se admite cuando Q = 0 o
+    cuando la presión de la curva es nula; se mantiene el rechazo de η = 0 con caudal y presión positivos, de
+    η < 0 y de η ≥ 100 %. La comprobación η_t = Q·FTP/W < 1 frente a la potencia absorbida no cambia.
+  - Pruebas: 8 casos nuevos al final de `tests/test_regresion_revision.py`, con contraste a mano de
+    VP = 60 Pa y η_t = 0.375 en el punto de descarga libre de la curva de prueba.
+
+Total tras esta corrección: ENGICALC 389/389; HVAC 140/140 con 204/204 comprobaciones numéricas.
 
 ### Efecto en el banco de pruebas
 
