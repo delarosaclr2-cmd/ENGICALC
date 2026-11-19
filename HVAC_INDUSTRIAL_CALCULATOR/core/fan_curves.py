@@ -59,11 +59,29 @@ class FanCurve:
                 setattr(fc, k, v)
         return fc
 
+    def total_pressure_at_point(self, pt: dict) -> float:
+        """Presión total del punto de catálogo (a ρ_ref): FTP = FSP + VP_salida si la base es estática."""
+        P = float(pt["P"])
+        if self.pressure_basis == "static" and self.outlet_area_m2:
+            P += 0.5 * self.rho_ref * (float(pt["Q"]) / self.outlet_area_m2) ** 2
+        return P
+
     def validate(self) -> list[str]:
+        """Errores que impiden usar la curva (datos incompletos o físicamente imposibles).
+
+        Coherencia caudal–presión–potencia: en cada punto con potencia absorbida W debe
+        cumplirse η_t = Q·FTP/W < 1 (conservación de la energía: el ventilador no puede
+        entregar al aire más potencia que la que absorbe en el eje). Las leyes de
+        semejanza conservan η, de modo que basta verificarlo a las condiciones del
+        catálogo. Las eficiencias declaradas deben estar en [0, 1) (η = 0 solo es
+        posible a caudal nulo).
+        """
         errs = []
         if len(self.points) < 3:
             errs.append("La curva requiere al menos 3 puntos (Q, P).")
         qs = [p["Q"] for p in self.points]
+        if any(q < 0 for q in qs):
+            errs.append("Caudales negativos en la curva.")
         if any(q2 <= q1 for q1, q2 in zip(qs, qs[1:])):
             errs.append("Los caudales de la curva deben ser estrictamente crecientes.")
         if any(p["P"] < 0 for p in self.points):
@@ -72,7 +90,52 @@ class FanCurve:
             errs.append("RPM y densidad de referencia deben ser positivas.")
         if self.pressure_basis == "static" and not self.outlet_area_m2:
             errs.append("Curva en presión estática: indique el área de descarga del ventilador para obtener la presión total.")
+        bad: list[tuple[float, float, float, float]] = []   # (Q, W, Q·FTP, η_t) con η_t ≥ 1
+        for pt in self.points:
+            Q = float(pt["Q"])
+            eta = pt.get("eta")
+            if eta is not None and eta != "":
+                eta = float(eta)
+                if not (0.0 <= eta < 1.0) or (eta == 0.0 and Q > 0):
+                    errs.append(f"Eficiencia físicamente imposible en Q = {Q:.4g} m³/s: η = {eta * 100:.1f} % "
+                                "(debe estar entre 0 y 100 %, y ser mayor que 0 si hay caudal).")
+            W = pt.get("W")
+            if W is not None and W != "" and float(W) != 0.0:
+                W = float(W)
+                if W < 0:
+                    errs.append(f"Potencia absorbida negativa en Q = {Q:.4g} m³/s.")
+                    continue
+                P_air = Q * self.total_pressure_at_point(pt)
+                eta_t = P_air / W
+                if eta_t >= 1.0:
+                    bad.append((Q, W, P_air, eta_t))
+        if bad:
+            worst = max(bad, key=lambda b: b[3])
+            pts = "; ".join(f"Q = {q:.4g} m³/s → η_t = {e * 100:.1f} %" for q, _, _, e in bad[:4])
+            more = f"; … ({len(bad) - 4} más)" if len(bad) > 4 else ""
+            errs.append(f"Incoherencia caudal–presión–potencia en {len(bad)} punto(s) de la curva: la potencia "
+                        f"absorbida no supera la potencia transmitida al aire (η_t = Q·FTP/W ≥ 100 %). Peor caso: "
+                        f"Q = {worst[0]:.4g} m³/s, W = {worst[1]:.4g} W < Q·FTP = {worst[2]:.4g} W "
+                        f"(η_t = {worst[3] * 100:.1f} %). Puntos: {pts}{more}. Revise las unidades de potencia "
+                        "(W, kW, hp), de presión y de caudal, y la base de presión (total/estática) de la curva.")
         return errs
+
+    def coherence_warnings(self, rel_tol: float = 0.05) -> list[str]:
+        """Diferencias entre la eficiencia declarada y la que resulta de Q·P/W (misma base de presión).
+
+        La potencia de la curva tiene prioridad en el cálculo; una diferencia mayor que
+        ``rel_tol`` indica datos transcritos de forma inconsistente.
+        """
+        out = []
+        for pt in self.points:
+            eta, W, Q = pt.get("eta"), pt.get("W"), float(pt["Q"])
+            if not eta or not W or Q <= 0:
+                continue
+            eta_w = Q * float(pt["P"]) / float(W)
+            if abs(eta_w - float(eta)) / float(eta) > rel_tol:
+                out.append(f"Q = {Q:.4g} m³/s: η declarada {float(eta) * 100:.1f} % frente a Q·P/W = "
+                           f"{eta_w * 100:.1f} %")
+        return out
 
 
 def load_curve_csv(path: str, q_unit: str = "m³/s", p_unit: str = "Pa", w_unit: str = "W") -> list[dict]:
@@ -125,7 +188,8 @@ class AdjustedFan:
                  diameter_m: float | None = None):
         errs = curve.validate()
         if errs:
-            raise FanCurveError("; ".join(errs))
+            more = f" (y {len(errs) - 3} error(es) más)" if len(errs) > 3 else ""
+            raise FanCurveError("; ".join(errs[:3]) + more)
         self.curve = curve
         self.rpm = rpm or curve.rpm
         self.rho = rho or curve.rho_ref

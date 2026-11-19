@@ -11,7 +11,7 @@ from PySide6.QtWidgets import (QMainWindow, QWidget, QHBoxLayout, QVBoxLayout, Q
 
 from config.settings import app_root, user_data_dir
 from core import units as U
-from core.calculation import run_project
+from core.calculation import run_project, results_are_current
 from core.hood_design import HoodEntry
 from core.network_solver import NetworkModel, NetNode, NetSegment
 from core.fittings import FittingInstance
@@ -56,18 +56,18 @@ def new_project_template() -> Project:
 
 
 class CalcThread(QThread):
-    done = Signal(object, float)
+    done = Signal(object, float, int)
     failed = Signal(str)
 
-    def __init__(self, project, db, settings):
+    def __init__(self, project, db, settings, seq: int = 0):
         super().__init__()
-        self.project, self.db, self.settings = project, db, settings
+        self.project, self.db, self.settings, self.seq = project, db, settings, seq
 
     def run(self):
         t = time.time()
         try:
             res = run_project(self.project, self.db, self.settings)
-            self.done.emit(res, time.time() - t)
+            self.done.emit(res, time.time() - t, self.seq)
         except Exception as exc:  # noqa: BLE001
             import traceback
             self.failed.emit(f"{exc}\n{traceback.format_exc()}")
@@ -89,6 +89,8 @@ class MainWindow(QMainWindow):
         self.dirty = False
         self.calc_thread = None
         self.pending = False
+        self._calc_seq = 0          # número de cálculo solicitado
+        self._applied_seq = -1      # número del cálculo cuyos resultados se muestran
         UnitContext.system = project.units
         U.DISPLAY_UNITS["SI"]["flow"] = settings.app("flow_unit_SI", "m³/h")
         self._build()
@@ -240,6 +242,7 @@ class MainWindow(QMainWindow):
         self.ctx.project = project
         self.ctx.results = None
         self.ctx.comparison = None
+        self.ctx.comparison_fp = ""
         if not keep_path:
             self.path = path
         UnitContext.set(project.units)
@@ -363,7 +366,7 @@ class MainWindow(QMainWindow):
             self.recent_menu.addAction(a)
 
     def export_pngs(self):
-        if self.ctx.results is None:
+        if not self.ensure_current_results():
             return
         d = QFileDialog.getExistingDirectory(self, "Carpeta para las gráficas")
         if not d:
@@ -380,12 +383,50 @@ class MainWindow(QMainWindow):
             self.pending = True
             return
         self.status.showMessage("Calculando…")
-        self.calc_thread = CalcThread(self.ctx.project.clone(), self.ctx.db, self.ctx.settings.copy())
+        self._calc_seq += 1
+        self.calc_thread = CalcThread(self.ctx.project.clone(), self.ctx.db, self.ctx.settings.copy(), self._calc_seq)
         self.calc_thread.done.connect(self._calc_done)
         self.calc_thread.failed.connect(self._calc_failed)
         self.calc_thread.start()
 
-    def _calc_done(self, results, dt):
+    def results_current(self) -> bool:
+        """True si los resultados mostrados corresponden a las entradas actuales (proyecto, configuración, BD)."""
+        return results_are_current(self.ctx.project, self.ctx.results, self.ctx.settings, self.ctx.db)
+
+    def ensure_current_results(self) -> bool:
+        """Garantiza resultados coherentes con las entradas actuales antes de exportar.
+
+        Si las entradas cambiaron después del último cálculo (p. ej. con el recálculo automático desactivado, o
+        con un cálculo en segundo plano aún en curso), recalcula de forma síncrona y actualiza la interfaz.
+        Devuelve False si el cálculo falla.
+        """
+        if self.results_current():
+            return True
+        from PySide6.QtWidgets import QApplication
+        self.status.showMessage("Actualizando resultados antes de exportar…")
+        QApplication.setOverrideCursor(Qt.WaitCursor)
+        t = time.time()
+        try:
+            self._calc_seq += 1
+            seq = self._calc_seq
+            res = run_project(self.ctx.project.clone(), self.ctx.db, self.ctx.settings.copy())
+        except Exception as exc:  # noqa: BLE001
+            QApplication.restoreOverrideCursor()
+            QMessageBox.critical(self, "Error de cálculo", f"No se pudieron actualizar los resultados:\n{exc}")
+            return False
+        QApplication.restoreOverrideCursor()
+        self._calc_done(res, time.time() - t, seq)
+        return self.results_current()
+
+    def _calc_done(self, results, dt, seq: int | None = None):
+        if seq is not None and seq < self._applied_seq:
+            # resultado de un cálculo anterior que terminó después de uno más reciente: se descarta
+            if self.pending:
+                self.pending = False
+                QTimer.singleShot(0, self.calculate)
+            return
+        if seq is not None:
+            self._applied_seq = seq
         self.ctx.results = results
         for p in self.pages:
             p.set_results()

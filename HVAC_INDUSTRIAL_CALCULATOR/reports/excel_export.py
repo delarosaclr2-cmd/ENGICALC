@@ -49,6 +49,9 @@ def _sheet(wb, title, hdr, rows, widths=None, note=None):
 
 
 def export_excel(project, results, db, settings, path: str, comparison=None) -> str:
+    """Exporta resultados a Excel. Rechaza (``StaleResultsError``) resultados de otras entradas."""
+    from .consistency import require_current_results
+    require_current_results(project, results, settings, db)
     system = project.units
     wb = Workbook()
     ws = wb.active

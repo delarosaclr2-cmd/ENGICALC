@@ -51,6 +51,25 @@ documentada.
 | SP en la boca de la chimenea calculada como −VP | La pérdida de descarga ocurre fuera del ducto: en la salida SP = 0 y TP = VP |
 | Supuesto erróneo: "ductos más grandes ⇒ menor consumo" | Con rpm fijas el ventilador mueve más aire y consume más; con rpm ajustadas, el balanceo exige más caudal en el principal. El comparador lo refleja |
 
+## 3 bis. Hallazgos de la revisión del PR (v1.0.1, corregidos)
+
+Revisión del commit 9769054: las 113 pruebas pasaban, pero cuatro comprobaciones adicionales reprodujeron errores.
+Los cuatro se reprodujeron de forma independiente antes de corregirlos.
+
+| # | Tipo | Hallazgo | Consecuencia | Corrección |
+|---|---|---|---|---|
+| 1 | Error de interpretación física / validación | La curva aceptaba potencias absorbidas menores que la potencia al aire. Con las potencias del ejemplo a la mitad se obtenía η = 159 %, motor de 4 kW y "aceptable con observaciones" | Motor subdimensionado sin ninguna alerta | `FanCurve.validate()` exige η_t = Q·FTP/W < 1 en cada punto y η declarada en [0, 1). `power_chain` vuelve a comprobar η < 1 en el punto de operación (bases total y estática) y bloquea la selección. Si la curva seleccionada es inválida no se sustituye por una eficiencia supuesta. Resultado: CRÍTICO, sin motor, dictamen "no recomendable". La eficiencia del usuario debe estar en (0, 1). Nueva alerta MEDIO si la η declarada difiere más de 5 % de Q·P/W |
+| 2 | Omisión de método | El transporte mínimo solo se verificaba con los caudales de diseño. A 2110 rpm, R1 y R4 operan a 20.54 y 20.50 m/s, por debajo del mínimo de 20.59 m/s, sin alerta, y la alternativa era elegible | Riesgo de sedimentación no detectado | `check_transport_operation` verifica la red de operación real del ventilador seleccionado con el mismo criterio (clase del tramo, V_min corregida por densidad), sin duplicar los tramos ya señalados en diseño. El dictamen y el comparador lo incorporan; el comparador reporta V mín/máx de operación con su base |
+| 3 | Error de programación | El intervalo de muestreo de la curva del sistema se calculaba con el dominio de catálogo, antes de aplicar las rpm o el diámetro. A 2400 rpm se reportaba "sin intersección" aunque el solucionador converge a 0.350 m³/s | Falso CRÍTICO; selección de ventilador rechazada sin motivo | Las curvas se ajustan (Q ∝ N·D³) antes de muestrear, y el intervalo cubre el dominio ajustado de cada ventilador |
+| 4 | Error de programación (trazabilidad) | La exportación combinaba el proyecto actual con el último resultado. Con el recálculo automático desactivado, una exportación a 35 °C usaba resultados de 25 °C | Memoria de cálculo incoherente | Cada resultado guarda una huella SHA-256 de sus entradas (proyecto, configuración y base de datos; se excluye la marca de guardado). `generate_pdf` y `export_excel` rechazan resultados de otras entradas (`StaleResultsError`). La interfaz recalcula de forma síncrona antes de exportar PDF, Excel o PNG, y vuelve a ejecutar el comparador si cambiaron las alternativas. Un cálculo en segundo plano más antiguo ya no sobrescribe uno más reciente |
+
+Cambios de interfaz, documentados por separado de los de cálculo:
+
+- La memoria y el Excel muestran el motivo cuando la selección de motor está bloqueada.
+- El comparador tiene una columna "Base de V" (operación real o diseño).
+- El campo de eficiencia del ventilador se limita a 99 %.
+- Se corrigió la doble viñeta en las conclusiones del comparador del PDF.
+
 ## 4. Estado de las herramientas (formato del proyecto)
 
 | Módulo | Estado de auditoría | Estado de validación |
@@ -62,8 +81,10 @@ documentada.
 | Ductos y fricción | CORREGIDA | VALIDADA BAJO CONDICIONES DOCUMENTADAS |
 | Accesorios | CORREGIDA | Fórmulas: VALIDADA; K tabulados: VALIDACIÓN PENDIENTE (fuente marcada) |
 | Red ramificada | NUEVA | VALIDADA BAJO CONDICIONES DOCUMENTADAS (árbol de extracción, un ventilador) |
-| Ventiladores | NUEVA | VALIDADA BAJO CONDICIONES DOCUMENTADAS (curvas reales: requieren datos certificados) |
-| Potencia | CORREGIDA | VALIDADA BAJO CONDICIONES DOCUMENTADAS |
+| Ventiladores | CORREGIDA (v1.0.1: intervalo con curva ajustada; coherencia Q·P·W) | VALIDADA BAJO CONDICIONES DOCUMENTADAS (curvas reales: requieren datos certificados) |
+| Potencia | CORREGIDA (v1.0.1: bloqueo con η ≥ 100 %) | VALIDADA BAJO CONDICIONES DOCUMENTADAS |
+| Transporte en operación real | NUEVA (v1.0.1) | VALIDADA BAJO CONDICIONES DOCUMENTADAS (ventilador seleccionado, filtro en estado de diseño) |
+| Exportación (coherencia entradas–resultados) | CORREGIDA (v1.0.1) | VALIDADA (prueba de interfaz con recálculo automático desactivado) |
 
 ## 5. Pendientes que requieren documentos del usuario
 

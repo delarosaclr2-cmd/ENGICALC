@@ -225,7 +225,7 @@ class PowerPage(BasePage):
                                   "el eje del motor y eléctrica de entrada; motor normalizado con margen aplicado una sola "
                                   "vez; consumo, costo y regulación por compuerta frente a variador."))
         g, f = group("Eficiencias y motor")
-        self.eta = QField(None, unit_override="%", scale=100, minimum=0.01, maximum=1.0)
+        self.eta = QField(None, unit_override="%", scale=100, minimum=0.01, maximum=0.99)   # η_vent < 100 %
         self.basis = combo([("total", "Total (con FTP)"), ("static", "Estática (con FSP)")])
         self.drive = combo([("Directo", "Acople directo"), ("Bandas", "Transmisión por bandas"), ("Otro", "Otro")])
         self.eta_d = QField(None, unit_override="%", scale=100, minimum=0.01, maximum=1.0)

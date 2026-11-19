@@ -10,6 +10,7 @@ from PySide6.QtWidgets import (QLineEdit, QTextEdit, QTextBrowser, QPushButton, 
                                QFileDialog, QMessageBox, QInputDialog, QTabWidget, QApplication)
 from PySide6.QtCore import Qt
 
+from core.calculation import comparison_fingerprint, results_are_current
 from core.project import Alternative, Project
 from graphics.plots import plot_alternatives
 from reports import tables as T
@@ -146,10 +147,35 @@ class ReportPage(BasePage):
             return
         QApplication.setOverrideCursor(Qt.WaitCursor)
         try:
-            self.ctx.comparison = run_alternatives(self.ctx.project, self.ctx.db, self.ctx.settings)
+            self._run_comparison()
         finally:
             QApplication.restoreOverrideCursor()
         self._show_comparison()
+
+    def _run_comparison(self):
+        self.ctx.comparison = run_alternatives(self.ctx.project, self.ctx.db, self.ctx.settings)
+        self.ctx.comparison_fp = comparison_fingerprint(self.ctx.project, self.ctx.settings, self.ctx.db)
+
+    def _prepare_export(self) -> bool:
+        """Antes de exportar: resultados y comparador coherentes con las entradas actuales.
+
+        Si las entradas cambiaron después del último cálculo (recálculo automático desactivado o cálculo en curso),
+        se recalcula; nunca se combina el proyecto actual con resultados de otras entradas.
+        """
+        if self.main is not None:
+            if not self.main.ensure_current_results():
+                return False
+        elif not results_are_current(self.ctx.project, self.ctx.results, self.ctx.settings, self.ctx.db):
+            QMessageBox.warning(self, "Resultados desactualizados", "Recalcule antes de exportar.")
+            return False
+        if len(self.ctx.project.alternatives) >= 3:
+            if self.ctx.comparison is None or self.ctx.comparison_fp != comparison_fingerprint(
+                    self.ctx.project, self.ctx.settings, self.ctx.db):
+                self._run_comparison()
+                self._show_comparison()
+        elif self.ctx.comparison is not None:
+            self.ctx.comparison, self.ctx.comparison_fp = None, ""
+        return True
 
     def _show_comparison(self):
         mets, concl = self.ctx.comparison
@@ -158,16 +184,15 @@ class ReportPage(BasePage):
         self.p_alt.set_figure(plot_alternatives(mets, self.ctx.system))
 
     def export_pdf(self):
-        if self.ctx.results is None:
-            return
         path, _ = QFileDialog.getSaveFileName(self, "Guardar memoria PDF", f"{self.ctx.project.info.name}.pdf", "PDF (*.pdf)")
         if not path:
             return
         from reports.pdf_report import generate_pdf
         QApplication.setOverrideCursor(Qt.WaitCursor)
         try:
-            if self.ctx.comparison is None and len(self.ctx.project.alternatives) >= 3:
-                self.ctx.comparison = run_alternatives(self.ctx.project, self.ctx.db, self.ctx.settings)
+            if not self._prepare_export():
+                QApplication.restoreOverrideCursor()
+                return
             generate_pdf(self.ctx.project, self.ctx.results, self.ctx.db, self.ctx.settings, path, self.ctx.comparison,
                          self.ctx.settings.data.get("report", {}).get("include_traces", True))
         except Exception as exc:  # noqa: BLE001
@@ -178,14 +203,15 @@ class ReportPage(BasePage):
         QDesktopServices.openUrl(QUrl.fromLocalFile(path))
 
     def export_excel(self):
-        if self.ctx.results is None:
-            return
         path, _ = QFileDialog.getSaveFileName(self, "Exportar Excel", f"{self.ctx.project.info.name}.xlsx", "Excel (*.xlsx)")
         if not path:
             return
         from reports.excel_export import export_excel
         QApplication.setOverrideCursor(Qt.WaitCursor)
         try:
+            if not self._prepare_export():
+                QApplication.restoreOverrideCursor()
+                return
             export_excel(self.ctx.project, self.ctx.results, self.ctx.db, self.ctx.settings, path, self.ctx.comparison)
         except Exception as exc:  # noqa: BLE001
             QApplication.restoreOverrideCursor()

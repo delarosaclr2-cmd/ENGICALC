@@ -14,6 +14,7 @@ class AppContext:
         self.settings = settings
         self.results = None
         self.comparison = None
+        self.comparison_fp = ""     # huella de las entradas con que se calculó ``comparison``
 
     @property
     def system(self):

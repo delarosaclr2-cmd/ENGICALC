@@ -66,11 +66,11 @@ HVAC_INDUSTRIAL_CALCULATOR/
 
 ## Validación
 
-`python -m pytest` ejecuta 113 pruebas con más de 180 comprobaciones numéricas contra referencias independientes:
+`python -m pytest` ejecuta 132 pruebas con 199 comprobaciones numéricas contra referencias independientes:
 CoolProp/IAPWS, soluciones analíticas, ecuaciones elementales y una segunda formulación del solucionador de red.
 Cada comprobación queda registrada con entrada, valor esperado, valor obtenido, error absoluto, error relativo,
 tolerancia y referencia en `tests/results/registro_pruebas.csv` y `.md`. Resumen y hallazgos en
-[`docs/VALIDACION.md`](docs/VALIDACION.md).
+[`docs/VALIDACION.md`](docs/VALIDACION.md); cambios por versión en [`CHANGELOG.md`](CHANGELOG.md).
 
 ## Ejecutable de Windows
 

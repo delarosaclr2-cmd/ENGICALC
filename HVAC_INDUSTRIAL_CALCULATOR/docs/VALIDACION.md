@@ -1,9 +1,9 @@
 # Validación matemática y prueba de integración
 
-Ejecución: `python -m pytest` (113 pruebas, 184 comprobaciones numéricas registradas). El registro detallado de cada
+Ejecución: `python -m pytest` (132 pruebas, 199 comprobaciones numéricas registradas). El registro detallado de cada
 comprobación (entrada, esperado, obtenido, error absoluto, error relativo, tolerancia, referencia y estado) está en
 `tests/results/registro_pruebas.csv` y `tests/results/registro_pruebas.md`. Resultado de la última ejecución:
-**113/113 pruebas aprobadas; 184/184 comprobaciones dentro de tolerancia**.
+**132/132 pruebas aprobadas; 199/199 comprobaciones dentro de tolerancia** (v1.0.1).
 
 Regla aplicada: los valores esperados provienen de referencias independientes del código y **nunca se ajustaron para
 aprobar**. Las discrepancias se investigaron; la sección 3 documenta las causas.
@@ -60,7 +60,7 @@ aprobar**. Las discrepancias se investigaron; la sección 3 documenta las causas
 | A — Diseño base | Elegible, 90/100, **recomendada** |
 | B — Principal un diámetro mayor | No elegible: velocidad de transporte insuficiente |
 | C — Punta radial RT-500 | Elegible, 66/100: mayor consumo |
-| D — Ventilador pequeño BI-450 | No elegible: déficit de caudal 15 %, aunque es la de menor consumo |
+| D — Ventilador pequeño BI-450 | No elegible: déficit de caudal 15 % y transporte insuficiente en operación real, aunque es la de menor consumo |
 
 El comparador no elige la alternativa más económica.
 
@@ -76,6 +76,22 @@ El comparador no elige la alternativa más económica.
    5 % se aceptan por criterio. Con tolerancia 0 la concordancia es de 10⁻⁵.
 5. **Alternativa B**: el supuesto "menos pérdida ⇒ menos energía" resultó falso en este caso por el reequilibrado de la
    red. El programa estaba en lo correcto; se corrigió la prueba y se añadió una prueba del comportamiento físico.
+
+6. **Revisión del PR (v1.0.1)**: cuatro errores reproducidos con casos del revisor y corregidos (ver
+   `docs/AUDITORIA_TECNICA.md`, sección 3 bis). Las pruebas de regresión están en
+   `tests/test_regresion_revision.py` (19 casos):
+   - η ≥ 100 %: curva con potencias a la mitad rechazada (η = 1.60 = Q·P/W calculado aparte). Sin motor y dictamen
+     "no recomendable". Bloqueo también para η_s que implica η_t > 1, para η = 1 indicada y para η > 1 en el
+     punto de operación.
+   - Transporte: a 2110 rpm el diseño cumple y la operación no. V de R1 y R4 contrastadas con V = ṁ/(ρ·A) y
+     V_min = 17.78/√(ρ/1.2) m/s. Alternativa excluida; a 2200 rpm no hay alerta.
+   - Intervalo de búsqueda: red de una campana a 1600, 2000, 2300 y 2400 rpm y con D = 0.42/0.44 m. El punto de
+     operación coincide (10⁻⁶) con el solucionador de red en modo operación. q_max ajustado = 0.30·2400/2000 = 0.36.
+   - Exportación: la GUI con recálculo automático desactivado y t = 35 °C exporta Excel y PDF con ρ(35 °C). El
+     valor se contrasta con un `run_project` independiente. Los generadores rechazan resultados desactualizados y
+     la huella no depende de la marca de guardado.
+   - Efecto en el banco: sin cambios en diseño, operación, potencia, motor (11 kW) ni dictamen. En el comparador,
+     D (BI-450) también se excluye por transporte en operación real, además del déficit de caudal.
 
 ## 4. Pruebas de interfaz y reportes
 

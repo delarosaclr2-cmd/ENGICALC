@@ -14,7 +14,7 @@ from .fan_curves import FanCurve
 from .hood_design import HoodEntry
 from .network_solver import NetworkModel
 
-APP_VERSION = "1.0.0"
+APP_VERSION = "1.0.1"
 FORMAT_VERSION = 1
 
 

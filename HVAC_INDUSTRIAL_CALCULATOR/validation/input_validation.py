@@ -23,10 +23,14 @@ def validate_project_inputs(project) -> list[Alert]:
                          "(−500 a 11 000 m)", a.altitude_m, "length", recommendation="Indique la presión barométrica medida.",
                          basis=BASIS_PHYSICS, source="ASHRAE Fundamentals cap. 1, ec. 3"))
     pw = project.power
-    for name, v in (("η transmisión", pw.eta_drive), ("η motor", pw.eta_motor), ("η variador", pw.eta_vfd),
-                    ("η ventilador", pw.eta_fan_user)):
+    for name, v in (("η transmisión", pw.eta_drive), ("η motor", pw.eta_motor), ("η variador", pw.eta_vfd)):
         if v is not None and not (0 < v <= 1):
-            crit("Potencia y motores", name, f"Eficiencia fuera de (0, 1]: {v}", "Las eficiencias deben estar en (0, 1].")
+            crit("Potencia y motores", name, f"Eficiencia fuera de (0, 1]: {v}", "Las eficiencias deben estar en (0, 1] "
+                 "(1.0 = acople directo o sin variador).")
+    if pw.eta_fan_user is not None and not (0 < pw.eta_fan_user < 1):
+        crit("Potencia y motores", "η ventilador", f"Eficiencia del ventilador físicamente imposible: {pw.eta_fan_user}",
+             "La eficiencia del ventilador debe estar en (0, 1): un ventilador no puede transmitir al aire toda la "
+             "potencia que absorbe.")
     if pw.margin < 0:
         crit("Potencia y motores", "Margen", "Margen de selección negativo", "Use un margen ≥ 0.")
     for h in project.hoods:

@@ -16,6 +16,8 @@ from __future__ import annotations
 
 import copy
 import datetime as _dt
+import hashlib
+import json
 import traceback
 from dataclasses import dataclass, field
 
@@ -27,11 +29,11 @@ from .duct_geometry import size_by_velocity, size_by_friction, size_static_regai
 from .fan_curves import AdjustedFan, find_intersections, analyze_operating_point, speed_for_design_point, OperatingPoint
 from .hood_design import hood_airflow, hood_entry_loss, HoodResult, HoodLossResult
 from .network_solver import (NetworkModel, FlowContext, solve_design, solve_operating, system_curve, NetworkResult)
-from .power import power_chain, part_load_comparison, PowerResult
+from .power import power_chain, part_load_comparison, PowerResult, PhysicalInconsistencyError
 from .project import Project, APP_VERSION
 from .trace import Trace
 
-from validation.alerts import Alert, sort_alerts, BASIS_PHYSICS
+from validation.alerts import Alert, sort_alerts, BASIS_PHYSICS, BASIS_DATA
 from validation import engineering_checks as EC
 from validation.input_validation import validate_project_inputs
 from validation.decision_engine import module_decision, build_dictamen, Decision, Dictamen
@@ -75,10 +77,16 @@ class ProjectResults:
     trace: Trace = field(default_factory=Trace)
     errors: dict[str, str] = field(default_factory=dict)
     settings: object = None
+    power_blocked: str = ""          # motivo por el que no se seleccionó motor (vacío si se calculó)
+    input_fingerprint: str = ""      # huella de las entradas usadas (proyecto + configuración + base de datos)
 
     @property
     def selected_fan(self) -> FanEval | None:
         return self.fans.get(self.selected_fan_id) if self.selected_fan_id else None
+
+
+class _PowerBlocked(Exception):
+    """Selección de motor bloqueada por un error de datos ya reportado en otro módulo."""
 
 
 def _err(res: ProjectResults, module: str, exc: Exception) -> None:
@@ -86,6 +94,39 @@ def _err(res: ProjectResults, module: str, exc: Exception) -> None:
     res.alerts.append(Alert("CRÍTICO", module, "Error de cálculo", str(exc), basis=BASIS_PHYSICS,
                             recommendation="Revise los datos de entrada del módulo.",
                             source="Validación de dominio del motor de cálculo"))
+
+
+def _canonical(obj) -> bytes:
+    return json.dumps(obj, sort_keys=True, ensure_ascii=False, default=str, separators=(",", ":")).encode("utf-8")
+
+
+def input_fingerprint(project: Project, settings, db) -> str:
+    """Huella SHA-256 de TODAS las entradas que determinan los resultados: proyecto (sin alternativas),
+    configuración (criterios, solucionador) y base de datos técnica. Permite verificar que una memoria
+    de cálculo combine entradas y resultados del mismo cálculo."""
+    d = project.to_dict(include_alternatives=False)
+    d.pop("saved", None)        # marca de tiempo de serialización: no es una entrada del cálculo
+    h = hashlib.sha256()
+    h.update(_canonical(d))
+    h.update(_canonical(getattr(settings, "data", None)))
+    h.update(_canonical(getattr(db, "data", None)))
+    return h.hexdigest()
+
+
+def comparison_fingerprint(project: Project, settings, db) -> str:
+    """Huella de las entradas del comparador: alternativas guardadas, sistema de unidades, configuración y base
+    de datos."""
+    h = hashlib.sha256()
+    h.update(_canonical([a.to_dict() if hasattr(a, "to_dict") else a.__dict__ for a in project.alternatives]))
+    h.update(_canonical(project.units))
+    h.update(_canonical(getattr(settings, "data", None)))
+    h.update(_canonical(getattr(db, "data", None)))
+    return h.hexdigest()
+
+
+def results_are_current(project: Project, results, settings, db) -> bool:
+    return bool(results is not None and getattr(results, "input_fingerprint", "")
+                and results.input_fingerprint == input_fingerprint(project, settings, db))
 
 
 def build_flow_context(project: Project, air: AP.AirState, db, settings, filter_state: str | None) -> FlowContext:
@@ -115,6 +156,7 @@ def prepare_model(project: Project, db) -> NetworkModel:
 
 def run_project(project: Project, db, settings, compute_fans: bool = True) -> ProjectResults:
     res = ProjectResults(_dt.datetime.now().isoformat(timespec="seconds"), APP_VERSION, settings=settings)
+    res.input_fingerprint = input_fingerprint(project, settings, db)
     res.alerts += validate_project_inputs(project)
     system = project.units
 
@@ -236,30 +278,37 @@ def run_project(project: Project, db, settings, compute_fans: bool = True) -> Pr
             ctx.extra_K = dict(nd_res.damper_K)
             x0 = {h: nd_res.state.node_mdot[h] for h in nd_res.hood_q_final}
             Qd = nd_res.state.Q_fan
-            q_lo, q_hi = 0.3 * Qd, 1.7 * Qd
-            for f in project.fans:
-                try:
-                    af_ = AdjustedFan(f, rho=nd_res.state.rho_fan)
-                    q_lo = min(q_lo, af_.q_min)
-                    q_hi = max(q_hi, af_.q_max)
-                except Exception:  # noqa: BLE001
-                    pass
-            npts = int(settings.solver("system_curve_points", 25))
-            qs = list(np.linspace(max(q_lo, 0.05 * Qd), q_hi, npts))
-            res.system_curve = system_curve(model, ctx, x0, qs)
-            ctx_c = build_flow_context(project, air, db, settings, "limpio")
-            ctx_c.extra_K = dict(nd_res.damper_K)
-            res.system_curve_clean = system_curve(model, ctx_c, x0, qs)
             sel = project.fan_selection
             res.selected_fan_id = sel.selected_id or (project.fans[0].id if project.fans else None)
+            # Curvas ajustadas ANTES de muestrear la curva del sistema: el intervalo de búsqueda debe cubrir el
+            # dominio de cada ventilador ya corregido por velocidad, diámetro y densidad (Q ∝ N·D³). Con el
+            # dominio de catálogo, un cambio de rpm/diámetro dejaba el punto de operación fuera del muestreo.
             for f in project.fans:
                 fe = FanEval(f.id, None, None, None, None)
                 res.fans[f.id] = fe
                 try:
                     rpm = sel.rpm if (f.id == res.selected_fan_id and sel.rpm) else None
                     D = sel.diameter_m if (f.id == res.selected_fan_id and sel.diameter_m) else None
-                    adj = AdjustedFan(f, rpm=rpm, rho=nd_res.state.rho_fan, diameter_m=D)
-                    fe.adjusted = adj
+                    fe.adjusted = AdjustedFan(f, rpm=rpm, rho=nd_res.state.rho_fan, diameter_m=D)
+                except Exception as exc:  # noqa: BLE001
+                    fe.error = str(exc)
+            q_lo, q_hi = 0.3 * Qd, 1.7 * Qd
+            for fe in res.fans.values():
+                if fe.adjusted is not None:
+                    q_lo = min(q_lo, fe.adjusted.q_min)
+                    q_hi = max(q_hi, fe.adjusted.q_max)
+            npts = int(settings.solver("system_curve_points", 25))
+            qs = list(np.linspace(max(q_lo, 0.05 * Qd), q_hi, npts))
+            res.system_curve = system_curve(model, ctx, x0, qs)
+            ctx_c = build_flow_context(project, air, db, settings, "limpio")
+            ctx_c.extra_K = dict(nd_res.damper_K)
+            res.system_curve_clean = system_curve(model, ctx_c, x0, qs)
+            for f in project.fans:
+                fe = res.fans[f.id]
+                if fe.adjusted is None:
+                    continue
+                try:
+                    adj = fe.adjusted
                     sq = [p[0] for p in res.system_curve if p[3]]
                     sp = [p[1] for p in res.system_curve if p[3]]
                     inter = find_intersections(adj, sq, sp)
@@ -284,6 +333,12 @@ def run_project(project: Project, db, settings, compute_fans: bool = True) -> Pr
             res.alerts += EC.check_fan(res.fans, res.selected_fan_id, res.network_design,
                                        res.selected_fan.op_network if res.selected_fan else None, settings,
                                        res.hood_q_required)
+            # Velocidades de transporte con los caudales REALES del ventilador seleccionado (la verificación de
+            # diseño usa el caudal balanceado; si el ventilador entrega menos, un tramo puede quedar bajo el mínimo).
+            fe_sel = res.selected_fan
+            if fe_sel is not None and fe_sel.op_network is not None:
+                res.alerts += EC.check_transport_operation(project, model, fe_sel.op_network, db, settings, hood_class,
+                                                           res.alerts)
         except Exception as exc:  # noqa: BLE001
             _err(res, "Selección de ventiladores", exc)
             res.errors["trace_fan"] = traceback.format_exc()
@@ -296,6 +351,12 @@ def run_project(project: Project, db, settings, compute_fans: bool = True) -> Pr
             ratings = db.motor_ratings_kw(pw.motor_standard)
             sel_W = pw.motor_selected_kw * 1000.0 if pw.motor_selected_kw else None
             eta_vfd = pw.eta_vfd if pw.use_vfd else 1.0
+            if fe is not None and fe.error:
+                # La curva del ventilador seleccionado es inválida (p. ej. η ≥ 100 %): no se sustituye por una
+                # eficiencia supuesta, porque eso ocultaría el error de datos y dimensionaría un motor sin respaldo.
+                res.power_blocked = (f"No se selecciona motor: la curva del ventilador seleccionado ({fe.fan_id}) no es "
+                                     f"válida — {fe.error}")
+                raise _PowerBlocked(res.power_blocked)
             if fe is not None and fe.op is not None:
                 op = fe.op
                 res.power = power_chain(op.Q, op.FTP, op.FSP, op.W_shaft, pw.eta_fan_user, pw.eta_basis, pw.eta_drive,
@@ -327,6 +388,21 @@ def run_project(project: Project, db, settings, compute_fans: bool = True) -> Pr
             if temps and max(temps) > air.t_c + 20:
                 hot_ratio = air.rho / res.network_design.state.rho_fan
             res.alerts += EC.check_power(pw, res.power, settings, overload, hot_ratio)
+        except _PowerBlocked:
+            res.power = None
+        except PhysicalInconsistencyError as exc:
+            res.power = None
+            res.power_blocked = str(exc)
+            fid = res.selected_fan.fan_id if res.selected_fan else ""
+            res.alerts.append(Alert(
+                "CRÍTICO", "Potencia y motores", "Coherencia caudal–presión–potencia", str(exc), exc.eta,
+                item=fid, criterion="η = P_aire/W_vent < 1 (conservación de la energía)",
+                consequence="La potencia absorbida estaría subestimada: el motor quedaría subdimensionado "
+                            "(sobrecarga, disparo de protecciones, daño del motor).",
+                recommendation="Corrija la curva del ventilador (unidades de potencia y presión, densidad de referencia, "
+                               "base total/estática) o la eficiencia indicada. No se selecciona motor hasta resolverlo.",
+                source="Conservación de la energía; definición de eficiencia del ventilador (AMCA 210)",
+                basis=BASIS_PHYSICS))
         except Exception as exc:  # noqa: BLE001
             _err(res, "Potencia y motores", exc)
 
@@ -391,10 +467,18 @@ def _build_decisions(project: Project, res: ProjectResults, insuf_flow: bool) ->
         if nr is not None:
             st = nr.state
             vs = [abs(e.V) for e in st.seg_evals.values()]
+            summ = [f"Diseño balanceado: velocidades de ducto entre {fmt(min(vs), 'velocity', sysu)} y "
+                    f"{fmt(max(vs), 'velocity', sysu)} en {len(vs)} tramos."]
+            fe_s = res.selected_fan
+            opn = fe_s.op_network if fe_s is not None else None
+            if opn is not None and opn.converged:
+                vo = [abs(e.V) for e in opn.state.seg_evals.values()]
+                summ.append(f"Operación real ({fe_s.fan_id}, {fe_s.adjusted.rpm:.0f} rpm): velocidades entre "
+                            f"{fmt(min(vo), 'velocity', sysu)} y {fmt(max(vo), 'velocity', sysu)}.")
             D["Diseño de ductos"] = module_decision(
-                "Diseño de ductos", res.alerts,
-                [f"Velocidades de ducto entre {min(vs):.1f} y {max(vs):.1f} m/s en {len(vs)} tramos."],
-                ["Continuidad V = Q/A; velocidades mínimas de transporte ACGIH corregidas por densidad."], system=sysu)
+                "Diseño de ductos", res.alerts, summ,
+                ["Continuidad V = Q/A; velocidades mínimas de transporte ACGIH corregidas por densidad, verificadas con "
+                 "los caudales de diseño y con los del punto de operación real del ventilador."], system=sysu)
             tb = nr.total_by_type()
             D["Pérdidas de presión"] = module_decision(
                 "Pérdidas de presión", res.alerts,
@@ -431,6 +515,10 @@ def _build_decisions(project: Project, res: ProjectResults, insuf_flow: bool) ->
                 "Selección de ventiladores", res.alerts, summ,
                 ["Intersección curva del ventilador (PCHIP, leyes de semejanza) con la curva del sistema obtenida del "
                  "solucionador de red."], system=sysu)
+    if res.power is None and res.power_blocked:
+        D["Potencia y motores"] = module_decision(
+            "Potencia y motores", res.alerts, [res.power_blocked], [], True,
+            ["Corregir los datos del ventilador para poder seleccionar el motor."], sysu)
     if res.power is not None:
         p = res.power
         D["Potencia y motores"] = module_decision(

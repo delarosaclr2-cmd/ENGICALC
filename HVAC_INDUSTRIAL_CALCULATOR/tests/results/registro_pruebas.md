@@ -1,7 +1,7 @@
 # Registro de pruebas de validación matemática
 
-Fecha: 2026-11-18T13:43:59  
-Comprobaciones numéricas: 185 — aprobadas: 185 — fallidas: 0
+Fecha: 2026-11-18T17:40:11  
+Comprobaciones numéricas: 199 — aprobadas: 199 — fallidas: 0
 
 | Prueba | Comprobación | Esperado | Obtenido | Error abs. | Error rel. | Tolerancia | Referencia | Estado |
 |---|---|---|---|---|---|---|---|---|
@@ -44,12 +44,12 @@ Comprobaciones numéricas: 185 — aprobadas: 185 — fallidas: 0
 | test_static_regain_balance | recuperación estática R·ΔVP = pérdidas | 19.735091 | 19.735091 | 9.09e-13 | 4.61e-14 | rel 1e-05 | Balance del método | APROBADA |
 | test_reynolds | Re | 200000 | 200000 | 2.91e-11 | 1.46e-16 | rel 1e-12 | Re = ρVD/μ | APROBADA |
 | test_laminar | f laminar Re=1000 | 0.064 | 0.064 | 0 | 0 | rel 1e-12 | 64/Re | APROBADA |
-| test_colebrook_vs_bisection[5000.0-0.0] | Colebrook Re=5000 εr=0 | 0.037392728 | 0.037392728 | 6.39e-15 | 1.71e-13 | rel 1e-10 | Colebrook resuelto por bisección (Brent) | APROBADA |
-| test_colebrook_vs_bisection[10000.0-0.0001] | Colebrook Re=10000 εr=0.0001 | 0.031037212 | 0.031037212 | 2.21e-15 | 7.11e-14 | rel 1e-10 | Colebrook resuelto por bisección (Brent) | APROBADA |
+| test_colebrook_vs_bisection[5000.0-0.0] | Colebrook Re=5000 εr=0 | 0.037392728 | 0.037392728 | 6.41e-15 | 1.71e-13 | rel 1e-10 | Colebrook resuelto por bisección (Brent) | APROBADA |
+| test_colebrook_vs_bisection[10000.0-0.0001] | Colebrook Re=10000 εr=0.0001 | 0.031037212 | 0.031037212 | 2.21e-15 | 7.13e-14 | rel 1e-10 | Colebrook resuelto por bisección (Brent) | APROBADA |
 | test_colebrook_vs_bisection[100000.0-0.0001] | Colebrook Re=100000 εr=0.0001 | 0.018513866 | 0.018513866 | 8.57e-16 | 4.63e-14 | rel 1e-10 | Colebrook resuelto por bisección (Brent) | APROBADA |
 | test_colebrook_vs_bisection[1000000.0-0.001] | Colebrook Re=1e+06 εr=0.001 | 0.019943466 | 0.019943466 | 1.73e-17 | 8.7e-16 | rel 1e-10 | Colebrook resuelto por bisección (Brent) | APROBADA |
-| test_colebrook_vs_bisection[10000000.0-1e-05] | Colebrook Re=1e+07 εr=1e-05 | 0.0089957117 | 0.0089957117 | 4.75e-16 | 5.28e-14 | rel 1e-10 | Colebrook resuelto por bisección (Brent) | APROBADA |
-| test_colebrook_vs_bisection[300000.0-0.005] | Colebrook Re=300000 εr=0.005 | 0.030689305 | 0.030689305 | 3.47e-18 | 1.13e-16 | rel 1e-10 | Colebrook resuelto por bisección (Brent) | APROBADA |
+| test_colebrook_vs_bisection[10000000.0-1e-05] | Colebrook Re=1e+07 εr=1e-05 | 0.0089957117 | 0.0089957117 | 4.77e-16 | 5.3e-14 | rel 1e-10 | Colebrook resuelto por bisección (Brent) | APROBADA |
+| test_colebrook_vs_bisection[300000.0-0.005] | Colebrook Re=300000 εr=0.005 | 0.030689305 | 0.030689305 | 0 | 0 | rel 1e-10 | Colebrook resuelto por bisección (Brent) | APROBADA |
 | test_explicit_correlations[10000.0-0.0001] | Haaland vs Colebrook | 0.030990343 | 0.031037212 | 4.69e-05 | 0.00151 | rel 0.02 | Haaland (1983), ±2 % | APROBADA |
 | test_explicit_correlations[10000.0-0.0001] | Swamee-Jain vs Colebrook | 0.031037212 | 0.0311487 | 0.000111 | 0.00359 | rel 0.015 | Swamee-Jain declara ≈±1 % | APROBADA |
 | test_explicit_correlations[10000.0-0.0001] | Churchill vs Colebrook | 0.031037212 | 0.031178157 | 0.000141 | 0.00454 | rel 0.03 | Churchill (1977) | APROBADA |
@@ -125,6 +125,20 @@ Comprobaciones numéricas: 185 — aprobadas: 185 — fallidas: 0
 | test_design_dampers_then_operating_reproduces_design | Q H2 operación = diseño con compuertas | 0.39 | 0.39 | 0 | 0 | rel 1e-05 | Consistencia diseño ↔ operación | APROBADA |
 | test_design_dampers_then_operating_reproduces_design | Q H3 operación = diseño con compuertas | 0.75 | 0.75 | 0 | 0 | rel 1e-05 | Consistencia diseño ↔ operación | APROBADA |
 | test_design_dampers_then_operating_reproduces_design | Q H4 operación = diseño con compuertas | 0.38 | 0.38 | 0 | 0 | rel 1e-05 | Consistencia diseño ↔ operación | APROBADA |
+| test_curve_with_halved_power_is_rejected | η_t del punto con potencia a la mitad | 1.6 | 1.6 | 0 | 0 | rel 1e-12 | η = Q·P/W (curva total, ρ_ref) | APROBADA |
+| test_power_chain_rejects_curve_power_below_air_power | η reportada en el bloqueo | 1.59 | 1.59 | 0 | 0 | rel 1e-12 | η = Q·FTP/W | APROBADA |
+| test_design_meets_transport_but_real_operation_does_not | V operación R1 | 20.538907 | 20.538907 | 0 | 0 | rel 1e-09 | Continuidad V = ṁ/(ρ·A) | APROBADA |
+| test_design_meets_transport_but_real_operation_does_not | V alerta R1 | 20.538907 | 20.538907 | 0 | 0 | rel 1e-12 | Valor de la alerta | APROBADA |
+| test_design_meets_transport_but_real_operation_does_not | V operación R4 | 20.503732 | 20.503732 | 3.55e-15 | 1.73e-16 | rel 1e-09 | Continuidad V = ṁ/(ρ·A) | APROBADA |
+| test_design_meets_transport_but_real_operation_does_not | V alerta R4 | 20.503732 | 20.503732 | 0 | 0 | rel 1e-12 | Valor de la alerta | APROBADA |
+| test_operating_point_found_after_speed_or_diameter_change[2000-None] | Q operación 2000 rpm D=None | 0.29098725 | 0.29098725 | 0 | 0 | rel 1e-06 | Solucionador de red en operación (independiente del muestreo de la curva del sistema) | APROBADA |
+| test_operating_point_found_after_speed_or_diameter_change[2400-None] | Q operación 2400 rpm D=None | 0.35017793 | 0.35017793 | 0 | 0 | rel 1e-06 | Solucionador de red en operación (independiente del muestreo de la curva del sistema) | APROBADA |
+| test_operating_point_found_after_speed_or_diameter_change[1600-None] | Q operación 1600 rpm D=None | 0.23185267 | 0.23185267 | 0 | 0 | rel 1e-06 | Solucionador de red en operación (independiente del muestreo de la curva del sistema) | APROBADA |
+| test_operating_point_found_after_speed_or_diameter_change[2000-0.44] | Q operación 2000 rpm D=0.44 | 0.34031956 | 0.34031956 | 0 | 0 | rel 1e-06 | Solucionador de red en operación (independiente del muestreo de la curva del sistema) | APROBADA |
+| test_operating_point_found_after_speed_or_diameter_change[2300-0.42] | Q operación 2300 rpm D=0.42 | 0.36415157 | 0.36415157 | 0 | 0 | rel 1e-06 | Solucionador de red en operación (independiente del muestreo de la curva del sistema) | APROBADA |
+| test_reviewer_case_2400_rpm | dominio ajustado q_max = 0.30·2400/2000 | 0.36 | 0.36 | 0 | 0 | rel 1e-12 | Q ∝ N (ley de semejanza) | APROBADA |
+| test_gui_export_recalculates_when_autorecalc_disabled | t exportada | 35 | 35 | 0 | 0 | rel 0 | Entrada actual | APROBADA |
+| test_gui_export_recalculates_when_autorecalc_disabled | ρ exportada = ρ(35 °C) | 0.86025015 | 0.8603 | 4.98e-05 | 5.79e-05 | rel 0.001 | run_project a 35 °C (independiente de la GUI) | APROBADA |
 | test_project_roundtrip | ida y vuelta JSON: n.º de alternativas | 4 | 4 | 0 | 0 | rel 0 | Persistencia | APROBADA |
 | test_flow_cfm | 1 cfm → m³/s | 0.00047194744 | 0.00047194744 | 0 | 0 | rel 1e-15 | Definición ft = 0.3048 m | APROBADA |
 | test_flow_cfm | 3600 m³/h → m³/s | 1 | 1 | 0 | 0 | rel 1e-15 | Definición | APROBADA |

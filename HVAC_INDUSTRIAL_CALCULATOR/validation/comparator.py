@@ -3,7 +3,8 @@
 Procedimiento (no se elige automáticamente la más barata ni la de menor presión):
 1. Filtro de elegibilidad: se excluyen las alternativas con alertas CRÍTICAS, con
    déficit de caudal en alguna campana mayor que la tolerancia o con velocidades de
-   transporte insuficientes (riesgo de sedimentación).
+   transporte insuficientes (riesgo de sedimentación) en el diseño balanceado O en el
+   punto de operación real del ventilador seleccionado.
 2. Puntuación multicriterio de las elegibles (0–100) con pesos configurables:
    energía, desempeño (margen de caudal y eficiencia), riesgo técnico (alertas ALTO/
    MEDIO), complejidad de instalación y facilidad de mantenimiento.
@@ -45,6 +46,7 @@ class AltMetrics:
     decision: str
     score: float = 0.0
     notes: str = ""
+    v_basis: str = "diseño"      # 'operación' si V mín/máx provienen del punto de operación real
 
 
 def metrics_from_results(name, project, results, complexity: int, maintenance: int, notes: str = "") -> AltMetrics:
@@ -58,7 +60,14 @@ def metrics_from_results(name, project, results, complexity: int, maintenance: i
         for h, qr in results.hood_q_required.items():
             q = op_net.hood_q_final.get(h, qr)
             deficit = max(deficit, (qr - q) / qr * 100)
-    vs = [abs(ev.V) for ev in nr.state.seg_evals.values()] if nr else []
+    # Velocidades reales: las del punto de operación si la red de operación convergió; si no, las de diseño.
+    if op_net is not None and op_net.converged:
+        vs = [abs(ev.V) for ev in op_net.state.seg_evals.values()]
+        v_basis = "operación"
+    else:
+        vs = [abs(ev.V) for ev in nr.state.seg_evals.values()] if nr else []
+        v_basis = "diseño"
+    # incluye las alertas de transporte en diseño y en operación (mismo parámetro)
     transport_ok = not any(a.parameter == "Velocidad de transporte" for a in alerts)
     pw = results.power
     op = results.selected_fan.op if results.selected_fan else None
@@ -81,7 +90,7 @@ def metrics_from_results(name, project, results, complexity: int, maintenance: i
         eta=pw.eta_total if pw else None, energy_kwh=pw.energy_kwh if pw else None, cost=pw.cost if pw else None,
         complexity=complexity, maintenance=maintenance, risk=worst_level([a for a in alerts if a.level != "CORRECTO"]),
         n_crit=cnt["CRÍTICO"], n_alto=cnt["ALTO"], n_medio=cnt["MEDIO"],
-        decision=results.dictamen.decision if results.dictamen else "", notes=notes)
+        decision=results.dictamen.decision if results.dictamen else "", notes=notes, v_basis=v_basis)
 
 
 def _norm_low_better(vals: list[float | None]) -> list[float]:

@@ -218,6 +218,10 @@ def fans_table(results, system):
 def power_table(results, project, system):
     p = results.power
     if p is None:
+        why = getattr(results, "power_blocked", "")
+        if why:
+            return (["Concepto", "Valor", "Unidad", "Ecuación / criterio"],
+                    [["Selección de motor", "BLOQUEADA", "—", why]])
         return [], []
     hdr = ["Concepto", "Valor", "Unidad", "Ecuación / criterio"]
     pu = display_unit("power", system)
@@ -274,14 +278,16 @@ def alerts_table(results, system):
 
 def comparison_table(metrics, project, system):
     hdr = ["Alternativa", "Elegible", _h("Q suministrado", "flow", system), "Déficit máx.", _h("V mín", "velocity", system),
-           _h("V máx", "velocity", system), _h("FTP", "pressure", system), _h("FSP", "pressure", system),
+           _h("V máx", "velocity", system), "Base de V", _h("FTP", "pressure", system), _h("FSP", "pressure", system),
            _h("Potencia eje", "power", system), _h("Potencia eléctrica", "power", system), "η vent.", "Energía kWh/año",
            f"Costo {project.power.currency}/año", "Complejidad (1–5)", "Mantenimiento (1–5)", "Riesgo técnico",
            "Puntuación", "Motivo de exclusión"]
     rows = []
     for m in metrics:
         rows.append([m.name, "Sí" if m.eligible else "No", _v(m.Q_fan, "flow", system), f"{m.deficit_max_pct:.1f} %",
-                     _v(m.v_min, "velocity", system), _v(m.v_max, "velocity", system), _v(m.FTP, "pressure", system),
+                     _v(m.v_min, "velocity", system), _v(m.v_max, "velocity", system),
+                     "Operación real" if getattr(m, "v_basis", "diseño") == "operación" else "Diseño",
+                     _v(m.FTP, "pressure", system),
                      _v(m.FSP, "pressure", system), _v(m.W_shaft, "power", system), _v(m.P_elec, "power", system),
                      f"{m.eta * 100:.1f} %" if m.eta else "—", f"{m.energy_kwh:,.0f}" if m.energy_kwh else "—",
                      f"{m.cost:,.0f}" if m.cost else "—", str(m.complexity), str(m.maintenance),

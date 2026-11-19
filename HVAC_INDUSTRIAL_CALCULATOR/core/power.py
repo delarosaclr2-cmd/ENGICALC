@@ -31,6 +31,21 @@ class PowerError(ValueError):
     pass
 
 
+class PhysicalInconsistencyError(PowerError):
+    """Eficiencia del ventilador ≥ 100 %: datos de caudal, presión y potencia incompatibles.
+
+    Se bloquea la selección del motor: con una potencia absorbida subestimada el motor
+    quedaría subdimensionado.
+    """
+
+    def __init__(self, msg: str, eta: float, W_fan: float, P_air: float, basis: str = "total"):
+        super().__init__(msg)
+        self.eta = eta
+        self.W_fan = W_fan
+        self.P_air = P_air
+        self.basis = basis
+
+
 @dataclass
 class PowerResult:
     Q: float
@@ -104,8 +119,9 @@ def power_chain(Q: float, FTP: float, FSP: float | None = None, W_fan_curve: flo
                 warns.append(f"La eficiencia indicada ({eta_fan:.3f}, base {eta_basis}) difiere más de 5 % de la que "
                              f"resulta de la curva ({ref:.3f}). Se usa la curva.")
     else:
-        if not eta_fan or not (0 < eta_fan <= 1):
-            raise PowerError("Sin curva de potencia: indique la eficiencia del ventilador en (0, 1]")
+        if not eta_fan or not (0 < eta_fan < 1):
+            raise PowerError("Sin curva de potencia: indique la eficiencia del ventilador en (0, 1) — una eficiencia "
+                             "de 100 % o mayor es físicamente imposible")
         if eta_basis == "static":
             if FSP is None:
                 raise PowerError("Eficiencia estática requiere la presión estática del ventilador")
@@ -124,6 +140,15 @@ def power_chain(Q: float, FTP: float, FSP: float | None = None, W_fan_curve: flo
                    f"W_vent = {n(Q)}·{n(FTP)}/{n(eta_fan)}", W_fan, "W", SRC_POWER)
         method = f"Eficiencia {eta_basis} indicada por el usuario"
         warns.append("Potencia calculada con una eficiencia supuesta: verifique con la curva certificada del fabricante.")
+    # Coherencia física (conservación de la energía): P_aire < W_vent en ambas bases. Si no se cumple,
+    # los datos de caudal, presión y potencia son incompatibles y NO se selecciona motor.
+    for basis_name, eta_chk, P_chk in (("total", eta_t, P_air), ("estática", eta_s, P_air_s)):
+        if eta_chk is not None and eta_chk >= 1.0:
+            raise PhysicalInconsistencyError(
+                f"Eficiencia {basis_name} del ventilador η = {eta_chk * 100:.1f} % ≥ 100 %: la potencia absorbida "
+                f"W_vent = {W_fan:.4g} W no supera la potencia transmitida al aire = {P_chk:.4g} W "
+                f"(Q = {Q:.4g} m³/s, FTP = {FTP:.4g} Pa). Datos de caudal, presión y potencia incompatibles; "
+                "se bloquea la selección del motor.", eta_chk, W_fan, P_chk, basis_name)
     W_motor = W_fan / eta_drive
     tr.add(MODULE, "Potencia en el eje del motor", "W_motor = W_vent/η_transmisión",
            [("W_vent", W_fan, "W", ""), ("η_tr", eta_drive, "-", "Transmisión (1.0 acople directo)")],

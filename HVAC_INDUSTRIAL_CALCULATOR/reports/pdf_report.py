@@ -153,11 +153,16 @@ def _img(fig, w, tmpdir, name):
 
 
 def _bullets(items, st):
-    return [Paragraph(escape(str(x)), st["bullet"], bulletText="•") for x in items] or [_p("—", st["body"])]
+    return [Paragraph(escape(str(x).lstrip("• ")), st["bullet"], bulletText="•") for x in items] or [_p("—", st["body"])]
 
 
 def generate_pdf(project, results, db, settings, path: str, comparison=None, include_traces: bool = True) -> str:
-    """Genera la memoria de cálculo. ``comparison`` = (métricas, conclusiones) del comparador."""
+    """Genera la memoria de cálculo. ``comparison`` = (métricas, conclusiones) del comparador.
+
+    Rechaza (``StaleResultsError``) resultados que no correspondan a las entradas actuales.
+    """
+    from .consistency import require_current_results
+    require_current_results(project, results, settings, db)
     _fonts()
     st = _styles()
     system = project.units
@@ -329,8 +334,14 @@ def generate_pdf(project, results, db, settings, path: str, comparison=None, inc
         E.append(_p(f"Potencia aerodinámica P = Q·FTP = {fmt(pw.P_air_total, 'power', system)}; potencia absorbida por el "
                     f"ventilador (eje del ventilador) = {fmt(pw.W_fan, 'power', system)} ({pw.W_fan_method}); potencia en el "
                     f"eje del motor = W_vent/η_transmisión = {fmt(pw.W_motor_out, 'power', system)}.", st["body"]))
+    elif getattr(results, "power_blocked", ""):
+        E.append(_p("CÁLCULO DE POTENCIA BLOQUEADO — " + results.power_blocked, st["body"]))
     H(17, "Potencia eléctrica, motor y energía")
-    E.append(_table(*T.power_table(results, project, system), st, [62 * mm, 28 * mm, 25 * mm, W - 115 * mm]))
+    if pw is None and getattr(results, "power_blocked", ""):
+        E.append(_p("No se selecciona motor ni se estima la energía hasta corregir la incoherencia de datos indicada "
+                    "en la sección 16 (ver alertas CRÍTICAS).", st["body"]))
+    else:
+        E.append(_table(*T.power_table(results, project, system), st, [62 * mm, 28 * mm, 25 * mm, W - 115 * mm]))
     hdr, rows = T.part_load_table(results, system)
     if hdr:
         E.append(_p("Regulación a carga parcial: compuerta frente a variador de frecuencia (eficiencias constantes):",

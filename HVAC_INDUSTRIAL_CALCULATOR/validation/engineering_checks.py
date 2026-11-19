@@ -234,18 +234,11 @@ def check_network(project, model, net_res, db, settings, hood_class: dict[str, s
     default_cls = project.network_settings.contaminant_class
     clean_side = clean_side_segments(model)
     ok_count = 0
-    # clase por tramo: la del ramal (campana aguas arriba) o la de la red
     for seg in model.segments:
         ev = st.seg_evals.get(seg.id)
         if ev is None:
             continue
-        cls_id = seg.contaminant_class
-        if not cls_id:
-            ups = model.upstream_hoods(seg.from_node) if model.nodes[seg.from_node].kind != "fan" else []
-            classes = {hood_class.get(h, default_cls) for h in ups}
-            cls_id = _strictest(classes, db) if classes else default_cls
-        if seg.id in clean_side and not seg.contaminant_class:
-            cls_id = "clean_air"
+        cls_id = segment_transport_class(seg, model, db, hood_class, default_cls, clean_side)
         cls = db.transport_class(cls_id)
         vmin, note = transport_min_for(cls, ev.rho, settings)
         V = abs(ev.V)
@@ -434,9 +427,74 @@ def check_network(project, model, net_res, db, settings, hood_class: dict[str, s
                                  recommendation="Revise el área de descarga del ventilador y las transiciones.",
                                  source="Balance de energía (SP = TP − VP)", basis=BASIS_PHYSICS))
     if ok_count and not any(a.parameter in ("Velocidad de transporte", "Velocidad elevada") for a in out):
-        out.append(Alert("CORRECTO", M_DUCT, "Velocidades de ducto", "Todas las velocidades dentro del rango de la clase "
-                         "de contaminante", criterion="V_min ≤ V ≤ V_max", source="ACGIH (velocidades de transporte)",
-                         basis=BASIS_REFERENCE))
+        out.append(Alert("CORRECTO", M_DUCT, "Velocidades de ducto", "Todas las velocidades del diseño balanceado dentro "
+                         "del rango de la clase de contaminante", criterion="V_min ≤ V ≤ V_max",
+                         source="ACGIH (velocidades de transporte)", basis=BASIS_REFERENCE))
+    return out
+
+
+def segment_transport_class(seg, model, db, hood_class: dict[str, str], default_cls: str, clean_side: set[str]) -> str:
+    """Clase de transporte de un tramo: la indicada en el tramo, la más exigente de las campanas aguas arriba o
+    la de la red; aire limpio aguas abajo de un equipo de control."""
+    cls_id = seg.contaminant_class
+    if not cls_id:
+        ups = model.upstream_hoods(seg.from_node) if model.nodes[seg.from_node].kind != "fan" else []
+        classes = {hood_class.get(h, default_cls) for h in ups}
+        cls_id = _strictest(classes, db) if classes else default_cls
+    if seg.id in clean_side and not seg.contaminant_class:
+        cls_id = "clean_air"
+    return cls_id
+
+
+def check_transport_operation(project, model, op_net, db, settings, hood_class: dict[str, str],
+                              previous_alerts: list[Alert] | None = None) -> list[Alert]:
+    """Velocidad mínima de transporte con los caudales del punto de operación REAL del ventilador seleccionado.
+
+    El diseño balanceado puede cumplir el mínimo y la operación no (el ventilador entrega menos caudal que el de
+    diseño, o lo reparte distinto entre ramales). Se usa el mismo criterio que en diseño (clase del tramo, V_min
+    corregida por densidad a la densidad del tramo en operación). Si un tramo ya tiene alerta de transporte en
+    diseño no se duplica.
+    """
+    out: list[Alert] = []
+    if op_net is None:
+        return out
+    if not op_net.converged:
+        out.append(Alert("INFO", M_DUCT, "Velocidades en operación", "No se verificaron las velocidades de transporte "
+                         "en el punto de operación: la solución de la red en operación no convergió",
+                         criterion="Solución de operación convergida",
+                         recommendation="Revise la curva del ventilador y la red; verifique en campo.",
+                         source="Solucionador numérico", basis=BASIS_DATA))
+        return out
+    already = {a.item for a in (previous_alerts or []) if a.parameter == "Velocidad de transporte"}
+    default_cls = project.network_settings.contaminant_class
+    clean_side = clean_side_segments(model)
+    checked = 0
+    for seg in model.segments:
+        ev = op_net.state.seg_evals.get(seg.id)
+        if ev is None:
+            continue
+        cls = db.transport_class(segment_transport_class(seg, model, db, hood_class, default_cls, clean_side))
+        vmin, note = transport_min_for(cls, ev.rho, settings)
+        if not cls or vmin <= 0:
+            continue
+        checked += 1
+        V = abs(ev.V)
+        if V < vmin and seg.id not in already:
+            out.append(Alert("ALTO", M_DUCT, "Velocidad de transporte", "Velocidad en el punto de operación REAL menor "
+                             f"que la mínima de transporte ({cls['name']}){note}; el diseño balanceado sí la cumple",
+                             V, "velocity", item=seg.id, criterion=f"V_operación ≥ {vmin:.2f} m/s",
+                             consequence="El ventilador seleccionado no entrega en este tramo el caudal de diseño: "
+                                         "sedimentación de partículas, obstrucción del ducto, pérdida de caudal en las "
+                                         "campanas y, con polvos combustibles, riesgo de incendio/explosión.",
+                             recommendation="Ajuste la velocidad del ventilador (poleas o variador) para alcanzar el "
+                                            "caudal de diseño, seleccione otro ventilador o reduzca el diámetro del "
+                                            "tramo; verifique de nuevo con la curva del ventilador.",
+                             source="ACGIH — velocidades mínimas de transporte (verificar edición vigente)",
+                             basis=BASIS_REFERENCE))
+    if checked and not out and not already:
+        out.append(Alert("CORRECTO", M_DUCT, "Velocidades en operación", "Todas las velocidades del punto de operación "
+                         "real cumplen la mínima de transporte", criterion="V_operación ≥ V_min",
+                         source="ACGIH (velocidades de transporte)", basis=BASIS_REFERENCE))
     return out
 
 
@@ -484,16 +542,34 @@ def check_fan(fan_evals: dict, selected_id, net_design, op_net, settings, hood_q
                          recommendation="Cargue la curva certificada del fabricante (CSV, Excel o captura manual).",
                          source="AMCA 210 / AMCA 211 (curvas certificadas)", basis=BASIS_DATA))
         return out
+    for fid, other in fan_evals.items():
+        if fid != selected_id and other.error:
+            out.append(Alert("INFO", M_FAN, "Curva no válida (no seleccionada)", other.error, item=fid, basis=BASIS_DATA,
+                             recommendation="Corrija la curva antes de considerar este ventilador como alternativa.",
+                             source="Validación de datos de la curva"))
     fe = fan_evals.get(selected_id)
     if fe is None:
         out.append(Alert("INFO", M_FAN, "Selección", "No se ha seleccionado ventilador", basis=BASIS_DATA))
         return out
+    if fe.error or fe.adjusted is None:
+        out.append(Alert("CRÍTICO", M_FAN, "Curva del ventilador", fe.error or "La curva no pudo procesarse",
+                         item=fe.fan_id, basis=BASIS_PHYSICS,
+                         consequence="No es posible determinar el punto de operación ni la potencia absorbida; "
+                                     "no se selecciona motor.",
+                         recommendation="Corrija los datos de la curva (unidades de caudal, presión y potencia; "
+                                        "eficiencias en fracción o %).",
+                         source="Validación de datos de la curva; conservación de la energía (η < 1)"))
+        return out
     fan = fe.adjusted
     curve = fan.curve
-    if fe.error:
-        out.append(Alert("CRÍTICO", M_FAN, "Curva del ventilador", fe.error, item=curve.id, basis=BASIS_PHYSICS,
-                         recommendation="Corrija los datos de la curva.", source="Validación de datos"))
-        return out
+    incoh = curve.coherence_warnings()
+    if incoh:
+        out.append(Alert("MEDIO", M_FAN, "Coherencia de la curva", "La eficiencia declarada no coincide con Q·P/W en "
+                         f"{len(incoh)} punto(s): " + "; ".join(incoh[:3]) + ("…" if len(incoh) > 3 else ""),
+                         item=curve.id, criterion="|η_declarada − Q·P/W| ≤ 5 % (misma base de presión)",
+                         consequence="Datos transcritos de forma inconsistente; el cálculo usa la potencia de la curva.",
+                         recommendation="Verifique la transcripción de la curva y la base de presión de la eficiencia.",
+                         source="Definición de eficiencia (AMCA 210)", basis=BASIS_PHYSICS))
     if not curve.certified:
         out.append(Alert("MEDIO", M_FAN, "Curva no certificada", "La curva usada no está identificada como certificada",
                          item=curve.id, criterion="Curva certificada por el fabricante (p. ej. programa AMCA CRP)",
