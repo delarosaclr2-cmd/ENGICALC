@@ -1,0 +1,786 @@
+{
+  "inputs": {
+    "qd": 0.03333333333333333,
+    "temp": 20,
+    "alt": 0,
+    "autoRho": true,
+    "rho": 998.2,
+    "autoPv": true,
+    "pvap": 2338,
+    "autoPatm": true,
+    "patm": 101325,
+    "zs": 0,
+    "zd": 32,
+    "zb": 2.5,
+    "mat": "140",
+    "ds": 0.15,
+    "ls": 12,
+    "ks": 5.5,
+    "dd": 0.125,
+    "ld": 180,
+    "kd": 8,
+    "cs": 140,
+    "cd": 140,
+    "leqs": 0,
+    "leqd": 0,
+    "ps": 0,
+    "pd": 0,
+    "sysModel": "k",
+    "manualK": false,
+    "kval": 12435.85872,
+    "rpm": 3500,
+    "dimp": 0.2,
+    "eta": 75,
+    "npshr": 3.5,
+    "useEtaCurve": true,
+    "useNpshrCurve": true,
+    "smargin": 15,
+    "etaMot": 92,
+    "npshMin": 1,
+    "npshRatio": 1.3,
+    "bepMode": "auto",
+    "bepQ": 0.034847222222222224,
+    "bepH": 43.71,
+    "stages": 1,
+    "affOn": true,
+    "affVar": "N",
+    "rpm2": 2900,
+    "dimp2": 0.18
+  },
+  "fields": [
+    {
+      "id": "qd",
+      "label": "Caudal de diseño",
+      "group": "Condición de diseño",
+      "type": "number",
+      "quantity": "flow",
+      "unit": "m³/h",
+      "options": [],
+      "min": null,
+      "max": null
+    },
+    {
+      "id": "temp",
+      "label": "Temperatura del líquido",
+      "group": "Condición de diseño",
+      "type": "number",
+      "quantity": "temp",
+      "unit": "°C",
+      "options": [],
+      "min": null,
+      "max": null
+    },
+    {
+      "id": "alt",
+      "label": "Altitud del sitio",
+      "group": "Condición de diseño",
+      "type": "number",
+      "quantity": "len",
+      "unit": "m",
+      "options": [],
+      "min": null,
+      "max": null
+    },
+    {
+      "id": "autoRho",
+      "label": "Densidad automática (agua vs. temperatura)",
+      "group": "Condición de diseño",
+      "type": "checkbox",
+      "quantity": "",
+      "unit": "",
+      "options": [],
+      "min": null,
+      "max": null
+    },
+    {
+      "id": "rho",
+      "label": "Densidad del líquido",
+      "group": "Condición de diseño",
+      "type": "number",
+      "quantity": "rho",
+      "unit": "kg/m³",
+      "options": [],
+      "min": null,
+      "max": null
+    },
+    {
+      "id": "autoPv",
+      "label": "Presión de vapor automática (agua, ec. de Buck)",
+      "group": "Condición de diseño",
+      "type": "checkbox",
+      "quantity": "",
+      "unit": "",
+      "options": [],
+      "min": null,
+      "max": null
+    },
+    {
+      "id": "pvap",
+      "label": "Presión de vapor absoluta",
+      "group": "Condición de diseño",
+      "type": "number",
+      "quantity": "press",
+      "unit": "kPa",
+      "options": [],
+      "min": null,
+      "max": null
+    },
+    {
+      "id": "autoPatm",
+      "label": "P. atmosférica automática (atmósfera estándar)",
+      "group": "Condición de diseño",
+      "type": "checkbox",
+      "quantity": "",
+      "unit": "",
+      "options": [],
+      "min": null,
+      "max": null
+    },
+    {
+      "id": "patm",
+      "label": "Presión atmosférica absoluta",
+      "group": "Condición de diseño",
+      "type": "number",
+      "quantity": "press",
+      "unit": "kPa",
+      "options": [],
+      "min": null,
+      "max": null
+    },
+    {
+      "id": "zs",
+      "label": "Nivel de líquido en succión",
+      "group": "Sistema de tuberías",
+      "type": "number",
+      "quantity": "len",
+      "unit": "m",
+      "options": [],
+      "min": null,
+      "max": null
+    },
+    {
+      "id": "zd",
+      "label": "Nivel de líquido en descarga",
+      "group": "Sistema de tuberías",
+      "type": "number",
+      "quantity": "len",
+      "unit": "m",
+      "options": [],
+      "min": null,
+      "max": null
+    },
+    {
+      "id": "zb",
+      "label": "Elevación del centro de la bomba",
+      "group": "Sistema de tuberías",
+      "type": "number",
+      "quantity": "len",
+      "unit": "m",
+      "options": [],
+      "min": null,
+      "max": null
+    },
+    {
+      "id": "mat",
+      "label": "Material de tubería (preset C)",
+      "group": "Sistema de tuberías",
+      "type": "select-one",
+      "quantity": "",
+      "unit": "",
+      "options": [
+        [
+          "",
+          "— seleccionar —"
+        ],
+        [
+          "150",
+          "PVC / PE / plástico liso (C = 150)"
+        ],
+        [
+          "140",
+          "Acero o hierro fundido nuevo (C = 140)"
+        ],
+        [
+          "135",
+          "Asbesto-cemento (C = 135)"
+        ],
+        [
+          "130",
+          "Hierro fundido ~10 años (C = 130)"
+        ],
+        [
+          "120",
+          "Acero comercial usado (C = 120)"
+        ],
+        [
+          "110",
+          "Hierro galvanizado (C = 110)"
+        ],
+        [
+          "100",
+          "Hierro fundido ~20 años (C = 100)"
+        ],
+        [
+          "90",
+          "Acero corroído / incrustado (C = 90)"
+        ]
+      ],
+      "min": null,
+      "max": null
+    },
+    {
+      "id": "ds",
+      "label": "Diámetro interior · succión",
+      "group": "Sistema de tuberías",
+      "type": "number",
+      "quantity": "dia",
+      "unit": "mm",
+      "options": [],
+      "min": null,
+      "max": null
+    },
+    {
+      "id": "ls",
+      "label": "Longitud recta · succión",
+      "group": "Sistema de tuberías",
+      "type": "number",
+      "quantity": "len",
+      "unit": "m",
+      "options": [],
+      "min": null,
+      "max": null
+    },
+    {
+      "id": "ks",
+      "label": "ΣK accesorios · succión",
+      "group": "Sistema de tuberías",
+      "type": "number",
+      "quantity": "",
+      "unit": "",
+      "options": [],
+      "min": null,
+      "max": null
+    },
+    {
+      "id": "dd",
+      "label": "Diámetro interior · descarga",
+      "group": "Sistema de tuberías",
+      "type": "number",
+      "quantity": "dia",
+      "unit": "mm",
+      "options": [],
+      "min": null,
+      "max": null
+    },
+    {
+      "id": "ld",
+      "label": "Longitud recta · descarga",
+      "group": "Sistema de tuberías",
+      "type": "number",
+      "quantity": "len",
+      "unit": "m",
+      "options": [],
+      "min": null,
+      "max": null
+    },
+    {
+      "id": "kd",
+      "label": "ΣK accesorios · descarga",
+      "group": "Sistema de tuberías",
+      "type": "number",
+      "quantity": "",
+      "unit": "",
+      "options": [],
+      "min": null,
+      "max": null
+    },
+    {
+      "id": "cs",
+      "label": "C Hazen-Williams · succión",
+      "group": "Sistema de tuberías",
+      "type": "number",
+      "quantity": "",
+      "unit": "",
+      "options": [],
+      "min": null,
+      "max": null
+    },
+    {
+      "id": "cd",
+      "label": "C Hazen-Williams · descarga",
+      "group": "Sistema de tuberías",
+      "type": "number",
+      "quantity": "",
+      "unit": "",
+      "options": [],
+      "min": null,
+      "max": null
+    },
+    {
+      "id": "leqs",
+      "label": "Longitud equivalente extra · succión",
+      "group": "Sistema de tuberías",
+      "type": "number",
+      "quantity": "len",
+      "unit": "m",
+      "options": [],
+      "min": null,
+      "max": null
+    },
+    {
+      "id": "leqd",
+      "label": "Longitud equivalente extra · descarga",
+      "group": "Sistema de tuberías",
+      "type": "number",
+      "quantity": "len",
+      "unit": "m",
+      "options": [],
+      "min": null,
+      "max": null
+    },
+    {
+      "id": "ps",
+      "label": "Presión manométrica del depósito de succión",
+      "group": "Sistema de tuberías",
+      "type": "number",
+      "quantity": "press",
+      "unit": "kPa",
+      "options": [],
+      "min": null,
+      "max": null
+    },
+    {
+      "id": "pd",
+      "label": "Presión manométrica del depósito de descarga",
+      "group": "Sistema de tuberías",
+      "type": "number",
+      "quantity": "press",
+      "unit": "kPa",
+      "options": [],
+      "min": null,
+      "max": null
+    },
+    {
+      "id": "sysModel",
+      "label": "Modelo de curva del sistema",
+      "group": "Sistema de tuberías",
+      "type": "select-one",
+      "quantity": "",
+      "unit": "",
+      "options": [
+        [
+          "k",
+          "H = H_est + K·Q²  (K equivalente)"
+        ],
+        [
+          "hw",
+          "Recálculo exacto Hazen-Williams punto a punto"
+        ]
+      ],
+      "min": null,
+      "max": null
+    },
+    {
+      "id": "manualK",
+      "label": "Capturar K del sistema manualmente",
+      "group": "Sistema de tuberías",
+      "type": "checkbox",
+      "quantity": "",
+      "unit": "",
+      "options": [],
+      "min": null,
+      "max": null
+    },
+    {
+      "id": "kval",
+      "label": "Coeficiente K del sistema",
+      "group": "Sistema de tuberías",
+      "type": "number",
+      "quantity": "",
+      "unit": "",
+      "options": [],
+      "min": null,
+      "max": null
+    },
+    {
+      "id": "rpm",
+      "label": "Velocidad nominal de la bomba",
+      "group": "Datos de la bomba",
+      "type": "number",
+      "quantity": "",
+      "unit": "rpm",
+      "options": [],
+      "min": null,
+      "max": null
+    },
+    {
+      "id": "dimp",
+      "label": "Diámetro del impulsor",
+      "group": "Datos de la bomba",
+      "type": "number",
+      "quantity": "dia",
+      "unit": "mm",
+      "options": [],
+      "min": null,
+      "max": null
+    },
+    {
+      "id": "eta",
+      "label": "Eficiencia fija de la bomba",
+      "group": "Datos de la bomba",
+      "type": "number",
+      "quantity": "",
+      "unit": "%",
+      "options": [],
+      "min": null,
+      "max": null
+    },
+    {
+      "id": "npshr",
+      "label": "NPSH requerido fijo",
+      "group": "Datos de la bomba",
+      "type": "number",
+      "quantity": "len",
+      "unit": "m",
+      "options": [],
+      "min": null,
+      "max": null
+    },
+    {
+      "id": "useEtaCurve",
+      "label": "Usar curva de eficiencia si está disponible",
+      "group": "Curvas del fabricante",
+      "type": "checkbox",
+      "quantity": "",
+      "unit": "",
+      "options": [],
+      "min": null,
+      "max": null
+    },
+    {
+      "id": "useNpshrCurve",
+      "label": "Usar curva de NPSHr si está disponible",
+      "group": "Curvas del fabricante",
+      "type": "checkbox",
+      "quantity": "",
+      "unit": "",
+      "options": [],
+      "min": null,
+      "max": null
+    },
+    {
+      "id": "smargin",
+      "label": "Margen de potencia del motor",
+      "group": "Criterios de selección",
+      "type": "number",
+      "quantity": "",
+      "unit": "%",
+      "options": [],
+      "min": null,
+      "max": null
+    },
+    {
+      "id": "etaMot",
+      "label": "Eficiencia del motor",
+      "group": "Criterios de selección",
+      "type": "number",
+      "quantity": "",
+      "unit": "%",
+      "options": [],
+      "min": null,
+      "max": null
+    },
+    {
+      "id": "npshMin",
+      "label": "Diferencia mínima de NPSH",
+      "group": "Criterios de selección",
+      "type": "number",
+      "quantity": "len",
+      "unit": "m",
+      "options": [],
+      "min": null,
+      "max": null
+    },
+    {
+      "id": "npshRatio",
+      "label": "Relación mínima NPSHa / NPSHr",
+      "group": "Criterios de selección",
+      "type": "number",
+      "quantity": "",
+      "unit": "",
+      "options": [],
+      "min": null,
+      "max": null
+    },
+    {
+      "id": "bepMode",
+      "label": "Determinación del punto BEP",
+      "group": "Criterios de selección",
+      "type": "select-one",
+      "quantity": "",
+      "unit": "",
+      "options": [
+        [
+          "auto",
+          "Máximo de la curva η(Q) (si existe)"
+        ],
+        [
+          "op",
+          "Punto de operación calculado"
+        ],
+        [
+          "design",
+          "Caudal de diseño"
+        ],
+        [
+          "manual",
+          "Manual (Q, H)"
+        ]
+      ],
+      "min": null,
+      "max": null
+    },
+    {
+      "id": "bepQ",
+      "label": "Caudal BEP manual",
+      "group": "Criterios de selección",
+      "type": "number",
+      "quantity": "flow",
+      "unit": "m³/h",
+      "options": [],
+      "min": null,
+      "max": null
+    },
+    {
+      "id": "bepH",
+      "label": "Altura BEP manual",
+      "group": "Criterios de selección",
+      "type": "number",
+      "quantity": "len",
+      "unit": "m",
+      "options": [],
+      "min": null,
+      "max": null
+    },
+    {
+      "id": "stages",
+      "label": "Número de etapas",
+      "group": "Criterios de selección",
+      "type": "number",
+      "quantity": "",
+      "unit": "",
+      "options": [],
+      "min": null,
+      "max": null
+    },
+    {
+      "id": "affOn",
+      "label": "Activar leyes de afinidad",
+      "group": "Configura la bomba",
+      "type": "checkbox",
+      "quantity": "",
+      "unit": "",
+      "options": [],
+      "min": null,
+      "max": null
+    },
+    {
+      "id": "affVar",
+      "label": "Variable de escalado",
+      "group": "Configura la bomba",
+      "type": "select-one",
+      "quantity": "",
+      "unit": "",
+      "options": [
+        [
+          "N",
+          "Velocidad de giro N₂"
+        ],
+        [
+          "D",
+          "Diámetro de impulsor D₂"
+        ]
+      ],
+      "min": null,
+      "max": null
+    },
+    {
+      "id": "rpm2",
+      "label": "Nueva velocidad de giro",
+      "group": "Configura la bomba",
+      "type": "number",
+      "quantity": "",
+      "unit": "rpm",
+      "options": [],
+      "min": null,
+      "max": null
+    },
+    {
+      "id": "dimp2",
+      "label": "Nuevo diámetro del impulsor",
+      "group": "Configura la bomba",
+      "type": "number",
+      "quantity": "dia",
+      "unit": "mm",
+      "options": [],
+      "min": null,
+      "max": null
+    }
+  ],
+  "units": {
+    "SI": {
+      "len": {
+        "lbl": "m",
+        "f": 1,
+        "dec": 2
+      },
+      "dia": {
+        "lbl": "mm",
+        "f": 0.001,
+        "dec": 1
+      },
+      "flow": {
+        "lbl": "m³/h",
+        "f": 0.0002777777777777778,
+        "dec": 2
+      },
+      "press": {
+        "lbl": "kPa",
+        "f": 1000,
+        "dec": 1
+      },
+      "pow": {
+        "lbl": "kW",
+        "f": 1000,
+        "dec": 2
+      },
+      "rho": {
+        "lbl": "kg/m³",
+        "f": 1,
+        "dec": 1
+      },
+      "vel": {
+        "lbl": "m/s",
+        "f": 1,
+        "dec": 2
+      },
+      "temp": {
+        "lbl": "°C",
+        "dec": 1
+      }
+    },
+    "US": {
+      "len": {
+        "lbl": "ft",
+        "f": 0.3048,
+        "dec": 2
+      },
+      "dia": {
+        "lbl": "in",
+        "f": 0.0254,
+        "dec": 2
+      },
+      "flow": {
+        "lbl": "GPM",
+        "f": 6.30901964e-05,
+        "dec": 1
+      },
+      "press": {
+        "lbl": "psi",
+        "f": 6894.757293,
+        "dec": 2
+      },
+      "pow": {
+        "lbl": "HP",
+        "f": 745.6998716,
+        "dec": 2
+      },
+      "rho": {
+        "lbl": "lb/ft³",
+        "f": 16.018463,
+        "dec": 2
+      },
+      "vel": {
+        "lbl": "ft/s",
+        "f": 0.3048,
+        "dec": 2
+      },
+      "temp": {
+        "lbl": "°F",
+        "dec": 1
+      }
+    }
+  },
+  "curves": {
+    "hq": [
+      {
+        "x": 0,
+        "y": 58
+      },
+      {
+        "x": 0.011111111111111112,
+        "y": 56.5
+      },
+      {
+        "x": 0.022222222222222223,
+        "y": 52
+      },
+      {
+        "x": 0.03333333333333333,
+        "y": 45
+      },
+      {
+        "x": 0.044444444444444446,
+        "y": 35
+      },
+      {
+        "x": 0.05555555555555555,
+        "y": 21
+      }
+    ],
+    "eq": [
+      {
+        "x": 0.011111111111111112,
+        "y": 52
+      },
+      {
+        "x": 0.022222222222222223,
+        "y": 70
+      },
+      {
+        "x": 0.03333333333333333,
+        "y": 77
+      },
+      {
+        "x": 0.044444444444444446,
+        "y": 73
+      },
+      {
+        "x": 0.05555555555555555,
+        "y": 58
+      }
+    ],
+    "nq": [
+      {
+        "x": 0.011111111111111112,
+        "y": 2
+      },
+      {
+        "x": 0.022222222222222223,
+        "y": 2.6
+      },
+      {
+        "x": 0.03333333333333333,
+        "y": 3.5
+      },
+      {
+        "x": 0.044444444444444446,
+        "y": 5
+      },
+      {
+        "x": 0.05555555555555555,
+        "y": 7.2
+      }
+    ]
+  }
+}
