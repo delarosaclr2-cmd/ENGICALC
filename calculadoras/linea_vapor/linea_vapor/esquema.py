@@ -67,7 +67,9 @@ def construir(c, res) -> Escena:
         gr.presiones(esc, x0 - 30, y, res["presion"])
         y -= 8 * 6.5 + 14
     if res.get("curva"):
-        gr.curva_velocidad(esc, x0 + 4, y - 54, 120, 50, res["curva"], "m³/h reales")
+        # Con caída de presión la curva dibujada es la de la velocidad de salida, la que gobierna.
+        donde = "a la salida" if (res["L"] > 0 or res["k_total"] > 0) else ""
+        gr.curva_velocidad(esc, x0 + 4, y - 54, 120, 50, res["curva"], "m³/h reales", donde)
     return esc
 
 

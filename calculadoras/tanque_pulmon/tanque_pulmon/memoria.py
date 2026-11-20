@@ -45,6 +45,13 @@ def presiones_tramos(caso, inf):
     """
     comun = caso.espesor or {}
     p_ope = caso.a_criterios().p_calibracion_psv_pa_g
+    origen_p = "presión de calibración de la válvula de alivio (NOM-020-STPS-2011 num. 14.2)"
+    if p_ope is None:
+        # Sin PSV capturada la tubería quedaría sin comparar contra ninguna presión. La mayor a la
+        # que trabaja en operación normal es la superior del tanque: con ella sí hay verificación.
+        p_ope = caso.p_superior_pa_g()
+        origen_p = ("presión superior de operación del tanque: no se capturó la calibración de la "
+                    "válvula de alivio, que es la que debe gobernar")
     filas, tablas, ver, adv = [], [], [], []
     for tu in caso.tramos:
         cfg = dict(comun)
@@ -61,10 +68,17 @@ def presiones_tramos(caso, inf):
             continue
         filas += [(f"Tubería '{tu.descripcion}': {a}", b, n)
                   for a, b, n in pres.filas_datos(pm) + pres.filas_resultado(pm)]
+        filas.append((f"Tubería '{tu.descripcion}': Presión de comparación",
+                      f"{p_ope/pres.PSI:,.2f} psig", origen_p))
         tit, enc, fl, anchos = pres.tabla(pm)
         tablas.append((f"{tu.descripcion} — {tit}", enc, fl, anchos))
         ver += [(f"{tu.descripcion}: {v[0]}", *v[1:]) for v in pres.verificaciones(pm)]
         adv += pm["avisos"]
+        if caso.a_criterios().p_calibracion_psv_pa_g is None:
+            adv.append(f"Tramo '{tu.descripcion}': se comparó contra la presión superior del tanque "
+                       f"({p_ope/pres.PSI:,.2f} psig) porque no se capturó la calibración de la válvula "
+                       "de alivio. Captúrela: la PSV es la que fija la presión máxima que puede "
+                       "alcanzar la tubería conectada.")
     return filas, tablas, ver, adv
 
 

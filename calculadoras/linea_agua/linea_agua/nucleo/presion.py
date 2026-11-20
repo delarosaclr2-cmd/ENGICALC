@@ -119,9 +119,43 @@ def presion_codigo(t_m: float, od_m: float, s_pa: float, e: float = 1.0, w: floa
     return 2.0 * s_pa * e * w * t_m / den
 
 
+# ---------------------------------------------------------------- dominio de la ecuación (3a)
+# ASME B31.3-2014 §304.1.2(b): la ec. (3a) vale para t < D/6 y P/(S·E) ≤ 0.385. Fuera de ese
+# dominio el código exige «consideración especial» (pared gruesa: teoría de Lamé, fluencia,
+# fatiga, gradiente térmico), que este módulo NO implementa. Por eso, cuando se excede, el
+# resultado se conserva como referencia pero las verificaciones se declaran NO EVALUABLES: un
+# CUMPLE calculado con una fórmula fuera de su dominio no es una comprobación.
+LIMITE_P_SE = 0.385
+
+
+def fuera_de_dominio(t_m: float, od_m: float, p_pa: float | None = None,
+                     s_pa: float | None = None, e: float = 1.0) -> list:
+    """Motivos por los que la ec. (3a) no aplica. Lista vacía = dentro del dominio."""
+    motivos = []
+    if t_m >= od_m / 6.0:
+        motivos.append(f"t ≥ D/6 (t = {t_m*1000:.3f} mm, D/6 = {od_m/6*1000:.3f} mm)")
+    if p_pa is not None and s_pa:
+        rel = p_pa / (s_pa * e)
+        if rel > LIMITE_P_SE:
+            motivos.append(f"P/(S·E) = {rel:.3f} > {LIMITE_P_SE:g}")
+    return motivos
+
+
+def _nota_dominio(motivos) -> str:
+    return (f"{'; '.join(motivos)}: fuera del dominio de la ecuación (3a), que requiere "
+            "consideración especial para pared gruesa (B31.3 §304.1.2(b)); no implementada")
+
+
 # ---------------------------------------------------------------- evaluación conjunta
 def espesores(t_nominal_m: float, tolerancia: float = 0.125, c_m: float = 0.0) -> dict:
     """Los tres espesores: nominal, disponible (menos tolerancia) y resistente (menos corrosión)."""
+    if t_nominal_m is None or t_nominal_m <= 0:
+        raise ValueError("El espesor nominal debe ser positivo")
+    if c_m < 0:
+        raise ValueError("El sobreespesor por corrosión c no puede ser negativo: un valor negativo "
+                         "aumentaría el espesor que resiste la presión y la presión admisible")
+    if not 0.0 <= tolerancia < 1.0:
+        raise ValueError("La tolerancia de fabricación debe estar entre 0 % y 100 %")
     disp = t_nominal_m * (1.0 - tolerancia)
     return {"t_nominal_m": t_nominal_m, "t_disponible_m": disp, "t_resistente_m": disp - c_m,
             "tolerancia": tolerancia, "c_m": c_m}
@@ -180,12 +214,24 @@ def evaluar(od_m: float, t_nominal_m: float, *, s_adm_pa: float, s_cedencia_pa: 
 
     r["e"], r["w"], r["y"] = e, w, y
     r["p_diseno_pa"], r["p_operacion_pa"] = p_diseno_pa, p_operacion_pa
-    for nombre, p in (("de diseño", p_diseno_pa), ("de operación", p_operacion_pa)):
-        if p is not None and r["p_max_pa"] is not None:
-            r[f"margen_{'diseno' if 'dise' in nombre else 'operacion'}"] = (r["p_max_pa"] / p) if p > 0 else None
-    r["cumple"] = None if (p_diseno_pa is None or r["p_max_pa"] is None) else p_diseno_pa <= r["p_max_pa"]
-    if r["t_resistente_m"] >= od_m / 6:
-        r["avisos"].append("t ≥ D/6: pared gruesa, la ecuación (3a) no aplica (B31.3 §304.1.2(b)).")
+
+    # Dominio de la ec. (3a) en cada espesor. El que gobierna es el de fin de vida útil, que es el
+    # que produce r["p_max_pa"]: si ese queda fuera, la presión máxima no es comprobable.
+    r["fuera_dominio"] = {n: fuera_de_dominio(r[c], od_m, r["codigo"][n], s_adm_pa, e)
+                          for n, c in etiquetas}
+    motivos = r["fuera_dominio"]["fin_vida"]
+    r["dominio_valido"] = not motivos
+    for nombre, _clave in etiquetas:
+        if r["fuera_dominio"][nombre]:
+            r["avisos"].append(f"Espesor {nombre.replace('_', ' ')}: "
+                               f"{_nota_dominio(r['fuera_dominio'][nombre])}.")
+
+    for nombre, p in (("diseno", p_diseno_pa), ("operacion", p_operacion_pa)):
+        # Un margen calculado fuera del dominio sería engañoso junto a un NO EVALUABLE.
+        if p is not None and p > 0 and r["p_max_pa"] is not None and not motivos:
+            r[f"margen_{nombre}"] = r["p_max_pa"] / p
+    r["cumple"] = (None if (p_diseno_pa is None or r["p_max_pa"] is None or motivos)
+                   else p_diseno_pa <= r["p_max_pa"])
     return r
 
 
@@ -250,12 +296,24 @@ def _mag(m, tabla, nombre):
 
 
 def sobreespesor(cfg: dict) -> tuple:
-    """c en m y su justificación. Usa vida útil × corrosión anual si se capturan; si no, c_mm."""
+    """c en m y su justificación. Usa vida útil × corrosión anual si se capturan; si no, c_mm.
+
+    El sobreespesor se RESTA del espesor disponible, así que un valor negativo engrosaría la pared
+    y elevaría la presión admisible. No es un dato físico: se rechaza antes de calcular.
+    """
     por_ano, anos = cfg.get("c_por_ano_in"), cfg.get("vida_util_anos")
     if por_ano not in (None, "") and anos not in (None, ""):
-        c = float(por_ano) * float(anos) * PULG
-        return c, f"{float(por_ano):g} in por año × {float(anos):g} años de vida útil"
-    return (cfg.get("c_mm") or 0.0) / 1000.0, "capturado"
+        por_ano, anos = float(por_ano), float(anos)
+        if por_ano < 0:
+            raise ValueError("la velocidad de corrosión no puede ser negativa "
+                             f"({por_ano:g} in por año)")
+        if anos < 0:
+            raise ValueError(f"la vida útil no puede ser negativa ({anos:g} años)")
+        return por_ano * anos * PULG, f"{por_ano:g} in por año × {anos:g} años de vida útil"
+    c_mm = float(cfg.get("c_mm") or 0.0)
+    if c_mm < 0:
+        raise ValueError(f"el sobreespesor por corrosión c no puede ser negativo ({c_mm:g} mm)")
+    return c_mm / 1000.0, "capturado"
 
 
 def desde_caso(cfg: dict, od_m: float, t_nom_m: float, s_adm_pa: float,
@@ -287,8 +345,14 @@ def desde_caso(cfg: dict, od_m: float, t_nom_m: float, s_adm_pa: float,
         e_nom = E_JUNTA.get(junta, 1.0) if junta else 1.0
     tf = b.get("t")
     if tf in (None, ""):
-        base = b.get("t_gas_c", t_diseno_c if t_diseno_c is not None else cfg.get("t_diseno_c"))
-        tf = factor_temperatura(float(base)) if base not in (None, "") else 1.0
+        # El cuadro 4 de la NOM-007 llega a 500 K y es un parámetro EXCLUSIVO de Barlow. Leerlo
+        # cuando no se pide Barlow interrumpiría el cálculo ASME, que tiene su propia tabla de S
+        # con otro intervalo de temperatura (B31.3 Tabla A-1 llega a 800 °F = 700 K para A106 B).
+        if s_ced:
+            base = b.get("t_gas_c", t_diseno_c if t_diseno_c is not None else cfg.get("t_diseno_c"))
+            tf = factor_temperatura(float(base)) if base not in (None, "") else 1.0
+        else:
+            tf = 1.0
     r = evaluar(od_m, t_nom_m, s_adm_pa=s_adm_pa, s_cedencia_pa=s_ced,
                 f=float(f) if f not in (None, "") else 0.5, e_nom=float(e_nom), tf=float(tf),
                 e=float(cfg.get("e", 1.0)), w=float(cfg.get("w", 1.0)), y=float(cfg.get("y", 0.4)),
@@ -343,12 +407,14 @@ def filas_resultado(r: dict) -> list:
                   ("Espesor requerido por Barlow (+ corrosión)", inm(r["t_barlow_requerido_m"]),
                    "t_r = t + t_c")]
     c = r["codigo"]
+    fd = r.get("fuera_dominio") or {}
+    dom = lambda n, nota: f"{nota}. FUERA DE DOMINIO: {'; '.join(fd[n])}" if fd.get(n) else nota
     filas += [("Presión máxima admisible, fin de vida útil", _psi_bar(c["fin_vida"]),
-               "código a presión, con t − tolerancia − corrosión"),
+               dom("fin_vida", "código a presión, con t − tolerancia − corrosión")),
               ("Presión máxima admisible, tubo nuevo", _psi_bar(c["nuevo"]),
-               "sin descontar corrosión"),
+               dom("nuevo", "sin descontar corrosión")),
               ("Presión máxima con el espesor nominal", _psi_bar(c["nominal"]),
-               "sin descuentos: solo de referencia")]
+               dom("nominal", "sin descuentos: solo de referencia"))]
     if r.get("barlow"):
         nota = "Barlow NOM-007-SECRE-2010" + ("" if r["aplica_nom"] else " — INFORMATIVO, no aplica a este servicio")
         filas += [("Presión máxima por Barlow, fin de vida útil", _psi_bar(r["barlow"]["fin_vida"]), nota),
@@ -363,18 +429,27 @@ def filas_resultado(r: dict) -> list:
 
 
 def verificaciones(r: dict) -> list:
-    """Filas (criterio, valor, límite, estado, referencia)."""
+    """Filas (criterio, valor, límite, estado, referencia).
+
+    Si el espesor que gobierna cae fuera del dominio de la ec. (3a), las dos verificaciones de
+    presión se declaran NO EVALUABLE: la presión máxima se calculó con una fórmula que el código
+    no autoriza para esa relación espesor/diámetro.
+    """
     v = []
+    motivos = (r.get("fuera_dominio") or {}).get("fin_vida") or []
+    ref_base = "ASME B31.3 §304.1.2 / B31.1 §104.1.2"
+    ref_dom = f"{ref_base} — {_nota_dominio(motivos)}" if motivos else None
     if r["p_diseno_pa"] is not None and r["p_max_pa"] is not None:
         v.append(("Presión de diseño ≤ presión máxima admisible",
                   f"{r['p_diseno_pa']/PSI:,.1f} psig", f"≤ {r['p_max_pa']/PSI:,.1f} psig",
-                  "CUMPLE" if r["cumple"] else "NO CUMPLE",
-                  "ASME B31.3 §304.1.2 / B31.1 §104.1.2, con t − tolerancia − corrosión"))
+                  "NO EVALUABLE" if motivos else ("CUMPLE" if r["cumple"] else "NO CUMPLE"),
+                  ref_dom or f"{ref_base}, con t − tolerancia − corrosión"))
     if r["p_operacion_pa"] is not None and r["p_max_pa"] is not None:
         ok = r["p_operacion_pa"] <= r["p_max_pa"]
         v.append(("Presión de operación ≤ presión máxima admisible",
                   f"{r['p_operacion_pa']/PSI:,.1f} psig", f"≤ {r['p_max_pa']/PSI:,.1f} psig",
-                  "CUMPLE" if ok else "NO CUMPLE", "ASME B31.3 §304.1.2 / B31.1 §104.1.2"))
+                  "NO EVALUABLE" if motivos else ("CUMPLE" if ok else "NO CUMPLE"),
+                  ref_dom or ref_base))
     if r.get("barlow") and r["p_diseno_pa"] is not None and r["barlow"]["fin_vida"] is not None:
         ok = r["p_diseno_pa"] <= r["barlow"]["fin_vida"]
         if r["aplica_nom"]:
@@ -418,10 +493,15 @@ def tabla(r: dict) -> tuple:
                                     ("fin_vida", "t_resistente_m", "− corrosión (fin de vida útil)")):
         pb = r["barlow"][nombre] if r.get("barlow") else None
         pc = r["codigo"][nombre]
+        # Un valor calculado fuera del dominio de la ec. (3a) se marca para que no se lea como admisible.
+        marca = " (fuera de dominio)" if (r.get("fuera_dominio") or {}).get(nombre) else ""
         filas.append([etiqueta, f"{r[clave]*1000:.3f}", f"{r[clave]/PULG:.4f}",
-                      "—" if pc is None else f"{pc/PSI:,.1f} psig",
+                      "—" if pc is None else f"{pc/PSI:,.1f} psig{marca}",
                       "—" if pb is None else f"{pb/PSI:,.1f} psig"])
-    return ("Presión máxima admisible según el espesor considerado", enc, filas, [5.6, 2.0, 2.0, 3.6, 3.6])
+    tit = "Presión máxima admisible según el espesor considerado"
+    if not r.get("dominio_valido", True):
+        tit += " — fuera del dominio de la ec. (3a): no es una presión admisible comprobada"
+    return (tit, enc, filas, [5.6, 2.0, 2.0, 3.6, 3.6])
 
 
 ECUACIONES = [

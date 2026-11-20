@@ -124,6 +124,9 @@ class Ventana(ttk.Frame):
         self.tv_ver.tag_configure("CUMPLE", background="#DFF0D8")
         self.tv_ver.tag_configure("NO CUMPLE", background="#F8D7DA")
         self.tv_ver.tag_configure("INFORMATIVO", background="#FFF3CD")
+        # NO EVALUABLE: el criterio quedó fuera del dominio del método. No es un aprobado ni un
+        # rechazo, así que no puede quedar sin color y parecer un renglón cualquiera.
+        self.tv_ver.tag_configure("NO EVALUABLE", background="#E0E0E0")
         self.tv_adv = self._arbol(res, 3, ("Advertencias",), (790,), 4)
         res.rowconfigure(1, weight=3)
         self.nb.add(res, text="Resultados")
@@ -292,11 +295,14 @@ class Ventana(ttk.Frame):
                 tv.heading(c, text=c, anchor="w")
                 tv.column(c, width=max(70, min(300, int(len(str(c)) * 9 + 46))), anchor="w", stretch=True)
             for tag, col in (("CUMPLE", "#DFF0D8"), ("NO CUMPLE", "#F8D7DA"), ("INFORMATIVO", "#FFF3CD"),
-                             ("actual", "#E3F2FD")):
+                             ("NO EVALUABLE", "#E0E0E0"), ("actual", "#E3F2FD")):
                 tv.tag_configure(tag, background=col)
+            ESTADOS = ("CUMPLE", "NO CUMPLE", "INFORMATIVO", "NO EVALUABLE")
             for f in filas:
                 celdas = [str(x) for x in f]
-                tag = next((c for c in celdas if c in ("CUMPLE", "NO CUMPLE", "INFORMATIVO")), None)
+                tag = next((c for c in celdas if c in ESTADOS), None)
+                if tag is None and any(x.startswith("no evaluable") for x in celdas):
+                    tag = "NO EVALUABLE"
                 if celdas and celdas[0].endswith(" *"):
                     tag = "actual"
                 tv.insert("", "end", values=celdas, tags=(tag,) if tag else ())

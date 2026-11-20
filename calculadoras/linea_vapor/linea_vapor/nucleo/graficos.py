@@ -61,14 +61,26 @@ def barras(esc, x, y, w, titulo, items, unidad, fmt="{:.3f}"):
 
 
 def espesor(esc, x, y, r):
-    """Comparación t_m requerido contra espesor nominal menos tolerancia (barras, en mm)."""
+    """Comparación t_m requerido contra espesor nominal menos tolerancia (barras, en mm).
+
+    Con `cumple` None el espesor quedó fuera del dominio de la ec. (3a): no hay dictamen ni
+    margen, así que las barras se dibujan en color neutro y el título lo dice.
+    """
     mm = 1000.0
+    ok = r["cumple"]
+    if ok is None:
+        col_tm, col_disp = COLORES["acero"], COLORES["acero"]
+        titulo = "Espesor de pared — NO EVALUABLE (fuera del dominio de la ec. 3a)"
+    else:
+        col_tm = COLORES["tubo"] if ok else COLORES["mal"]
+        col_disp = COLORES["ok"] if ok else COLORES["aviso"]
+        titulo = (f"Espesor de pared — {'CUMPLE' if ok else 'NO CUMPLE'} "
+                  f"(margen {r['margen']:.2f}×)")
     items = [("t por presión", r["t_presion_m"] * mm, COLORES["acento"]),
-             ("t_m = t + c", r["t_m_m"] * mm, COLORES["mal"] if not r["cumple"] else COLORES["tubo"]),
-             ("nominal − tolerancia", r["t_disponible_m"] * mm, COLORES["ok"] if r["cumple"] else COLORES["aviso"]),
+             ("t_m = t + c", r["t_m_m"] * mm, col_tm),
+             ("nominal − tolerancia", r["t_disponible_m"] * mm, col_disp),
              ("nominal", r["t_nominal_m"] * mm, COLORES["acero"])]
-    barras(esc, x, y, 110, f"Espesor de pared — {'CUMPLE' if r['cumple'] else 'NO CUMPLE'} "
-                           f"(margen {r['margen']:.2f}×)", items, "mm", "{:.2f}")
+    barras(esc, x, y, 110, titulo, items, "mm", "{:.2f}")
 
 
 def presiones(esc, x, y, r, psi=6894.757293168):
@@ -89,21 +101,31 @@ def presiones(esc, x, y, r, psi=6894.757293168):
                       COLORES["mal"] if r.get("cumple") is False else COLORES["tubo"]))
     if r.get("p_operacion_pa"):
         items.append(("P de operación", r["p_operacion_pa"] / psi, COLORES["liquido"]))
-    est = "" if r.get("cumple") is None else (" — CUMPLE" if r["cumple"] else " — NO CUMPLE")
+    if r.get("cumple") is None:
+        # None por dos razones distintas: no hay presión de diseño que comparar, o el espesor
+        # quedó fuera del dominio de la ec. (3a). En el segundo caso hay que decirlo.
+        est = "" if r.get("dominio_valido", True) else " — NO EVALUABLE (fuera del dominio de la ec. 3a)"
+    else:
+        est = " — CUMPLE" if r["cumple"] else " — NO CUMPLE"
     margen = f" (margen {r['margen_diseno']:.2f}×)" if r.get("margen_diseno") else ""
     barras(esc, x, y, 118, f"Presión máxima admisible{est}{margen}", items, "psig", "{:,.1f}")
 
 
-def curva_velocidad(esc, x, y, w, h, cv, unidad="m³/h"):
+def curva_velocidad(esc, x, y, w, h, cv, unidad="m³/h", donde_v=""):
     """Velocidad contra caudal para el diámetro elegido, con el intervalo recomendado y el punto
-    de operación. cv es el diccionario que devuelve seleccion.curva()."""
-    pts = cv["puntos"]
-    if not pts:
+    de operación. cv es el diccionario que devuelve seleccion.curva().
+
+    donde_v dice dónde se evalúa la velocidad dibujada ("a la salida" para gas y vapor, donde la
+    que gobierna no es la de entrada), para que el eje coincida con las tablas."""
+    pts = [(q, v) for q, v in cv["puntos"] if v is not None]
+    if not pts or cv.get("v_actual") is None:
         return
     qmax = max(q for q, _ in pts) or 1.0
     vmax_g = max(max(v for _, v in pts), cv["v_actual"], cv.get("v_max") or 0) * 1.1 or 1.0
-    T = esc.grafica(x, y, w, h, (0, qmax), (0, vmax_g), "Velocidad contra caudal",
-                    f"Caudal ({unidad})", "v (m/s)", fmt_x="{:,.0f}", fmt_y="{:.1f}")
+    titulo = "Velocidad contra caudal" + (f" ({donde_v})" if donde_v else "")
+    T = esc.grafica(x, y, w, h, (0, qmax), (0, vmax_g), titulo,
+                    f"Caudal ({unidad})", f"v {donde_v} (m/s)" if donde_v else "v (m/s)",
+                    fmt_x="{:,.0f}", fmt_y="{:.1f}")
     lo, hi = cv.get("v_min") or 0.0, cv.get("v_max")
     if hi:
         p0, p1 = T(0, lo), T(qmax, min(hi, vmax_g))

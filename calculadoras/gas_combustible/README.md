@@ -1,4 +1,4 @@
-# gas_combustible v1.2.0: propiedades del gas natural, flujo de turbina y consumos
+# gas_combustible v1.2.1: propiedades del gas natural, flujo de turbina y consumos
 
 Calcula a partir de la cromatografía:
 - M con las masas molares de GPA 2145-16;

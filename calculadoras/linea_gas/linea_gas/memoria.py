@@ -1,12 +1,14 @@
 """Arma la memoria de cálculo (y el esquema) de una línea a partir de los resultados del motor."""
+from dataclasses import replace
+
 from . import __version__
 from . import presion as pres
 from . import seleccion as sel
 from . import unidades as u
-from .caso import ejecutar, huella
+from .caso import ejecutar, huella, p_atm_sitio_pa
 from .datos import (GASES, REFERENCIAS, RUGOSIDAD_ACERO_M, d_interior_m, espesor_nominal_in, nps_lista, od_in)
 from .esquema import construir
-from .motor import colebrook
+from .motor import calcular
 from .ui.memoria_pdf import Memoria
 
 ECUACIONES = [
@@ -127,8 +129,10 @@ def presion_maxima(c, e):
     else:
         return None
     s_adm, _ = pres.resolver_s(cfg)
+    # La presión de operación se compara en MANOMÉTRICA, igual que la presión máxima admisible.
+    # Se resta la atmósfera del SITIO, la misma con la que se convirtió la presión de entrada.
     return pres.desde_caso(cfg, od, tn, s_adm, cfg.get("t_diseno_c", e.t_k - 273.15),
-                           p_operacion_pa=e.p_entrada_pa - 101325.0)
+                           p_operacion_pa=e.p_entrada_pa - p_atm_sitio_pa(c))
 
 
 def barridos(c, e, r):
@@ -142,27 +146,43 @@ def barridos(c, e, r):
     vmin = (c.get("criterios") or {}).get("v_min_m_s")
     ced = str(c["tuberia"].get("cedula") or "40")
 
-    def calc(d):
-        a = 3.141592653589793 * d ** 2 / 4
-        v = q / a
-        re = r.rho_entrada * v * d / r.mu
-        f = colebrook(re, e.rugosidad_m, d)
-        return {"v": v, "re": re, "f": f,
-                "dp_pa": (f * e.longitud_m / d * r.rho_entrada * v ** 2 / 2) if e.longitud_m else None}
-
     cand = []
     for nps in nps_lista():
         try:
             cand.append((nps, ced, d_interior_m(nps, ced)))
         except KeyError:
             continue
-    salida = {"curva": sel.curva(e.d_interior_m, q, vmin, vmax),
+    d_a_nps = {d: nps for nps, _c, d in cand}
+
+    def calc(d):
+        """Resultado del tramo completo con ese diámetro, al mismo caudal y presión de entrada.
+
+        Informa la velocidad A LA SALIDA y la ΔP del modelo compresible, no una estimación con la
+        densidad de entrada: así el estado de cada diámetro coincide con el que dictaminaría el
+        motor si se capturara ese diámetro.
+        """
+        r2 = calcular(replace(e, d_interior_m=d, nps=d_a_nps.get(d, e.nps)))
+        return {"v": r2.v_salida, "re": r2.re, "f": r2.f,
+                "dp_pa": r2.dp_total_pa if e.longitud_m else None}
+
+    def v_salida(q_entrada):
+        """Velocidad A LA SALIDA para ese caudal de entrada, con la misma P₁, T y diámetro.
+
+        Es la que verifica el motor (la densidad cae con la presión, así que es la mayor del
+        tramo). Se obtiene volviendo a correr el mismo modelo isotérmico escalando el caudal de
+        referencia: ṁ es proporcional a Q_ref, y el caudal real de entrada a ṁ con P₁ y T fijas.
+        """
+        return calcular(replace(e, q_ref_m3s=e.q_ref_m3s * q_entrada / q)).v_salida
+
+    salida = {"curva": sel.curva(e.d_interior_m, q, vmin, vmax, v_gobernante=v_salida),
               "tabla_capacidad": sel.tabla_capacidad(e.d_interior_m, q, vmin, vmax,
                                                      conv=lambda x: x / q * float(c["caudal"]["valor"]),
-                                                     unidad=f"{c['caudal']['unidad']} {e.ref}"),
+                                                     unidad=f"{c['caudal']['unidad']} {e.ref}",
+                                                     v_gobernante=v_salida, donde_v="a la salida"),
               "diametro_requerido_m": sel.diametro_requerido(q, float(vmax)) if vmax not in (None, "") else None}
     cand = sel.ventana(cand, q, vmin, vmax, c["tuberia"].get("nps"))
     if cand:
         salida["tabla_diametros"] = sel.tabla_diametros(cand, calc, vmin, vmax, c["tuberia"].get("nps"),
-                                                        e.longitud_m or None)
+                                                        e.longitud_m or None, donde_v="a la salida",
+                                                        nota_dp="total del tramo ({} m y accesorios)")
     return salida

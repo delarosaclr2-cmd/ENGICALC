@@ -11,7 +11,8 @@ Tabla A-1 de B31.3-2014, A106 Gr. B (sin costura, E = 1.00, tabla A-1B): S [ksi]
 """
 from __future__ import annotations
 
-from .presion import PSI, S_A106B_B313_KSI, resolver_s, s_a106b_b313  # noqa: F401  (API compartida)
+from .presion import (PSI, S_A106B_B313_KSI, _nota_dominio, fuera_de_dominio,  # noqa: F401
+                      resolver_s, s_a106b_b313)                                # (API compartida)
 
 
 def espesor_requerido(p_pa, od_m, s_pa, e=1.0, w=1.0, y=0.4, c_m=0.0):
@@ -23,15 +24,24 @@ def espesor_requerido(p_pa, od_m, s_pa, e=1.0, w=1.0, y=0.4, c_m=0.0):
 
 
 def verificar(p_pa, od_m, t_nom_m, s_pa, e=1.0, w=1.0, y=0.4, c_m=0.0, tolerancia=0.125):
+    """Espesor requerido y su comparación con el disponible.
+
+    `cumple` es None cuando la ec. (3a) queda fuera de su dominio (B31.3 §304.1.2(b)): el espesor
+    requerido se calculó con una fórmula que el código no autoriza ahí, así que la comparación no
+    es una comprobación. Los motivos quedan en `fuera_dominio`.
+    """
+    if c_m < 0:
+        raise ValueError("El sobreespesor c no puede ser negativo")
+    if not 0.0 <= tolerancia < 1.0:
+        raise ValueError("La tolerancia de fabricación debe estar entre 0 % y 100 %")
     t, tm = espesor_requerido(p_pa, od_m, s_pa, e, w, y, c_m)
     t_min = t_nom_m * (1.0 - tolerancia)
-    avisos = []
-    if t >= od_m / 6:
-        avisos.append("t ≥ D/6: la ecuación (3a) no aplica (B31.3 §304.1.2(b)).")
-    if p_pa / (s_pa * e) > 0.385:
-        avisos.append("P/(S·E) > 0.385: requiere consideración especial (B31.3 §304.1.2(b)).")
+    motivos = fuera_de_dominio(t, od_m, p_pa, s_pa, e)
+    avisos = [f"Espesor por presión: {_nota_dominio(motivos)}."] if motivos else []
     return {"t_presion_m": t, "t_m_m": tm, "t_nominal_m": t_nom_m, "t_disponible_m": t_min,
-            "cumple": tm <= t_min, "margen": t_min / tm if tm > 0 else float("inf"), "avisos": avisos}
+            "cumple": None if motivos else tm <= t_min, "fuera_dominio": motivos,
+            "margen": None if motivos else (t_min / tm if tm > 0 else float("inf")),
+            "avisos": avisos}
 
 
 _S_UNID = {"psi": PSI, "ksi": 1000 * PSI, "MPa": 1e6, "kgf/cm²": 98066.5}
@@ -90,6 +100,8 @@ def filas_resultado(r):
 
 
 def verificacion(r):
+    motivos = r.get("fuera_dominio") or []
     return ("Espesor de pared (t_m ≤ nominal − tolerancia)",
             f"{r['t_m_m']*1000:.3f} mm", f"≤ {r['t_disponible_m']*1000:.3f} mm",
-            "CUMPLE" if r["cumple"] else "NO CUMPLE", r["codigo"])
+            "NO EVALUABLE" if motivos else ("CUMPLE" if r["cumple"] else "NO CUMPLE"),
+            f"{r['codigo']} — {_nota_dominio(motivos)}" if motivos else r["codigo"])

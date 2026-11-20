@@ -4,4 +4,4 @@ Estado: VALIDACIÓN PENDIENTE de datos del proyecto (ver README). El motor está
 contra un cálculo independiente (integración numérica) y contra el recálculo de la memoria
 PCGV-DM-014.
 """
-__version__ = "1.2.0"
+__version__ = "1.2.1"

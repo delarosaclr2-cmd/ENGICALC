@@ -1,4 +1,4 @@
-# Calculadora de tanque pulmón de aire comprimido (v1.2.0)
+# Calculadora de tanque pulmón de aire comprimido (v1.2.1)
 
 Módulo para ENGICALC derivado de la auditoría de la memoria **PCGV-DM-014** (Cogeneración V).
 Calcula, para un recipiente de aire comprimido y la tubería conectada a él:
@@ -109,3 +109,18 @@ Botones: CALCULAR, Abrir caso, Guardar caso (JSON), **Memoria PDF** (memoria de 
 El esquema solo dibuja valores que ya calculó el motor; no hace cálculos propios (lo comprueba `tests/test_esquema.py`).
 
 Dependencias: openpyxl y reportlab (las instala el lanzador la primera vez).
+
+## Correcciones de la revisión del PR (v1.2.1)
+
+Seis hallazgos de la revisión. Los tres primeros podían producir un CUMPLE indebido.
+
+| # | Qué pasaba | Qué se hizo |
+|---|---|---|
+| P1-1 | Se aceptaba una corrosión anual, una vida útil o un sobreespesor **negativos**, que engrosaban la pared y elevaban la presión admisible (en DM-012, de ~991 a ~1,890 psig: el dictamen pasaba de NO CUMPLE a CUMPLE). | `presion.sobreespesor`, `presion.espesores` y `espesor.verificar` rechazan esos valores antes de calcular, con el mensaje de qué dato está mal. |
+| P1-2 | Con `t ≥ D/6` o `P/(S·E) > 0.385` se avisaba del dominio, pero se conservaba la presión y se dictaminaba **CUMPLE** con la ec. (3a), que ASME B31.3 §304.1.2(b) no autoriza ahí. | Las verificaciones de presión y de espesor salen **NO EVALUABLE**, sin margen; la presión se conserva marcada «fuera de dominio» como referencia. El motivo y los números van en la referencia de la fila. |
+| P2-5 | El cuadro 4 de la NOM-007 (que llega a 500 K) se leía aunque **no se pidiera Barlow**, e interrumpía el cálculo ASME a 300 °C, temperatura que sí está en la tabla A-1 implementada. | El factor T solo se evalúa cuando hay cedencia capturada, es decir cuando sí se va a calcular Barlow. El cálculo ASME es independiente. |
+| P2-6 | La función documentaba que, sin presión de calibración de la PSV, se usaría la presión superior del tanque, pero **no estaba implementado**: los tramos quedaban sin verificación de presión ni advertencia. En el caso 1 con S de 1,000 psi las admisibles son ~66.1 y ~62.4 psig y la superior de operación 114.2 psig, y no se decía nada. | Sin PSV se compara contra la presión superior del tanque, convertida a manométrica con la atmósfera del sitio (`CasoUsuario.p_superior_pa_g`). Se agrega la fila de presión de comparación, la verificación y una advertencia de que falta capturar la PSV, que es la que debe gobernar. |
+
+Estado de las verificaciones: **CUMPLE**, **NO CUMPLE**, **INFORMATIVO** (criterio que no aplica a este servicio) y **NO EVALUABLE** (el método no cubre ese caso). El último es nuevo y aparece con fondo gris en la interfaz y en el PDF.
+
+Pruebas de regresión en `tests/test_revision_pr.py`, con los mismos números de los escenarios reportados.

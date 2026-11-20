@@ -111,8 +111,11 @@ def exportar_pdf(m: Memoria, ruta: str, incluir_esquema=True) -> str:
                   ("VALIGN", (0, 0), (-1, -1), "TOP"),
                   ("TOPPADDING", (0, 0), (-1, -1), 2), ("BOTTOMPADDING", (0, 0), (-1, -1), 2)]
         if estado_col is not None:
+            # NO EVALUABLE: fuera del dominio del método; ni aprobado ni rechazado, pero debe
+            # distinguirse a simple vista de un renglón sin estado.
             for i, f in enumerate(filas, start=1):
-                col = {"CUMPLE": "#DFF0D8", "NO CUMPLE": "#F8D7DA", "INFORMATIVO": "#FFF3CD"}.get(f[estado_col])
+                col = {"CUMPLE": "#DFF0D8", "NO CUMPLE": "#F8D7DA", "INFORMATIVO": "#FFF3CD",
+                       "NO EVALUABLE": "#E0E0E0"}.get(f[estado_col])
                 if col:
                     estilo.append(("BACKGROUND", (estado_col, i), (estado_col, i), colors.HexColor(col)))
         t.setStyle(TableStyle(estilo))

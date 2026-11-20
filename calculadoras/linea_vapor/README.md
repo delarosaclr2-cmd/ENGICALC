@@ -1,4 +1,4 @@
-# linea_vapor v1.1.0: líneas de vapor saturado y sobrecalentado
+# linea_vapor v1.1.1: líneas de vapor saturado y sobrecalentado
 
 Velocidad (Menon ec. 4.24), caída de presión por segmentos con flujo adiabático y **IAPWS-IF97** (la densidad sigue a la presión),
 velocidad sónica de referencia (Menon ec. 4.25), caudal real de venteo a silenciador (expansión isentálpica) y espesor de pared.
@@ -45,3 +45,18 @@ Verificaciones: CUMPLE (verde), NO CUMPLE (rojo) e INFORMATIVO (amarillo; p. ej.
 Dependencias: openpyxl y reportlab (las instala el lanzador). No requiere CoolProp: las propiedades se calculan con código propio verificado.
 
 Herramienta de apoyo; no sustituye la revisión de un ingeniero responsable.
+
+## Correcciones de la revisión del PR (v1.1.1)
+
+Seis hallazgos de la revisión. Los tres primeros podían producir un CUMPLE indebido.
+
+| # | Qué pasaba | Qué se hizo |
+|---|---|---|
+| P1-1 | Se aceptaba una corrosión anual, una vida útil o un sobreespesor **negativos**, que engrosaban la pared y elevaban la presión admisible (en DM-012, de ~991 a ~1,890 psig: el dictamen pasaba de NO CUMPLE a CUMPLE). | `presion.sobreespesor`, `presion.espesores` y `espesor.verificar` rechazan esos valores antes de calcular, con el mensaje de qué dato está mal. |
+| P1-2 | Con `t ≥ D/6` o `P/(S·E) > 0.385` se avisaba del dominio, pero se conservaba la presión y se dictaminaba **CUMPLE** con la ec. (3a), que ASME B31.3 §304.1.2(b) no autoriza ahí. | Las verificaciones de presión y de espesor salen **NO EVALUABLE**, sin margen; la presión se conserva marcada «fuera de dominio» como referencia. El motivo y los números van en la referencia de la fila. |
+| P2-5 | El cuadro 4 de la NOM-007 (que llega a 500 K) se leía aunque **no se pidiera Barlow**, e interrumpía el cálculo ASME a 300 °C, temperatura que sí está en la tabla A-1 implementada. | El factor T solo se evalúa cuando hay cedencia capturada, es decir cuando sí se va a calcular Barlow. El cálculo ASME es independiente. |
+| P2-4 | La **capacidad máxima** salía de `v_máx·A` con el volumen específico de **entrada**, pero la verificación usa la mayor velocidad del tramo, que es la de salida. El escenario de 150 m anunciaba 130,411 kg/h, caudal con el que la salida llega a 55.04 m/s frente al límite de 50.9. | El caudal se resuelve marchando el tramo con el mismo modelo del dictamen: 121,887.7 kg/h, que da 50.90 m/s a la salida. La marcha por segmentos se extrajo a `motor.marcha()` para no duplicar la física; las marchas auxiliares usan `N_SEG_BARRIDO` segmentos, con la convergencia comprobada en `test_segmentacion_converge`. Sin longitud ni accesorios el comportamiento no cambia. |
+
+Estado de las verificaciones: **CUMPLE**, **NO CUMPLE**, **INFORMATIVO** (criterio que no aplica a este servicio) y **NO EVALUABLE** (el método no cubre ese caso). El último es nuevo y aparece con fondo gris en la interfaz y en el PDF.
+
+Pruebas de regresión en `tests/test_revision_pr.py`, con los mismos números de los escenarios reportados.

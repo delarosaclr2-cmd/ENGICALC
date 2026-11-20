@@ -27,6 +27,12 @@ from .nucleo.tubos import (RUGOSIDAD_ACERO_M, d_interior_m, espesor_nominal_in, 
 AVISO = ("Herramienta de apoyo al cálculo. Sus resultados no sustituyen la revisión y aprobación de un "
          "ingeniero responsable ni constituyen una validación del proyecto.")
 FT3_LB = 0.3048 ** 3 / u.LB     # m³/kg por ft³/lb
+# Segmentos para las marchas AUXILIARES (capacidad, curva y barrido de diámetros), que se repiten
+# decenas de veces al resolver el caudal de capacidad. El dictamen del tramo sigue usando los 60
+# segmentos de calcular(). La iteración de punto medio converge cada segmento, así que el estado
+# de salida ya coincide con el de 120 segmentos en 8 cifras con 4 (test_segmentacion_converge);
+# 8 deja el doble de margen. Si se cambia, revisar ese test.
+N_SEG_BARRIDO = 8
 
 
 class ErrorEntrada(ValueError):
@@ -66,6 +72,43 @@ def gamma(e):
     return 1.135 if (e.x is not None) else 1.3
 
 
+def marcha(e1, d, eps, L, k_tot, m, n_seg: int = 60):
+    """Marcha por segmentos a lo largo del tramo: estado de salida y perfil [(x, p, v)].
+
+    Flujo adiabático (h constante): en cada segmento el estado se obtiene de (p, h) con IF97, de
+    modo que el volumen específico sigue la caída de presión y la velocidad crece hacia la salida.
+    Los accesorios (ΣK) se reparten uniformemente en la longitud.
+
+    Está extraída de calcular() para que el barrido de diámetros y el caudal de capacidad usen
+    EXACTAMENTE el mismo modelo que el dictamen, sin duplicar la física.
+    """
+    A = area(d)
+    G = m / A
+    perfil = [(0.0, e1.p, G * e1.v)]
+    if not (L > 0 or k_tot > 0):
+        return e1, perfil
+    p, est, x = e1.p, e1, 0.0
+    dx = L / n_seg if L > 0 else 0.0
+    dk = k_tot / n_seg
+    for i in range(n_seg):
+        for _ in range(3):             # punto medio: ΔP con la densidad media del segmento
+            re = G * d / est.mu
+            f, _r = factor_friccion(re, eps, d)
+            dp = (f * dx / d + dk) * G * G * est.v / 2
+            if p - dp <= 0.3 * e1.p:
+                raise ErrorEntrada("La caída de presión supera el 70 % de la presión de entrada: el modelo por "
+                                   "segmentos sin término de aceleración no es válido (posible flujo crítico)")
+            try:
+                est = if97.estado_ph(p - dp / 2, e1.h)
+            except ValueError as exc:
+                raise ErrorEntrada(f"Estado fuera de IF97 a lo largo de la línea: {exc}")
+        p -= dp
+        est = if97.estado_ph(p, e1.h)
+        x += dx
+        perfil.append((x if L > 0 else (i + 1) / n_seg, p, G * est.v))
+    return est, perfil
+
+
 def calcular(c: dict, n_seg: int = 60) -> dict:
     patm = _num(c.get("p_atm_kpa", 101.325), "presión atmosférica") * 1000
     tub = c["tuberia"]
@@ -100,28 +143,7 @@ def calcular(c: dict, n_seg: int = 60) -> dict:
     if e1.x is not None and e1.x < 1:
         adv.append("Vapor húmedo: modelo homogéneo; la viscosidad es la del vapor saturado (aproximación).")
     # Caída de presión por segmentos (flujo adiabático, h constante)
-    p, est, x = e1.p, e1, 0.0
-    if L > 0 or k_tot > 0:
-        dx = L / n_seg if L > 0 else 0.0
-        dk = k_tot / n_seg
-        for i in range(n_seg):
-            for _ in range(3):         # punto medio: ΔP con la densidad media del segmento
-                re = G * d / est.mu
-                f, _r = factor_friccion(re, eps, d)
-                dp = (f * dx / d + dk) * G * G * est.v / 2
-                if p - dp <= 0.3 * e1.p:
-                    raise ErrorEntrada("La caída de presión supera el 70 % de la presión de entrada: el modelo por "
-                                       "segmentos sin término de aceleración no es válido (posible flujo crítico)")
-                try:
-                    medio = if97.estado_ph(p - dp / 2, e1.h)
-                except ValueError as exc:
-                    raise ErrorEntrada(f"Estado fuera de IF97 a lo largo de la línea: {exc}")
-                est = medio
-            p -= dp
-            est = if97.estado_ph(p, e1.h)
-            x += dx
-            res["perfil"].append((x if L > 0 else (i + 1) / n_seg, p, G * est.v))
-    e2 = est if (L > 0 or k_tot > 0) else e1
+    e2, res["perfil"] = marcha(e1, d, eps, L, k_tot, m, n_seg)
     res.update(e2=e2, v2=G * e2.v, dp=e1.p - e2.p)
     us = math.sqrt(gamma(e2) * e2.p * e2.v)
     res["mach2"] = res["v2"] / us
@@ -191,20 +213,38 @@ def barridos(c, res):
     El caudal volumétrico real es Q = ṁ·ν a la condición de ENTRADA; la velocidad crece a lo largo
     de la línea conforme cae la presión, por lo que el barrido es una preselección de diámetro.
     """
-    m, e1, eps, L = res["m"], res["e1"], res["eps"], res["L"]
+    m, e1, eps, L, k_tot = res["m"], res["e1"], res["eps"], res["L"], res["k_total"]
     q = m * e1.v
     cv = c.get("criterio_velocidad") or {}
     vmin, vmax = cv.get("v_min_m_s"), cv.get("v_max_m_s")
     tub = c["tuberia"]
     ced = str(tub.get("cedula") or "40")
+    hay_dp = L > 0 or k_tot > 0
+
+    def v_gobernante(q_entrada, d=None, n_seg=N_SEG_BARRIDO):
+        """Velocidad MÁXIMA DEL TRAMO para ese caudal de entrada: la misma que verifica calcular().
+
+        Con caída de presión el volumen específico crece y la velocidad es mayor a la salida, así
+        que ṁ·ν₁/A con la densidad de entrada subestima lo que gobierna. Se vuelve a marchar el
+        tramo con el flujo másico correspondiente (ṁ = Q/ν₁, con la misma presión de entrada).
+        """
+        d = res["d"] if d is None else d
+        mm = q_entrada / e1.v
+        v_ent = mm * e1.v / area(d)
+        if not hay_dp:
+            return v_ent
+        e2, _ = marcha(e1, d, eps, L, k_tot, mm, n_seg)
+        return max(v_ent, mm * e2.v / area(d))
 
     def calc(d):
+        """Velocidad gobernante y ΔP del tramo completo con ese diámetro, al mismo flujo."""
         g = m / area(d)
-        v = g * e1.v
         re = g * d / e1.mu
         f, _ = factor_friccion(re, eps, d)
-        return {"v": v, "re": re, "f": f,
-                "dp_pa": (f * L / d * g * g * e1.v / 2) if L else None}
+        if not hay_dp:
+            return {"v": g * e1.v, "re": re, "f": f, "dp_pa": None}
+        e2, _ = marcha(e1, d, eps, L, k_tot, m, N_SEG_BARRIDO)
+        return {"v": max(g * e1.v, g * e2.v), "re": re, "f": f, "dp_pa": e1.p - e2.p}
 
     cand = []
     for nps in nps_lista():
@@ -212,12 +252,19 @@ def barridos(c, res):
             cand.append((nps, ced, d_interior_m(nps, ced)))
         except KeyError:
             continue
-    salida = {"q_entrada_m3s": q, "curva": sel.curva(res["d"], q, vmin, vmax),
+    # Sin caída de presión la velocidad es la misma en todo el tramo: no hace falta resolver nada.
+    vg = v_gobernante if hay_dp else None
+    donde = "a la salida" if hay_dp else ""
+    salida = {"q_entrada_m3s": q, "curva": sel.curva(res["d"], q, vmin, vmax, n=12 if hay_dp else 24,
+                                                     v_gobernante=vg),
               "tabla_capacidad": sel.tabla_capacidad(res["d"], q, vmin, vmax,
                                                      conv=lambda x: x / e1.v / u.masico_a_kgs(1, c["flujo"]["unidad"]),
-                                                     unidad=c["flujo"]["unidad"], simbolo="ṁ"),
+                                                     unidad=c["flujo"]["unidad"], simbolo="ṁ",
+                                                     v_gobernante=vg, donde_v=donde),
               "diametro_requerido_m": sel.diametro_requerido(q, float(vmax)) if vmax not in (None, "") else None}
     cand = sel.ventana(cand, q, vmin, vmax, tub.get("nps"))
     if cand:
-        salida["tabla_diametros"] = sel.tabla_diametros(cand, calc, vmin, vmax, tub.get("nps"), L or None)
+        salida["tabla_diametros"] = sel.tabla_diametros(
+            cand, calc, vmin, vmax, tub.get("nps"), L or None, donde_v=donde,
+            nota_dp="total del tramo ({} m y accesorios)" if hay_dp else "por fricción en {} m de tubo recto")
     return salida

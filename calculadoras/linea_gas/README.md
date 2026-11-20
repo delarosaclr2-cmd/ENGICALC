@@ -1,4 +1,4 @@
-# linea_gas v1.2.0: caída de presión en líneas de aire comprimido y gas natural
+# linea_gas v1.2.1: caída de presión en líneas de aire comprimido y gas natural
 
 Cálculo isotérmico compresible con Darcy y Colebrook-White (Menon 2005, cap. 5). Los accesorios se suman como ΣK, con valores de la tabla 5.11 de Menon por diámetro, dentro de la misma ecuación. La ΔP se obtiene con la densidad del gas. Para aire se incluye la fórmula de Fritzsche (Menon ec. 5.34) como comparación.
 
@@ -59,3 +59,19 @@ Botones: CALCULAR, Abrir caso, Guardar caso (JSON), **Memoria PDF** (memoria de 
 El esquema solo dibuja valores que ya calculó el motor; no hace cálculos propios (lo comprueba `tests/test_esquema.py`).
 
 Dependencias: openpyxl y reportlab (las instala el lanzador la primera vez).
+
+## Correcciones de la revisión del PR (v1.2.1)
+
+Seis hallazgos de la revisión. Los tres primeros podían producir un CUMPLE indebido.
+
+| # | Qué pasaba | Qué se hizo |
+|---|---|---|
+| P1-1 | Se aceptaba una corrosión anual, una vida útil o un sobreespesor **negativos**, que engrosaban la pared y elevaban la presión admisible (en DM-012, de ~991 a ~1,890 psig: el dictamen pasaba de NO CUMPLE a CUMPLE). | `presion.sobreespesor`, `presion.espesores` y `espesor.verificar` rechazan esos valores antes de calcular, con el mensaje de qué dato está mal. |
+| P1-2 | Con `t ≥ D/6` o `P/(S·E) > 0.385` se avisaba del dominio, pero se conservaba la presión y se dictaminaba **CUMPLE** con la ec. (3a), que ASME B31.3 §304.1.2(b) no autoriza ahí. | Las verificaciones de presión y de espesor salen **NO EVALUABLE**, sin margen; la presión se conserva marcada «fuera de dominio» como referencia. El motivo y los números van en la referencia de la fila. |
+| P2-5 | El cuadro 4 de la NOM-007 (que llega a 500 K) se leía aunque **no se pidiera Barlow**, e interrumpía el cálculo ASME a 300 °C, temperatura que sí está en la tabla A-1 implementada. | El factor T solo se evalúa cuando hay cedencia capturada, es decir cuando sí se va a calcular Barlow. El cálculo ASME es independiente. |
+| P1-3 | La presión de operación se pasaba a manométrica restando **101325 Pa fijos**, aunque el caso permite capturar otra atmósfera. En el caso L1 con 10 psia de sitio y 114.2 psig de entrada se verificaba contra 109.5 psig, y con S de 1,700 psi eso convertía un NO CUMPLE en CUMPLE. | Se resta la atmósfera del sitio (`caso.p_atm_sitio_pa`), la misma con la que se convierten las entradas. |
+| P2-4 | La **capacidad máxima** salía de `v_máx·A` con la densidad de **entrada**, pero la verificación usa la velocidad de **salida**, mayor al caer la presión. A 15 m/s anunciaba 3,577.63 Nm³/h, caudal con el que la salida llega a 19.30 m/s y la propia calculadora dice NO CUMPLE. | El caudal de capacidad se resuelve con el modelo del tramo, de modo que la velocidad gobernante iguale el límite: 3,026.15 Nm³/h. El barrido de diámetros y la curva v(Q) también informan la velocidad de salida y la ΔP del modelo completo. |
+
+Estado de las verificaciones: **CUMPLE**, **NO CUMPLE**, **INFORMATIVO** (criterio que no aplica a este servicio) y **NO EVALUABLE** (el método no cubre ese caso). El último es nuevo y aparece con fondo gris en la interfaz y en el PDF.
+
+Pruebas de regresión en `tests/test_revision_pr.py`, con los mismos números de los escenarios reportados.

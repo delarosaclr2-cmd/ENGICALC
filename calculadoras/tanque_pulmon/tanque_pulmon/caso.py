@@ -101,6 +101,16 @@ class CasoUsuario:
             n_politropico=self.n_politropico,
         )
 
+    def p_superior_pa_g(self) -> float:
+        """Presión superior de operación del tanque, MANOMÉTRICA con la atmósfera del sitio.
+
+        Es la mayor presión a la que trabaja el sistema en operación normal, así que es la que hay
+        que comparar contra la presión máxima admisible de la tubería conectada cuando no se
+        capturó la calibración de la válvula de alivio.
+        """
+        patm = self.p_atm_pa()
+        return self._p(self.p_superior, patm) - patm
+
     def a_criterios(self) -> Criterios:
         patm = self.p_atm_pa()
 

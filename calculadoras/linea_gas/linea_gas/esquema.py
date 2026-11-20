@@ -78,5 +78,5 @@ def construir(c, e, r, presion=None, curva=None) -> Escena:
         gr.presiones(esc, x0 - 30, yy - 10, presion)
         yy -= 8 * 6.5 + 20
     if curva and curva.get("puntos"):
-        gr.curva_velocidad(esc, x0 + 4, yy - 58, 120, 50, curva, "m³/h reales")
+        gr.curva_velocidad(esc, x0 + 4, yy - 58, 120, 50, curva, "m³/h reales", "a la salida")
     return esc

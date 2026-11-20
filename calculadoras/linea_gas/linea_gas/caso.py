@@ -15,8 +15,18 @@ AVISO = ("Herramienta de apoyo al cálculo. Sus resultados no sustituyen la revi
 _DIF = {"kPa": 1000.0, "psi": u.PSI, "bar": u.BAR}
 
 
+def p_atm_sitio_pa(c: dict) -> float:
+    """Presión atmosférica del SITIO en Pa absolutos (14.696 psia al nivel del mar por omisión).
+
+    Es la referencia de toda conversión absoluta↔manométrica del caso. Usar 101325 Pa fijos en
+    algún punto del cálculo haría que la presión manométrica no correspondiera con la capturada:
+    en un sitio a 10 psia la diferencia es de 4.7 psi, que puede decidir un CUMPLE.
+    """
+    return u.presion_a_pa_abs(c.get("p_atm_psia", 14.696), "psia", 0.0)
+
+
 def a_entradas(c: dict) -> Entradas:
-    patm = u.presion_a_pa_abs(c.get("p_atm_psia", 14.696), "psia", 0.0)
+    patm = p_atm_sitio_pa(c)
     tub = c["tuberia"]
     d = tub["d_interior_mm"] / 1000 if tub.get("d_interior_mm") else d_interior_m(tub["nps"], tub["cedula"])
     crit = c.get("criterios", {})

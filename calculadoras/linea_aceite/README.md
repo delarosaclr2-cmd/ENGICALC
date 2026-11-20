@@ -1,4 +1,4 @@
-# linea_aceite v1.1.0: líneas de aceite (lubricación de turbinas)
+# linea_aceite v1.1.1: líneas de aceite (lubricación de turbinas)
 
 Viscosidad a la temperatura de operación con **ASTM D341** (Menon ecs. 6.13–6.16) a partir de dos puntos de la hoja técnica,
 Reynolds (Menon ec. 6.38), Darcy con altura en metros **del aceite** (ec. 6.49), flujo laminar (f = 64/Re, accesorios por
@@ -47,3 +47,17 @@ Verificaciones: CUMPLE (verde), NO CUMPLE (rojo) e INFORMATIVO (amarillo; p. ej.
 Dependencias: openpyxl y reportlab (las instala el lanzador). No requiere CoolProp: las propiedades se calculan con código propio verificado.
 
 Herramienta de apoyo; no sustituye la revisión de un ingeniero responsable.
+
+## Correcciones de la revisión del PR (v1.1.1)
+
+Seis hallazgos de la revisión. Los tres primeros podían producir un CUMPLE indebido.
+
+| # | Qué pasaba | Qué se hizo |
+|---|---|---|
+| P1-1 | Se aceptaba una corrosión anual, una vida útil o un sobreespesor **negativos**, que engrosaban la pared y elevaban la presión admisible (en DM-012, de ~991 a ~1,890 psig: el dictamen pasaba de NO CUMPLE a CUMPLE). | `presion.sobreespesor`, `presion.espesores` y `espesor.verificar` rechazan esos valores antes de calcular, con el mensaje de qué dato está mal. |
+| P1-2 | Con `t ≥ D/6` o `P/(S·E) > 0.385` se avisaba del dominio, pero se conservaba la presión y se dictaminaba **CUMPLE** con la ec. (3a), que ASME B31.3 §304.1.2(b) no autoriza ahí. | Las verificaciones de presión y de espesor salen **NO EVALUABLE**, sin margen; la presión se conserva marcada «fuera de dominio» como referencia. El motivo y los números van en la referencia de la fila. |
+| P2-5 | El cuadro 4 de la NOM-007 (que llega a 500 K) se leía aunque **no se pidiera Barlow**, e interrumpía el cálculo ASME a 300 °C, temperatura que sí está en la tabla A-1 implementada. | El factor T solo se evalúa cuando hay cedencia capturada, es decir cuando sí se va a calcular Barlow. El cálculo ASME es independiente. |
+
+Estado de las verificaciones: **CUMPLE**, **NO CUMPLE**, **INFORMATIVO** (criterio que no aplica a este servicio) y **NO EVALUABLE** (el método no cubre ese caso). El último es nuevo y aparece con fondo gris en la interfaz y en el PDF.
+
+Pruebas de regresión en `tests/test_revision_pr.py`, con los mismos números de los escenarios reportados.

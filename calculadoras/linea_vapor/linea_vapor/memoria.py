@@ -112,7 +112,12 @@ def evaluar(c: dict) -> Memoria:
         resumen.append(("Espesor t_m / disponible", f"{res['espesor']['t_m_m']*1000:.2f} / "
                                                     f"{res['espesor']['t_disponible_m']*1000:.2f} mm"))
     if res.get("presion") and res["presion"]["p_max_pa"]:
-        resumen.append(("Presión máxima admisible", f"{res['presion']['p_max_pa']/PSI:,.0f} psig"))
+        # Fuera del dominio de la ec. (3a) el número existe pero no es una admisible comprobada:
+        # en el tablero de resumen tiene que verse, o se lee como un resultado válido.
+        _pm = res["presion"]
+        resumen.append(("Presión máxima admisible",
+                        f"{_pm['p_max_pa']/PSI:,.0f} psig"
+                        + ("" if _pm.get("dominio_valido", True) else " (no evaluable)")))
     return Memoria(
         titulo="Línea de vapor: velocidad, caída de presión y espesor", caso=c["nombre"], version=__version__,
         huella=huella(c), documento=c.get("documento", ""),

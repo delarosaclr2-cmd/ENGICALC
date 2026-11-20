@@ -48,6 +48,78 @@ def diametro_requerido(q_m3s: float, v_m_s: float) -> float:
     return math.sqrt(4.0 * q_m3s / (math.pi * v_m_s))
 
 
+def caudal_limite_real(v_de_q, v_objetivo, q_inicial: float, max_iter: int = 60):
+    """Caudal de ENTRADA cuya velocidad GOBERNANTE del tramo iguala v_objetivo.
+
+    Para un gas o un vapor la densidad cae con la presión, así que la velocidad crece a lo largo
+    de la línea y la que gobierna la verificación es la de salida. Entonces Q_máx = v_máx·A
+    calculado a la entrada sobreestima la capacidad: al conducir ese caudal la salida ya excede el
+    límite. Aquí se resuelve el caudal de entrada que hace que la velocidad gobernante alcance el
+    límite, usando el mismo modelo de caída de presión del tramo.
+
+    v_de_q      función q (m³/s a la entrada) -> velocidad gobernante (m/s), o None / excepción si
+                la línea no puede conducir ese caudal con esa presión de entrada. Debe crecer con q.
+    q_inicial   caudal de referencia para acotar la búsqueda (el capturado).
+    Devuelve el caudal en m³/s a la entrada, o None si no se pudo acotar (línea ya saturada o
+    criterio inalcanzable). Se aproxima POR DEBAJO: el valor devuelto cumple el límite.
+    """
+    if v_objetivo in (None, "") or not q_inicial or q_inicial <= 0:
+        return None
+    v_objetivo = float(v_objetivo)
+    if v_objetivo <= 0:
+        return None
+
+    def v(q):
+        """Velocidad gobernante, o None si la línea no conduce ese caudal (flujo crítico, ΔP > P1)."""
+        try:
+            x = v_de_q(q)
+        except Exception:                      # un caudal inviable acota por arriba, no es un error
+            return None
+        return x if (x is not None and math.isfinite(x) and x > 0) else None
+
+    lo = q_inicial                             # cota inferior: velocidad por debajo del objetivo
+    v_lo = None
+    for _ in range(max_iter):
+        v_lo = v(lo)
+        if v_lo is not None and v_lo < v_objetivo:
+            break
+        lo *= 0.5
+    else:
+        return None
+    hi, v_hi = lo * 2.0, None                  # cota superior: la alcanza o la línea ya no conduce
+    for _ in range(max_iter):
+        v_hi = v(hi)
+        if v_hi is None or v_hi >= v_objetivo:
+            break
+        lo, v_lo, hi = hi, v_hi, hi * 2.0
+    else:
+        return None
+
+    # Illinois (secante acotada): v(q) es suave y casi lineal, así converge en ~6 evaluaciones en
+    # vez de ~40. El intervalo se conserva en todo momento, así que no puede divergir. Cada
+    # evaluación vuelve a correr el modelo del tramo, que para vapor cuesta décimas de segundo.
+    g_lo, g_hi = v_lo - v_objetivo, (None if v_hi is None else v_hi - v_objetivo)
+    for _ in range(max_iter):
+        if hi - lo <= 1e-6 * hi:
+            break
+        if g_hi is None or g_hi <= 0 or g_lo >= 0:
+            m = 0.5 * (lo + hi)                        # sin secante útil: parte en dos
+        else:
+            m = lo + (hi - lo) * (-g_lo) / (g_hi - g_lo)
+            borde = 0.01 * (hi - lo)                   # no pegarse a un extremo
+            m = min(max(m, lo + borde), hi - borde)
+        v_m = v(m)
+        if v_m is None or v_m >= v_objetivo:
+            hi, g_hi = m, (None if v_m is None else v_m - v_objetivo)
+            if g_lo is not None:
+                g_lo *= 0.5                            # Illinois: acelera el extremo estancado
+        else:
+            lo, g_lo = m, v_m - v_objetivo
+            if g_hi is not None:
+                g_hi *= 0.5
+    return lo
+
+
 def estado_velocidad(v: float, v_min=None, v_max=None) -> str:
     """CUMPLE / NO CUMPLE / INFORMATIVO según el intervalo recomendado."""
     if v_max not in (None, "") and v > float(v_max):
@@ -111,8 +183,13 @@ def ventana(candidatos, q_m3s, v_min=None, v_max=None, nps_actual=None, antes=2,
     return candidatos[i0:i1 + 1]
 
 
-def tabla_diametros(candidatos, calc, v_min=None, v_max=None, nps_actual=None, longitud_m=None) -> tuple:
-    """Tabla (título, encabezados, filas, anchos) del barrido de diámetros para la memoria."""
+def tabla_diametros(candidatos, calc, v_min=None, v_max=None, nps_actual=None, longitud_m=None,
+                    donde_v="", nota_dp="por fricción en {} m de tubo recto") -> tuple:
+    """Tabla (título, encabezados, filas, anchos) del barrido de diámetros para la memoria.
+
+    donde_v   dónde se evalúa la velocidad que reporta `calc`, p. ej. "a la salida" para gas y
+              vapor, donde la que gobierna no es la de entrada.
+    """
     filas = barrido(candidatos, calc, v_min, v_max, nps_actual)
     lim = []
     if v_min not in (None, ""):
@@ -120,53 +197,107 @@ def tabla_diametros(candidatos, calc, v_min=None, v_max=None, nps_actual=None, l
     if v_max not in (None, ""):
         lim.append(f"v ≤ {float(v_max):g} m/s")
     tit = "Velocidad por diámetro al caudal capturado"
+    if donde_v:
+        tit += f" (velocidad {donde_v}: la que gobierna)"
     if lim:
         tit += f" (criterio: {', '.join(lim)})"
     if longitud_m:
-        tit += f"; ΔP por fricción en {longitud_m:g} m de tubo recto"
-    enc = ["NPS", "Céd.", "Di (mm)", "v (m/s)", "v (ft/s)", "Re", "ΔP (kPa)", "Estado"]
+        tit += "; ΔP " + nota_dp.format(f"{longitud_m:g}")
+    v_enc = f"v {donde_v} (m/s)" if donde_v else "v (m/s)"
+    enc = ["NPS", "Céd.", "Di (mm)", v_enc, "v (ft/s)", "Re", "ΔP (kPa)", "Estado"]
     return (tit, enc, filas, [1.9, 1.3, 2.0, 2.0, 2.0, 2.4, 2.2, 3.8])
 
 
 def tabla_capacidad(d_m: float, q_m3s: float, v_min=None, v_max=None, conv=None, unidad="m³/h",
-                    simbolo="Q") -> tuple:
+                    simbolo="Q", v_gobernante=None, donde_v="") -> tuple:
     """Tabla (título, encabezados, filas, anchos) de capacidad de la línea: caudal contra velocidad.
 
-    conv  función q_m3s -> valor en la unidad de presentación (por omisión m³/h).
+    conv          función q_m3s -> valor en la unidad de presentación (por omisión m³/h).
+    v_gobernante  función q (m³/s a la entrada) -> velocidad que gobierna la verificación del tramo.
+                  Para un LÍQUIDO se omite: la velocidad no cambia a lo largo de la línea, así que
+                  v = Q/A basta. Para GAS y VAPOR debe darse, porque la velocidad crece al caer la
+                  presión y v_máx·A con la densidad de entrada sobreestima la capacidad.
+    donde_v       dónde se evalúa la velocidad gobernante, p. ej. "a la salida" (para el título).
     """
     doble = conv is not None and unidad.replace(" ", "") not in ("m³/h", "m3/h")
     conv = conv or (lambda q: q * 3600.0)
+    comp = v_gobernante is not None
     filas = []
-    def fila(etiqueta, v, nota):
-        q = caudal_limite(d_m, v)
-        cols = [etiqueta, f"{v:.3f}", f"{conv(q):,.2f}"] + ([f"{q*3600:,.3f}"] if doble else []) + [nota]
+
+    def q_de_v(v_obj):
+        """Caudal de entrada que lleva la velocidad gobernante al objetivo."""
+        if comp:
+            return caudal_limite_real(v_gobernante, v_obj, q_m3s)
+        return caudal_limite(d_m, v_obj)
+
+    def fila(etiqueta, v, q, nota):
+        if q is None or v is None:
+            cols = [etiqueta, "—" if v is None else f"{v:.3f}", "no alcanzable"] + \
+                   (["—"] if doble else []) + [nota]
+        else:
+            cols = [etiqueta, f"{v:.3f}", f"{conv(q):,.2f}"] + \
+                   ([f"{q*3600:,.3f}"] if doble else []) + [nota]
         filas.append(cols)
+
     if v_min not in (None, ""):
-        fila("Velocidad mínima recomendada", float(v_min), "caudal por debajo del cual la línea queda holgada")
-    v_act = velocidad(q_m3s, d_m)
-    fila("Velocidad al caudal capturado", v_act, "condición evaluada")
+        fila("Velocidad mínima recomendada", float(v_min), q_de_v(float(v_min)),
+             "caudal por debajo del cual la línea queda holgada")
+    try:
+        v_act = v_gobernante(q_m3s) if comp else velocidad(q_m3s, d_m)
+    except Exception:
+        v_act = None
+    fila("Velocidad al caudal capturado", v_act, q_m3s, "condición evaluada")
     if v_max not in (None, ""):
-        fila("Velocidad máxima recomendada", float(v_max), "CAPACIDAD MÁXIMA de la línea con este criterio")
-    enc = ["Condición", "v (m/s)", f"{simbolo} ({unidad})"] + (["Q (m³/h real)"] if doble else []) + ["Nota"]
+        nota = "CAPACIDAD MÁXIMA de la línea con este criterio"
+        if comp:
+            nota += f", resuelta con la caída de presión (velocidad {donde_v or 'gobernante'})"
+        fila("Velocidad máxima recomendada", float(v_max), q_de_v(float(v_max)), nota)
+    etiqueta_v = f"v {donde_v} (m/s)" if (comp and donde_v) else "v (m/s)"
+    enc = ["Condición", etiqueta_v, f"{simbolo} ({unidad})"] + (["Q (m³/h real)"] if doble else []) + ["Nota"]
     anchos = [5.2, 2.0, 3.0] + ([3.0] if doble else []) + [4.4 if doble else 7.4]
-    return (f"Capacidad de la línea: caudal correspondiente a cada velocidad (Di = {d_m*1000:.2f} mm)",
-            enc, filas, anchos)
+    tit = f"Capacidad de la línea: caudal correspondiente a cada velocidad (Di = {d_m*1000:.2f} mm)"
+    if comp:
+        tit += f"; velocidad gobernante del tramo{(' ' + donde_v) if donde_v else ''}, " \
+               "con la presión de entrada fija"
+    return (tit, enc, filas, anchos)
 
 
-def curva(d_m: float, q_m3s: float, v_min=None, v_max=None, n: int = 24) -> dict:
-    """Puntos (Q en m³/h real, v en m/s) para graficar la velocidad contra el caudal."""
-    qmax = q_m3s * 2.0
-    if v_max not in (None, ""):
-        qmax = max(qmax, caudal_limite(d_m, float(v_max)) * 1.15)
-    pts = [(q_m3s * 0 + qmax * i / n * 3600.0, velocidad(qmax * i / n, d_m)) for i in range(n + 1)]
-    return {"puntos": pts, "q_actual_m3h": q_m3s * 3600.0, "v_actual": velocidad(q_m3s, d_m),
-            "q_max_m3h": (caudal_limite(d_m, float(v_max)) * 3600.0) if v_max not in (None, "") else None,
-            "q_min_m3h": (caudal_limite(d_m, float(v_min)) * 3600.0) if v_min not in (None, "") else None,
+def curva(d_m: float, q_m3s: float, v_min=None, v_max=None, n: int = 24, v_gobernante=None) -> dict:
+    """Puntos (Q en m³/h real a la entrada, v en m/s) para graficar la velocidad contra el caudal.
+
+    Con `v_gobernante` la curva es la de la velocidad que gobierna la verificación (la mayor del
+    tramo), para que el punto de capacidad coincida con el de la tabla y con el dictamen.
+    """
+    comp = v_gobernante is not None
+
+    def vel(q):
+        if not comp:
+            return velocidad(q, d_m)
+        try:
+            v = v_gobernante(q)
+        except Exception:
+            return None
+        return v if (v is not None and math.isfinite(v)) else None
+
+    q_de_v = (lambda v: caudal_limite_real(v_gobernante, v, q_m3s)) if comp \
+        else (lambda v: caudal_limite(d_m, v))
+    q_lim = q_de_v(float(v_max)) if v_max not in (None, "") else None
+    q_bajo = q_de_v(float(v_min)) if v_min not in (None, "") else None
+    qmax = max(q_m3s * 2.0, (q_lim or 0.0) * 1.15)
+    pts = [(qmax * i / n * 3600.0, vel(qmax * i / n)) for i in range(1, n + 1)]
+    pts = [(q, v) for q, v in pts if v is not None]
+    return {"puntos": pts, "q_actual_m3h": q_m3s * 3600.0, "v_actual": vel(q_m3s),
+            "q_max_m3h": (q_lim * 3600.0) if q_lim else None,
+            "q_min_m3h": (q_bajo * 3600.0) if q_bajo else None,
             "v_min": None if v_min in (None, "") else float(v_min),
             "v_max": None if v_max in (None, "") else float(v_max)}
 
 
 ECUACIONES = [
     "A = π·Di²/4;   v = Q/A   (Q volumétrico a la condición de operación)",
-    "Capacidad: Q_máx = v_máx·A;   diámetro requerido: Di = √(4·Q/(π·v))",
+    "Capacidad (líquido, densidad constante): Q_máx = v_máx·A",
+    "Capacidad (gas y vapor): se resuelve el caudal de entrada tal que la velocidad gobernante del "
+    "tramo (la de salida, con la caída de presión) iguale v_máx; v_máx·A con la densidad de entrada "
+    "sobreestima la capacidad",
+    "Diámetro requerido (preselección, con la condición de entrada): Di = √(4·Q/(π·v))",
 ]
