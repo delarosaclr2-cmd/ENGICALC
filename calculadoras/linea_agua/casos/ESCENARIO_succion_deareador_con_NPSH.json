@@ -1,0 +1,83 @@
+{
+  "documento": "PCGV-DM-012 Rev C",
+  "p_atm_kpa": 101.325,
+  "temperatura_c": 105,
+  "propiedades": "IF97",
+  "estado": "saturado",
+  "presion": {
+    "valor": null,
+    "unidad": "bar g"
+  },
+  "rugosidad_mm": 0.045,
+  "dz_m": 0,
+  "accesorios": [
+    {
+      "tipo": "compuerta",
+      "cantidad": 1
+    },
+    {
+      "tipo": "codo90",
+      "cantidad": 3
+    }
+  ],
+  "nombre": "ESCENARIO: succión deareador con NPSH (datos supuestos)",
+  "servicio": "succion",
+  "caudal": {
+    "valor": 44.325,
+    "unidad": "m³/h"
+  },
+  "tuberia": {
+    "nps": "6",
+    "cedula": "40"
+  },
+  "longitud_m": 12.661,
+  "criterio_velocidad": {
+    "v_min_m_s": 0.15,
+    "v_max_m_s": 0.91,
+    "fuente": "Memoria (0.5–3 ft/s); fuente no identificada"
+  },
+  "npsh": {
+    "p_superficie": {
+      "valor": 120.8,
+      "unidad": "kPa a"
+    },
+    "nivel_m": 6.0,
+    "npshr_m": 3.0,
+    "margen_m": 1.0,
+    "fuente": "ESCENARIO: valores supuestos para mostrar el cálculo"
+  },
+  "notas": "ESCENARIO ilustrativo: nivel, NPSHr y accesorios supuestos. No son datos del proyecto. Presión máxima admisible calculada con la geometría y el material; la presión de diseño de esta línea no viene en la memoria: captúrela para verificar el espesor.",
+  "espesor": {
+    "codigo": "B31.1",
+    "p_diseno": {
+      "valor": null,
+      "unidad": "psig"
+    },
+    "p_operacion": {
+      "valor": null,
+      "unidad": "psig"
+    },
+    "t_diseno_c": 90,
+    "s": {
+      "valor": 15000,
+      "unidad": "psi",
+      "fuente": "Valor de PCGV-DM-011 (B31.1, A106 B); verificar en la edición contractual"
+    },
+    "e": 1.0,
+    "w": 1.0,
+    "y": 0.4,
+    "c_por_ano_in": 0.00625,
+    "vida_util_anos": 10,
+    "tolerancia_pct": 12.5,
+    "barlow": {
+      "s_cedencia": {
+        "valor": 35000,
+        "unidad": "psi",
+        "fuente": "SMYS de A106 Gr. B indicada en la memoria; verificar en ASTM A106"
+      },
+      "clase_localizacion": "3",
+      "junta": "A106 sin costura",
+      "aplica_nom": false
+    }
+  }
+}

@@ -1,0 +1,72 @@
+{
+  "documento": "PCGV-DM-012 Rev C",
+  "p_atm_kpa": 101.325,
+  "temperatura_c": 90,
+  "propiedades": "IF97",
+  "estado": "saturado",
+  "presion": {
+    "valor": null,
+    "unidad": "bar g"
+  },
+  "rugosidad_mm": 0.045,
+  "dz_m": 0,
+  "accesorios": [],
+  "nombre": "Succión bombas TQ nuevo de condensado (8\")",
+  "servicio": "succion",
+  "caudal": {
+    "valor": 88.655,
+    "unidad": "m³/h"
+  },
+  "tuberia": {
+    "nps": "8",
+    "cedula": "40"
+  },
+  "longitud_m": 2.13,
+  "criterio_velocidad": {
+    "v_min_m_s": 0.15,
+    "v_max_m_s": 0.91,
+    "fuente": "Memoria (0.5–3 ft/s); fuente no identificada"
+  },
+  "npsh": {
+    "p_superficie": {
+      "valor": null,
+      "unidad": "kPa a"
+    },
+    "nivel_m": null,
+    "npshr_m": null
+  },
+  "notas": "Datos de la memoria: agua a 90 °C (la memoria no da la presión de operación; se toma líquido saturado), rugosidad 0.045 mm. La memoria no considera accesorios ni desnivel: capture los reales. NPSH pendiente: falta el nivel del tanque sobre la bomba y el NPSHr. Presión máxima admisible calculada con la geometría y el material; la presión de diseño de esta línea no viene en la memoria: captúrela para verificar el espesor.",
+  "espesor": {
+    "codigo": "B31.1",
+    "p_diseno": {
+      "valor": null,
+      "unidad": "psig"
+    },
+    "p_operacion": {
+      "valor": null,
+      "unidad": "psig"
+    },
+    "t_diseno_c": 90,
+    "s": {
+      "valor": 15000,
+      "unidad": "psi",
+      "fuente": "Valor de PCGV-DM-011 (B31.1, A106 B); verificar en la edición contractual"
+    },
+    "e": 1.0,
+    "w": 1.0,
+    "y": 0.4,
+    "c_por_ano_in": 0.00625,
+    "vida_util_anos": 10,
+    "tolerancia_pct": 12.5,
+    "barlow": {
+      "s_cedencia": {
+        "valor": 35000,
+        "unidad": "psi",
+        "fuente": "SMYS de A106 Gr. B indicada en la memoria; verificar en ASTM A106"
+      },
+      "clase_localizacion": "3",
+      "junta": "A106 sin costura",
+      "aplica_nom": false
+    }
+  }
+}
