@@ -1,0 +1,62 @@
+{
+  "gas": "aire",
+  "p_atm_psia": 14.696,
+  "temperatura": {
+    "valor": 60.0,
+    "unidad": "°C"
+  },
+  "rugosidad_mm": 0.046,
+  "z": 1.0,
+  "nombre": "Venteo del eliminador de neblina de aceite 8\" (PCGV-DM-017)",
+  "documento": "PCGV-DM-017 Rev D",
+  "caudal": {
+    "valor": 750.0,
+    "unidad": "m³/h",
+    "referencia": "normal"
+  },
+  "p_entrada": {
+    "valor": 0.1,
+    "unidad": "kPa g"
+  },
+  "longitud_m": 18.0,
+  "tuberia": {
+    "nps": "8",
+    "cedula": "40"
+  },
+  "accesorios": [],
+  "criterios": {
+    "dp_max": {
+      "valor": 0.0980665,
+      "unidad": "kPa"
+    }
+  },
+  "notas": "Datos de PCGV-DM-017: 750 Nm³/h a 60 °C, 18 m de 8\" céd. 40, criterio de contrapresión de 10 mmH₂O (0.098 kPa; fuente no indicada en la memoria). La memoria calcula con 750 m³/h reales; como Nm³/h el caudal real es 915 m³/h. No incluye la pérdida de salida (1 carga de velocidad) ni accesorios; agréguelos (k) si existen. P atm a nivel del mar: corregir por altitud del sitio. Para la presión máxima admisible capture el material de la tubería (esfuerzo admisible S y, si quiere la comparación con Barlow, la cedencia SMYS): la memoria de esta línea no calcula espesores.",
+  "espesor": {
+    "p_diseno": {
+      "valor": null,
+      "unidad": "psig"
+    },
+    "t_diseno_c": null,
+    "s": {
+      "valor": null,
+      "unidad": "psi",
+      "fuente": ""
+    },
+    "e": 1.0,
+    "w": 1.0,
+    "y": 0.4,
+    "c_por_ano_in": 0.00625,
+    "vida_util_anos": 10,
+    "tolerancia_pct": 12.5,
+    "barlow": {
+      "s_cedencia": {
+        "valor": null,
+        "unidad": "psi",
+        "fuente": ""
+      },
+      "clase_localizacion": "3",
+      "junta": "A106 sin costura",
+      "aplica_nom": false
+    }
+  }
+}

@@ -1,0 +1,68 @@
+{
+  "documento": "PCGV-DM-014 Rev E (10/03/25)",
+  "p_atm_sitio": {
+    "valor": 14.7,
+    "unidad": "psia"
+  },
+  "v_tanque": {
+    "valor": 20.0,
+    "unidad": "m³"
+  },
+  "t_aire": {
+    "valor": 28.0,
+    "unidad": "°C"
+  },
+  "p_inferior": {
+    "valor": 115.0,
+    "unidad": "psia"
+  },
+  "tramos": [],
+  "incluir_tuberia": false,
+  "n_politropico": 1.0,
+  "margen_consumo_pct": 0.0,
+  "t_retencion_req_min": null,
+  "nombre": "Rev E D (ESCENARIO): suministro de 200 Nm³/h por el rack con consumo de 100",
+  "p_superior": {
+    "valor": 129.08,
+    "unidad": "psia"
+  },
+  "q_consumo": {
+    "valor": 100.0,
+    "unidad": "m³/h",
+    "referencia": "normal"
+  },
+  "q_compresor": {
+    "valor": 200.0,
+    "unidad": "m³/h",
+    "referencia": "normal"
+  },
+  "notas": "ESCENARIO: supone que el rack entrega al tanque 200 Nm³/h (flujo de diseño de la línea). El suministro real depende del cabezal de MQ3; los compresores de MQ3 dan servicio a toda la planta. T = 28 °C es la temperatura de operación de la propia memoria Rev E. Solo tanque (conservador): no se sabe si hay válvula de retención o regulador entre el rack y el tanque.",
+  "espesor": {
+    "p_diseno": {
+      "valor": null,
+      "unidad": "psig"
+    },
+    "t_diseno_c": null,
+    "s": {
+      "valor": null,
+      "unidad": "psi",
+      "fuente": ""
+    },
+    "e": 1.0,
+    "w": 1.0,
+    "y": 0.4,
+    "c_por_ano_in": 0.00625,
+    "vida_util_anos": 10,
+    "tolerancia_pct": 12.5,
+    "barlow": {
+      "s_cedencia": {
+        "valor": null,
+        "unidad": "psi",
+        "fuente": ""
+      },
+      "clase_localizacion": "3",
+      "junta": "A106 sin costura",
+      "aplica_nom": false
+    }
+  }
+}

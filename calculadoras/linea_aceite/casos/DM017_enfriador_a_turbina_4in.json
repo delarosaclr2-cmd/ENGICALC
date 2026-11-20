@@ -1,0 +1,75 @@
+{
+  "documento": "PCGV-DM-017 Rev D",
+  "viscosidad": {
+    "modo": "dos_puntos",
+    "t1_c": 80,
+    "nu1_cst": 14.73,
+    "t2_c": 55,
+    "nu2_cst": 25.525
+  },
+  "densidad": {
+    "rho_kg_m3": 827,
+    "fuente": "Memoria (sección de venteo); temperatura de referencia no indicada"
+  },
+  "rugosidad_mm": 0.04572,
+  "dz_m": 0,
+  "criterio_velocidad": {
+    "v_min_m_s": 1.0,
+    "v_max_m_s": 3.0,
+    "fuente": "Memoria (1–3 m/s para aceites); fuente no indicada"
+  },
+  "nombre": "Aceite: retorno enfriador → turbina (4\")",
+  "temperatura_c": 55,
+  "caudal": {
+    "valor": 1190,
+    "unidad": "L/min"
+  },
+  "tuberia": {
+    "nps": "4",
+    "cedula": "40"
+  },
+  "longitud_m": 35,
+  "accesorios": [
+    {
+      "tipo": "codo90",
+      "cantidad": 7
+    },
+    {
+      "tipo": "compuerta",
+      "cantidad": 1
+    }
+  ],
+  "p_operacion": "4.5 bar g",
+  "espesor": {
+    "codigo": "B31.3",
+    "p_diseno": {
+      "valor": 4.5,
+      "unidad": "bar g"
+    },
+    "t_diseno_c": 55,
+    "s": {
+      "tabla": "A106B_B313"
+    },
+    "e": 1.0,
+    "w": 1.0,
+    "y": 0.4,
+    "tolerancia_pct": 12.5,
+    "c_por_ano_in": 0.00625,
+    "vida_util_anos": 10,
+    "p_operacion": {
+      "valor": null,
+      "unidad": "psig"
+    },
+    "barlow": {
+      "s_cedencia": {
+        "valor": 35000,
+        "unidad": "psi",
+        "fuente": "SMYS de A106 Gr. B de la memoria PCGV-DM-017; verificar en ASTM A106"
+      },
+      "clase_localizacion": "3",
+      "junta": "A106 sin costura",
+      "aplica_nom": false
+    }
+  },
+  "notas": "Datos de PCGV-DM-017 Rev D. La viscosidad se ajusta con los dos valores de la memoria (14.73 cSt a 80 °C y 25.525 cSt a 55 °C); confirmar el grado ISO VG con la hoja técnica. Densidad 827 kg/m³ de la memoria. Accesorios como en la memoria (codo L/D = 30, compuerta L/D = 8)."
+}
