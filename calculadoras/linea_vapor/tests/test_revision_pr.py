@@ -320,3 +320,150 @@ def test_marcha_es_la_misma_que_usa_calcular():
     e2, perfil = motor.marcha(res["e1"], res["d"], res["eps"], res["L"], res["k_total"], res["m"], 60)
     assert res["m"] * e2.v / area(res["d"]) == pytest.approx(res["v2"], rel=1e-12)
     assert perfil == res["perfil"]
+
+
+def test_barrido_recalcula_k_por_diametro_y_coincide_con_el_calculo_completo():
+    """Revisión de comentarios: el barrido usaba el ΣK del NPS 12 (4.62) para el NPS 8. Al
+    seleccionar NPS 8 el cálculo completo da ΣK 4.98 y 51.02 m/s, NO CUMPLE; el barrido mostraba
+    50.900 m/s y CUMPLE."""
+    from linea_vapor import motor
+
+    c = _caso()
+    c["flujo"] = {"valor": 53265.24, "unidad": "kg/h"}
+    res = motor.calcular(c)
+    assert res["k_total"] == pytest.approx(4.62, abs=0.005)
+    fila8 = [f for f in motor.barridos(c, res)["tabla_diametros"][2] if f[0] == "8"][0]
+
+    c8 = copy.deepcopy(c); c8["tuberia"]["nps"] = "8"
+    completo = motor.calcular(c8)
+    assert completo["k_total"] == pytest.approx(4.98, abs=0.005)
+    assert float(fila8[3]) == pytest.approx(completo["v2"], abs=0.01)
+    assert float(fila8[3]) == pytest.approx(51.02, abs=0.01)
+    assert fila8[7] == "NO CUMPLE"
+
+
+def test_k_capturado_se_conserva_en_todos_los_diametros():
+    """Un K capturado explícitamente no depende del NPS: el barrido debe usar ese mismo valor."""
+    from linea_vapor import motor
+
+    c = _caso()
+    c["flujo"] = {"valor": 53265.24, "unidad": "kg/h"}
+    c["accesorios"] = [{"tipo": "codo90", "cantidad": 8, "k": 0.3}, {"tipo": "check_columpio", "cantidad": 1, "k": 2.0}]
+    assert motor._k_total_para_nps(c, "12") == pytest.approx(4.4)
+    assert motor._k_total_para_nps(c, "8") == pytest.approx(4.4)
+
+    res = motor.calcular(c)
+    c8 = copy.deepcopy(c); c8["tuberia"]["nps"] = "8"
+    fila8 = [f for f in motor.barridos(c, res)["tabla_diametros"][2] if f[0] == "8"][0]
+    assert float(fila8[3]) == pytest.approx(motor.calcular(c8)["v2"], abs=0.01)
+
+
+def test_capacidad_mostrada_reintroducida_cumple():
+    """La capacidad mostrada, reintroducida tal cual, debe cumplir el límite de salida."""
+    from linea_vapor import motor
+
+    res = motor.calcular(_caso())
+    cap_txt = [f for f in res["tabla_capacidad"][2] if "máxima" in f[0]][0][2]
+    c = copy.deepcopy(_caso()); c["flujo"]["valor"] = float(cap_txt.replace(",", ""))
+    v = [x for x in motor.calcular(c)["verificaciones"] if "Velocidad máxima" in x[0]]
+    assert v and v[0][3] == "CUMPLE", v
+
+
+# ======================================== segunda ronda de comentarios del PR: valores límite
+def test_redondeo_seguro_nunca_cruza_el_limite():
+    """Comentario de revisión: 3,026.149… Nm³/h se mostraba 3,026.15 (redondeo al más cercano), que
+    al reintroducirse daba 15.000010344 m/s y NO CUMPLE frente a 15 m/s."""
+    assert sel.redondeo_seguro(3026.149, 2, "abajo") == 3026.14
+    assert sel.redondeo_seguro(3026.141, 2, "arriba") == 3026.15
+    assert sel.redondeo_seguro(56.5487, 2, "abajo") == 56.54
+    assert sel.redondeo_seguro(14.1372, 2, "arriba") == 14.14
+    with pytest.raises(ValueError):
+        sel.redondeo_seguro(1.0, 2, "cercano")
+
+
+def test_ajustar_al_criterio_corrige_con_el_modelo_del_dictamen():
+    """Un caudal resuelto con un modelo barato que excede en el modelo del dictamen se corrige."""
+    dictamen = lambda q: 10.0 * q ** 1.2              # la velocidad crece más que linealmente
+    q_barato = (15.0 / 10.0) ** (1 / 1.2) * 1.0001      # excede un poco en el dictamen
+    q = sel.ajustar_al_criterio(q_barato, 15.0, dictamen, "abajo")
+    assert q is not None and dictamen(q) <= 15.0
+    q = sel.ajustar_al_criterio(q_barato * 0.99, 15.0, dictamen, "arriba")
+    assert q is not None and dictamen(q) >= 15.0
+    assert sel.ajustar_al_criterio(1.0, 15.0, dictamen, "abajo") == 1.0     # ya cumple: no se toca
+
+
+def test_minimo_se_juzga_con_la_velocidad_mas_baja_del_tramo():
+    """Como en el dictamen: el máximo con la mayor velocidad (salida), el mínimo con la menor
+    (entrada). Q_mín = v_mín·A con la velocidad de entrada."""
+    assert sel.estado_velocidad(35.0, 30.5, 50.9) == "CUMPLE"
+    assert sel.estado_velocidad(35.0, 30.5, 50.9, v_baja=29.0) == "INFORMATIVO"
+    assert sel.estado_velocidad(52.0, 30.5, 50.9, v_baja=29.0) == "NO CUMPLE"
+    A = sel.area(0.1)
+    lim = sel.limites_de_caudal(0.1, 0.2, v_min=30.5, v_max=50.9, v_gobernante=lambda q: q / A * 1.3)
+    assert lim["q_min"] == pytest.approx(30.5 * A)
+    assert lim["q_max"] / A * 1.3 <= 50.9
+
+
+def test_tabla_de_capacidad_comprueba_con_el_modelo_del_dictamen():
+    """La capacidad mostrada se comprueba con el modelo que dictamina (vapor: 60 segmentos), no con
+    el modelo barato con que se resolvió (8 segmentos)."""
+    A = sel.area(0.1)
+    barato = lambda q: q / A * 1.30
+    dictamen = lambda q: q / A * 1.30 * (1 + 2e-5)      # difiere 2·10⁻⁵, del orden de 8 vs 60 seg.
+    q_barato = sel.limites_de_caudal(0.1, 0.2, v_max=50.9, v_gobernante=barato)["q_max"]
+    assert dictamen(q_barato) > 50.9                    # sin comprobar, el dictamen diría NO CUMPLE
+    t, enc, filas, _ = sel.tabla_capacidad(0.1, 0.2, v_max=50.9, v_gobernante=barato,
+                                           v_verificacion=dictamen, donde_v="a la salida")
+    fila = [f for f in filas if "máxima" in f[0]][0]
+    assert dictamen(float(fila[2].replace(",", "")) / 3600.0) <= 50.9
+
+
+def test_redondeo_de_capacidad_hacia_el_lado_seguro():
+    """Máximo: se redondea hacia abajo. Mínimo: hacia arriba. Ambos quedan del lado que cumple."""
+    t, enc, filas, _ = sel.tabla_capacidad(0.1, 0.01, v_min=0.5, v_max=2.0)
+    assert [f for f in filas if "máxima" in f[0]][0][2] == "56.54"      # 56.5487 m³/h → abajo
+    assert [f for f in filas if "mínima" in f[0]][0][2] == "14.14"      # 14.1372 m³/h → arriba
+
+
+def test_barrido_coincide_con_el_dictamen_en_cada_diametro():
+    """Comentario de revisión: cada fila del barrido debe dar la misma velocidad y el mismo estado
+    que el cálculo completo con ese diámetro. 120,000 kg/h prueba un tramo con ΔP/P₁ = 0.62, donde
+    8 segmentos diferían 0.28 m/s y la fila se recalcula con los del dictamen."""
+    from linea_vapor import motor
+
+    for flujo in (53265.24, 120000.0):
+        c = _caso()
+        c["flujo"] = {"valor": flujo, "unidad": "kg/h"}
+        for f in motor.calcular(c)["tabla_diametros"][2]:
+            if f[3] == "—":
+                continue
+            cc = copy.deepcopy(c); cc["tuberia"]["nps"] = f[0].replace(" *", "")
+            rr = motor.calcular(cc)
+            ver = [x[3] for x in rr["verificaciones"] if "elocidad" in x[0]]
+            est = "NO CUMPLE" if "NO CUMPLE" in ver else ("INFORMATIVO" if "INFORMATIVO" in ver else "CUMPLE")
+            assert float(f[3]) == pytest.approx(max(rr["v1"], rr["v2"]), abs=6e-4), (flujo, f)
+            assert f[7] == est, (flujo, f, ver)
+
+
+def test_caudal_minimo_mostrado_deja_la_entrada_en_el_intervalo():
+    """El dictamen juzga el mínimo con la velocidad de entrada: el caudal mínimo mostrado,
+    reintroducido, no debe producir el aviso de velocidad mínima."""
+    from linea_vapor import motor
+
+    fila = [f for f in motor.calcular(_caso())["tabla_capacidad"][2] if "mínima" in f[0]][0]
+    c = _caso(); c["flujo"]["valor"] = float(fila[2].replace(",", ""))
+    rr = motor.calcular(c)
+    assert rr["v1"] >= 30.5
+    assert not [x for x in rr["verificaciones"] if "mínima" in x[0]]
+
+
+def test_memoria_anuncia_una_capacidad_que_cumple():
+    """La fila «Capacidad máxima» de la memoria (en t/h) también se redondea hacia abajo y, al
+    reintroducirla, el dictamen da CUMPLE."""
+    from linea_vapor import memoria, motor
+
+    fila = [r for r in memoria.evaluar(_caso()).resultados if r[0].startswith("Capacidad máxima")][0]
+    t_h = float(fila[2].split(" t/h")[0].replace(",", ""))
+    c = _caso(); c["flujo"] = {"valor": t_h * 1000.0, "unidad": "kg/h"}
+    v = [x for x in motor.calcular(c)["verificaciones"] if "Velocidad máxima" in x[0]]
+    assert v and v[0][3] == "CUMPLE", (fila, v)

@@ -1,2 +1,2 @@
 """Calculadora de líneas de gas (aire comprimido, gas natural) — ENGICALC / RMR."""
-__version__ = "1.2.1"
+__version__ = "1.2.2"

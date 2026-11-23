@@ -232,3 +232,86 @@ def test_capacidad_de_gas_descuenta_la_caida_de_presion():
     assert v_sal(cap) == pytest.approx(15.0, rel=1e-4)
     assert cap < sel.caudal_limite(d, 15.0)                 # menor que la estimación de entrada
     assert "a la salida" in filas[-1][-1]
+
+
+def test_redondeo_de_capacidad_hacia_el_lado_seguro():
+    """Máximo: se redondea hacia abajo. Mínimo: hacia arriba. Ambos quedan del lado que cumple."""
+    # Di = 100 mm: A = π·0.1²/4 = 0.0078540 m²
+    t, enc, filas, _ = sel.tabla_capacidad(0.1, 0.01, v_min=0.5, v_max=2.0)
+    fila_max = [f for f in filas if "máxima" in f[0]][0]
+    fila_min = [f for f in filas if "mínima" in f[0]][0]
+    assert fila_max[2] == "56.54"          # 56.5487 m³/h → abajo
+    assert fila_min[2] == "14.14"          # 14.1372 m³/h → arriba
+
+
+# ======================================== segunda ronda de comentarios del PR: valores límite
+def test_redondeo_seguro_nunca_cruza_el_limite():
+    """Comentario de revisión: 3,026.149… Nm³/h se mostraba 3,026.15 (redondeo al más cercano), que
+    al reintroducirse daba 15.000010344 m/s y NO CUMPLE frente a 15 m/s."""
+    assert sel.redondeo_seguro(3026.149, 2, "abajo") == 3026.14
+    assert sel.redondeo_seguro(3026.141, 2, "arriba") == 3026.15
+    assert sel.redondeo_seguro(56.5487, 2, "abajo") == 56.54
+    assert sel.redondeo_seguro(14.1372, 2, "arriba") == 14.14
+    with pytest.raises(ValueError):
+        sel.redondeo_seguro(1.0, 2, "cercano")
+
+
+def test_ajustar_al_criterio_corrige_con_el_modelo_del_dictamen():
+    """Un caudal resuelto con un modelo barato que excede en el modelo del dictamen se corrige."""
+    dictamen = lambda q: 10.0 * q ** 1.2              # la velocidad crece más que linealmente
+    q_barato = (15.0 / 10.0) ** (1 / 1.2) * 1.0001      # excede un poco en el dictamen
+    q = sel.ajustar_al_criterio(q_barato, 15.0, dictamen, "abajo")
+    assert q is not None and dictamen(q) <= 15.0
+    q = sel.ajustar_al_criterio(q_barato * 0.99, 15.0, dictamen, "arriba")
+    assert q is not None and dictamen(q) >= 15.0
+    assert sel.ajustar_al_criterio(1.0, 15.0, dictamen, "abajo") == 1.0     # ya cumple: no se toca
+
+
+def test_minimo_se_juzga_con_la_velocidad_mas_baja_del_tramo():
+    """Como en el dictamen: el máximo con la mayor velocidad (salida), el mínimo con la menor
+    (entrada). Q_mín = v_mín·A con la velocidad de entrada."""
+    assert sel.estado_velocidad(35.0, 30.5, 50.9) == "CUMPLE"
+    assert sel.estado_velocidad(35.0, 30.5, 50.9, v_baja=29.0) == "INFORMATIVO"
+    assert sel.estado_velocidad(52.0, 30.5, 50.9, v_baja=29.0) == "NO CUMPLE"
+    A = sel.area(0.1)
+    lim = sel.limites_de_caudal(0.1, 0.2, v_min=30.5, v_max=50.9, v_gobernante=lambda q: q / A * 1.3)
+    assert lim["q_min"] == pytest.approx(30.5 * A)
+    assert lim["q_max"] / A * 1.3 <= 50.9
+
+
+def test_tabla_de_capacidad_comprueba_con_el_modelo_del_dictamen():
+    """La capacidad mostrada se comprueba con el modelo que dictamina (vapor: 60 segmentos), no con
+    el modelo barato con que se resolvió (8 segmentos)."""
+    A = sel.area(0.1)
+    barato = lambda q: q / A * 1.30
+    dictamen = lambda q: q / A * 1.30 * (1 + 2e-5)      # difiere 2·10⁻⁵, del orden de 8 vs 60 seg.
+    q_barato = sel.limites_de_caudal(0.1, 0.2, v_max=50.9, v_gobernante=barato)["q_max"]
+    assert dictamen(q_barato) > 50.9                    # sin comprobar, el dictamen diría NO CUMPLE
+    t, enc, filas, _ = sel.tabla_capacidad(0.1, 0.2, v_max=50.9, v_gobernante=barato,
+                                           v_verificacion=dictamen, donde_v="a la salida")
+    fila = [f for f in filas if "máxima" in f[0]][0]
+    assert dictamen(float(fila[2].replace(",", "")) / 3600.0) <= 50.9
+
+
+def test_memoria_anuncia_una_capacidad_que_cumple():
+    """La fila «Capacidad máxima» de la memoria se redondea hacia abajo: reintroducida, cumple."""
+    import glob
+    import json
+    import os
+
+    from linea_aceite import memoria, motor
+
+    casos = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "casos")
+    revisados = 0
+    for ruta in sorted(glob.glob(os.path.join(casos, "*.json"))):
+        c = json.load(open(ruta, encoding="utf-8"))
+        vmax = (c.get("criterio_velocidad") or {}).get("v_max_m_s")
+        filas = [r for r in memoria.evaluar(c).resultados if r[0].startswith("Capacidad máxima")]
+        if vmax in (None, "") or not filas:
+            continue
+        c["caudal"] = {"valor": float(filas[0][1].split(" ")[0].replace(",", "")), "unidad": "m³/h"}
+        r = motor.calcular(c)
+        v = r["v"] if "v" in r else r["tramo"]["v"]
+        assert v <= float(vmax), (ruta, filas[0], v)
+        revisados += 1
+    assert revisados

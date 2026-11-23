@@ -70,11 +70,13 @@ def evaluar(c: dict) -> Memoria:
     cap = res.get("curva") or {}
     if cap.get("q_max_m3h"):
         resultados.append(("Capacidad máxima con el criterio de velocidad",
-                           f"{cap['q_max_m3h']:,.2f} m³/h",
-                           f"{cap['q_max_m3h']*1000/60:,.1f} L/min (v_máx = {cap['v_max']:g} m/s)"))
+                           f"{sel.redondeo_seguro(cap['q_max_m3h'], 2, 'abajo'):,.2f} m³/h",
+                           f"{sel.redondeo_seguro(cap['q_max_m3h']*1000/60, 1, 'abajo'):,.1f} L/min "
+                           f"(v_máx = {cap['v_max']:g} m/s; redondeada hacia abajo)"))
     if res.get("diametro_requerido_m"):
         resultados.append(("Diámetro interior requerido a la velocidad máxima",
-                           f"{res['diametro_requerido_m']*1000:.2f} mm", "Di = √(4·Q/(π·v))"))
+                           f"{sel.redondeo_seguro(res['diametro_requerido_m']*1000, 2, 'arriba'):.2f} mm",
+                           "Di = √(4·Q/(π·v)), redondeado hacia arriba"))
     tablas = [x for x in (res.get("tabla_diametros"), res.get("tabla_capacidad")) if x]
     if res.get("presion"):
         tablas.append(pres.tabla(res["presion"]))

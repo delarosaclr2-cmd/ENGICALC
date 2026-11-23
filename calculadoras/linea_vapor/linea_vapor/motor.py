@@ -33,6 +33,16 @@ FT3_LB = 0.3048 ** 3 / u.LB     # m³/kg por ft³/lb
 # de salida ya coincide con el de 120 segmentos en 8 cifras con 4 (test_segmentacion_converge);
 # 8 deja el doble de margen. Si se cambia, revisar ese test.
 N_SEG_BARRIDO = 8
+# Segmentos del DICTAMEN. Todo valor que se anuncie como límite (capacidad máxima) o como estado
+# de un diámetro cerca del límite se comprueba con este mismo número, para que no lo contradiga.
+N_SEG_DICTAMEN = 60
+# Una fila del barrido se recalcula con N_SEG_DICTAMEN si su velocidad cae dentro de esta banda
+# relativa alrededor de v_máx, o si la caída de presión supera DP_REL_REFINAR de la presión de
+# entrada. Diferencia observada entre 8 y 60 segmentos: < 4·10⁻⁵ relativa cerca de 50.9 m/s, y
+# ≈ 1·10⁻³ con ΔP/P₁ = 0.62 (Mach 0.54). Con ambas reglas ningún estado ni velocidad mostrada
+# difiere del dictamen (test_barrido_coincide_con_el_dictamen_en_todos_los_casos).
+BANDA_REFINAR = 5e-3
+DP_REL_REFINAR = 0.2
 
 
 class ErrorEntrada(ValueError):
@@ -109,7 +119,7 @@ def marcha(e1, d, eps, L, k_tot, m, n_seg: int = 60):
     return est, perfil
 
 
-def calcular(c: dict, n_seg: int = 60) -> dict:
+def calcular(c: dict, n_seg: int = N_SEG_DICTAMEN) -> dict:
     patm = _num(c.get("p_atm_kpa", 101.325), "presión atmosférica") * 1000
     tub = c["tuberia"]
     try:
@@ -207,11 +217,24 @@ def presion_maxima(c, tub):
         raise ErrorEntrada(f"Presión máxima: {str(exc).strip(chr(39) + chr(34))}")
 
 
+def _k_total_para_nps(c: dict, nps) -> float:
+    """ΣK del tramo si la línea fuera de ese NPS.
+
+    Los accesorios con K capturado (k explícito) se conservan tal cual; los que tienen K tabulado
+    se recalculan con la tabla de ese NPS. Sin NPS no se puede tabular: se exige el K capturado.
+    """
+    total = 0.0
+    for a in c.get("accesorios", []):
+        total += k_accesorio(a["tipo"], nps, a.get("cantidad", 1), a.get("k"))
+    return total
+
+
 def barridos(c, res):
     """Velocidad por diámetro al caudal real de entrada, capacidad de la línea y curva v(Q).
 
     El caudal volumétrico real es Q = ṁ·ν a la condición de ENTRADA; la velocidad crece a lo largo
-    de la línea conforme cae la presión, por lo que el barrido es una preselección de diámetro.
+    de la línea conforme cae la presión. Igual que el dictamen, el máximo se juzga con la mayor
+    velocidad del tramo (salida) y el mínimo con la menor (entrada).
     """
     m, e1, eps, L, k_tot = res["m"], res["e1"], res["eps"], res["L"], res["k_total"]
     q = m * e1.v
@@ -220,31 +243,26 @@ def barridos(c, res):
     tub = c["tuberia"]
     ced = str(tub.get("cedula") or "40")
     hay_dp = L > 0 or k_tot > 0
+    d0 = res["d"]
 
-    def v_gobernante(q_entrada, d=None, n_seg=N_SEG_BARRIDO):
-        """Velocidad MÁXIMA DEL TRAMO para ese caudal de entrada: la misma que verifica calcular().
+    def v_gobernante(q_entrada, n_seg=N_SEG_BARRIDO):
+        """Velocidad MÁXIMA DEL TRAMO (diámetro y accesorios del caso) para ese caudal de entrada.
 
         Con caída de presión el volumen específico crece y la velocidad es mayor a la salida, así
         que ṁ·ν₁/A con la densidad de entrada subestima lo que gobierna. Se vuelve a marchar el
         tramo con el flujo másico correspondiente (ṁ = Q/ν₁, con la misma presión de entrada).
+        Solo vale para el diámetro del caso: otro diámetro tiene otros K (ver calc).
         """
-        d = res["d"] if d is None else d
         mm = q_entrada / e1.v
-        v_ent = mm * e1.v / area(d)
+        v_ent = mm * e1.v / area(d0)
         if not hay_dp:
             return v_ent
-        e2, _ = marcha(e1, d, eps, L, k_tot, mm, n_seg)
-        return max(v_ent, mm * e2.v / area(d))
+        e2, _ = marcha(e1, d0, eps, L, k_tot, mm, n_seg)
+        return max(v_ent, mm * e2.v / area(d0))
 
-    def calc(d):
-        """Velocidad gobernante y ΔP del tramo completo con ese diámetro, al mismo flujo."""
-        g = m / area(d)
-        re = g * d / e1.mu
-        f, _ = factor_friccion(re, eps, d)
-        if not hay_dp:
-            return {"v": g * e1.v, "re": re, "f": f, "dp_pa": None}
-        e2, _ = marcha(e1, d, eps, L, k_tot, m, N_SEG_BARRIDO)
-        return {"v": max(g * e1.v, g * e2.v), "re": re, "f": f, "dp_pa": e1.p - e2.p}
+    def v_dictamen(q_entrada):
+        """La misma velocidad con los segmentos del dictamen: con ella se comprueba la capacidad."""
+        return v_gobernante(q_entrada, N_SEG_DICTAMEN)
 
     cand = []
     for nps in nps_lista():
@@ -252,15 +270,46 @@ def barridos(c, res):
             cand.append((nps, ced, d_interior_m(nps, ced)))
         except KeyError:
             continue
+    d_a_nps = {d: nps for nps, _c, d in cand}
+
+    def calc(d):
+        """Velocidad gobernante y ΔP del tramo completo con ese diámetro, al mismo flujo.
+
+        Los accesorios se recalculan para el NPS de ESE diámetro: los K tabulados (Menon 5.11)
+        cambian con el diámetro, mientras que los K capturados explícitamente se conservan. Si la
+        velocidad cae cerca de v_máx o la caída de presión es grande, la fila se recalcula con los
+        segmentos del dictamen, para que coincida con lo que daría calcular() con ese diámetro.
+        """
+        g = m / area(d)
+        re = g * d / e1.mu
+        f, _ = factor_friccion(re, eps, d)
+        v_ent = g * e1.v
+        k_d = _k_total_para_nps(c, d_a_nps.get(d, tub.get("nps")))
+        if not (L > 0 or k_d > 0):
+            return {"v": v_ent, "v_baja": v_ent, "re": re, "f": f, "dp_pa": None}
+        e2, _ = marcha(e1, d, eps, L, k_d, m, N_SEG_BARRIDO)
+        v = max(v_ent, g * e2.v)
+        cerca = vmax not in (None, "") and abs(v - float(vmax)) <= BANDA_REFINAR * float(vmax)
+        if cerca or (e1.p - e2.p) > DP_REL_REFINAR * e1.p:
+            e2, _ = marcha(e1, d, eps, L, k_d, m, N_SEG_DICTAMEN)
+            v = max(v_ent, g * e2.v)
+        return {"v": v, "v_baja": v_ent, "re": re, "f": f, "dp_pa": e1.p - e2.p}
+
     # Sin caída de presión la velocidad es la misma en todo el tramo: no hace falta resolver nada.
     vg = v_gobernante if hay_dp else None
+    vd = v_dictamen if hay_dp else None
     donde = "a la salida" if hay_dp else ""
-    salida = {"q_entrada_m3s": q, "curva": sel.curva(res["d"], q, vmin, vmax, n=12 if hay_dp else 24,
-                                                     v_gobernante=vg),
-              "tabla_capacidad": sel.tabla_capacidad(res["d"], q, vmin, vmax,
+    # La velocidad gobernante al caudal capturado ya la dio el dictamen: no se repite la marcha.
+    v_act = max(res["v1"], res["v2"]) if "v2" in res else None
+    lim = sel.limites_de_caudal(d0, q, vmin, vmax, vg, vd, v_actual=v_act)
+    salida = {"q_entrada_m3s": q,
+              "curva": sel.curva(d0, q, vmin, vmax, n=12 if hay_dp else 24, v_gobernante=vg,
+                                 v_verificacion=vd, limites=lim),
+              "tabla_capacidad": sel.tabla_capacidad(d0, q, vmin, vmax,
                                                      conv=lambda x: x / e1.v / u.masico_a_kgs(1, c["flujo"]["unidad"]),
                                                      unidad=c["flujo"]["unidad"], simbolo="ṁ",
-                                                     v_gobernante=vg, donde_v=donde),
+                                                     v_gobernante=vg, donde_v=donde, v_verificacion=vd,
+                                                     limites=lim),
               "diametro_requerido_m": sel.diametro_requerido(q, float(vmax)) if vmax not in (None, "") else None}
     cand = sel.ventana(cand, q, vmin, vmax, tub.get("nps"))
     if cand:
@@ -268,3 +317,4 @@ def barridos(c, res):
             cand, calc, vmin, vmax, tub.get("nps"), L or None, donde_v=donde,
             nota_dp="total del tramo ({} m y accesorios)" if hay_dp else "por fricción en {} m de tubo recto")
     return salida
+

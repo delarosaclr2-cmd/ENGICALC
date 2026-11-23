@@ -80,12 +80,15 @@ def evaluar(c: dict) -> Memoria:
     cap = res.get("curva") or {}
     if cap.get("q_max_m3h"):
         resultados.append(("Capacidad máxima con el criterio de velocidad",
-                           f"{cap['q_max_m3h']:,.1f} m³/h reales",
-                           f"{cap['q_max_m3h']/e1.v/1000:,.3f} t/h de vapor a la entrada "
-                           f"(v_máx = {cap['v_max']:g} m/s)"))
+                           f"{sel.redondeo_seguro(cap['q_max_m3h'], 1, 'abajo'):,.1f} m³/h reales",
+                           f"{sel.redondeo_seguro(cap['q_max_m3h']/e1.v/1000, 3, 'abajo'):,.3f} t/h de vapor "
+                           f"a la entrada (v_máx = {cap['v_max']:g} m/s; comprobada con el dictamen y "
+                           "redondeada hacia abajo)"))
     if res.get("diametro_requerido_m"):
         resultados.append(("Diámetro interior requerido a la velocidad máxima",
-                           f"{res['diametro_requerido_m']*1000:.2f} mm", "Di = √(4·Q/(π·v))"))
+                           f"{sel.redondeo_seguro(res['diametro_requerido_m']*1000, 2, 'arriba'):.2f} mm",
+                           "Di = √(4·Q/(π·v)) con la densidad de ENTRADA: preselección; la velocidad de "
+                           "salida es mayor, verifique el diámetro en la tabla de diámetros"))
     tablas = [x for x in (res.get("tabla_diametros"), res.get("tabla_capacidad")) if x]
     if res.get("presion"):
         tablas.append(pres.tabla(res["presion"]))

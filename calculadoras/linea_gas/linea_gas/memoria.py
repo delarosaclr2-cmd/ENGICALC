@@ -94,11 +94,15 @@ def evaluar(c: dict) -> Memoria:
     cv = bar.get("curva") or {}
     resultados.insert(2, ("Área interior A", f"{sel.area(e.d_interior_m)*1e3:.4f}", "×10⁻³ m² (A = π·Di²/4)"))
     if cv.get("q_max_m3h"):
-        resultados.append(("Capacidad máxima con el criterio de velocidad", f"{cv['q_max_m3h']:,.2f}",
-                           f"m³/h reales a la entrada (v_máx = {cv['v_max']:g} m/s)"))
+        resultados.append(("Capacidad máxima con el criterio de velocidad",
+                           f"{sel.redondeo_seguro(cv['q_max_m3h'], 2, 'abajo'):,.2f}",
+                           f"m³/h reales a la entrada (v_máx = {cv['v_max']:g} m/s a la salida; "
+                           "redondeada hacia abajo)"))
     if bar.get("diametro_requerido_m"):
         resultados.append(("Diámetro interior requerido a la velocidad máxima",
-                           f"{bar['diametro_requerido_m']*1000:.2f}", "mm (Di = √(4·Q/(π·v)))"))
+                           f"{sel.redondeo_seguro(bar['diametro_requerido_m']*1000, 2, 'arriba'):.2f}",
+                           "mm (Di = √(4·Q/(π·v)) con la densidad de ENTRADA: preselección; la velocidad "
+                           "de salida es mayor, verifique el diámetro en la tabla de diámetros)"))
     return Memoria(
         titulo="Caída de presión en línea de gas o aire comprimido", caso=c["nombre"], version=__version__,
         huella=huella(c), documento=c.get("documento", ""),
@@ -159,10 +163,12 @@ def barridos(c, e, r):
 
         Informa la velocidad A LA SALIDA y la ΔP del modelo compresible, no una estimación con la
         densidad de entrada: así el estado de cada diámetro coincide con el que dictaminaría el
-        motor si se capturara ese diámetro.
+        motor si se capturara ese diámetro. Los accesorios se recalculan con el NPS de ese diámetro
+        (K capturados se conservan) porque calcular() los toma de la tabla con e.nps. El mínimo se
+        juzga con la velocidad de entrada, la menor del tramo.
         """
         r2 = calcular(replace(e, d_interior_m=d, nps=d_a_nps.get(d, e.nps)))
-        return {"v": r2.v_salida, "re": r2.re, "f": r2.f,
+        return {"v": r2.v_salida, "v_baja": r2.v_entrada, "re": r2.re, "f": r2.f,
                 "dp_pa": r2.dp_total_pa if e.longitud_m else None}
 
     def v_salida(q_entrada):
@@ -174,11 +180,15 @@ def barridos(c, e, r):
         """
         return calcular(replace(e, q_ref_m3s=e.q_ref_m3s * q_entrada / q)).v_salida
 
-    salida = {"curva": sel.curva(e.d_interior_m, q, vmin, vmax, v_gobernante=v_salida),
+    # v_salida corre el mismo modelo que el dictamen, así que no hace falta otra verificación; la
+    # velocidad al caudal capturado ya la dio el dictamen (r.v_salida).
+    lim = sel.limites_de_caudal(e.d_interior_m, q, vmin, vmax, v_salida, v_actual=r.v_salida)
+    salida = {"curva": sel.curva(e.d_interior_m, q, vmin, vmax, v_gobernante=v_salida, limites=lim),
               "tabla_capacidad": sel.tabla_capacidad(e.d_interior_m, q, vmin, vmax,
                                                      conv=lambda x: x / q * float(c["caudal"]["valor"]),
                                                      unidad=f"{c['caudal']['unidad']} {e.ref}",
-                                                     v_gobernante=v_salida, donde_v="a la salida"),
+                                                     v_gobernante=v_salida, donde_v="a la salida",
+                                                     limites=lim),
               "diametro_requerido_m": sel.diametro_requerido(q, float(vmax)) if vmax not in (None, "") else None}
     cand = sel.ventana(cand, q, vmin, vmax, c["tuberia"].get("nps"))
     if cand:
