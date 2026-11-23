@@ -1,0 +1,57 @@
+{
+  "gas": "aire",
+  "p_atm_psia": 14.7,
+  "temperatura": {
+    "valor": 28.0,
+    "unidad": "°C"
+  },
+  "rugosidad_mm": 0.04572,
+  "z": 1.0,
+  "nombre": "L3 Casa de filtros (individual) 1\"",
+  "documento": "PCGV-DM-014 Rev E",
+  "caudal": {
+    "valor": 50.0,
+    "unidad": "m³/h",
+    "referencia": "normal"
+  },
+  "p_entrada": {
+    "valor": 108.78,
+    "unidad": "psig"
+  },
+  "longitud_m": 1.5,
+  "tuberia": {
+    "nps": "1",
+    "cedula": "40"
+  },
+  "accesorios": [],
+  "criterios": {},
+  "notas": "Datos de PCGV-DM-014 Rev E. Presión de cálculo igual a la de la memoria; check de columpio con L/D = 100 (Menon tabla 5.10), como en la memoria. Para la presión máxima admisible capture el material de la tubería (esfuerzo admisible S y, si quiere la comparación con Barlow, la cedencia SMYS): la memoria de esta línea no calcula espesores.",
+  "espesor": {
+    "p_diseno": {
+      "valor": null,
+      "unidad": "psig"
+    },
+    "t_diseno_c": null,
+    "s": {
+      "valor": null,
+      "unidad": "psi",
+      "fuente": ""
+    },
+    "e": 1.0,
+    "w": 1.0,
+    "y": 0.4,
+    "c_por_ano_in": 0.00625,
+    "vida_util_anos": 10,
+    "tolerancia_pct": 12.5,
+    "barlow": {
+      "s_cedencia": {
+        "valor": null,
+        "unidad": "psi",
+        "fuente": ""
+      },
+      "clase_localizacion": "3",
+      "junta": "A106 sin costura",
+      "aplica_nom": false
+    }
+  }
+}

@@ -3,6 +3,8 @@
 Uso:
     python menu_principal.py                        abre el menú principal
     python menu_principal.py --calculadora bomba    abre el menú y una calculadora
+    python menu_principal.py --calculadora memoria_bombas    abre el menú y la memoria completa
+    python menu_principal.py --calculadora hvac_industrial   abre HVAC industrial desde el menú
     python menu_principal.py --lista                lista las calculadoras disponibles
     python menu_principal.py --cambiar-contrasena   cambia (o desactiva) la contraseña de acceso
 """
@@ -17,16 +19,17 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 
 
 def main(argv: list[str] | None = None) -> int:
-    from calculadoras.calculos import CALCULADORAS, POR_ID
+    from calculadoras.catalogo import HERRAMIENTAS as herramientas
 
     parser = argparse.ArgumentParser(description="Calculadoras de Ingeniería RMR")
-    parser.add_argument("--calculadora", choices=sorted(POR_ID), help="abre directamente esta calculadora")
-    parser.add_argument("--lista", action="store_true", help="lista las calculadoras y termina")
+    parser.add_argument("--calculadora", choices=sorted(c.id for c in herramientas),
+                        help="abre directamente una calculadora o memoria completa")
+    parser.add_argument("--lista", action="store_true", help="lista las calculadoras y memorias y termina")
     parser.add_argument("--cambiar-contrasena", action="store_true", help="cambia la contraseña de acceso y termina")
     args = parser.parse_args(argv)
 
     if args.lista:
-        for c in CALCULADORAS:
+        for c in herramientas:
             print(f"{c.id:16s} {c.nombre}  [{c.estado_validacion}]")
         return 0
     if args.cambiar_contrasena:

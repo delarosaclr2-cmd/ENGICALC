@@ -1,0 +1,76 @@
+{
+  "documento": "PCGV-DM-014 (memoria de cálculo sistema de aire comprimido, tanque pulmón)",
+  "p_atm_sitio": {
+    "valor": 14.7,
+    "unidad": "psia"
+  },
+  "v_tanque": {
+    "valor": 20.0,
+    "unidad": "m³"
+  },
+  "p_superior": {
+    "valor": 128.9,
+    "unidad": "psia"
+  },
+  "t_aire": {
+    "valor": 40.0,
+    "unidad": "°C"
+  },
+  "tramos": [
+    {
+      "descripcion": "Línea 4\" (supuesta céd. 40)",
+      "longitud_m": 447.6,
+      "nps": "4",
+      "cedula": "40"
+    },
+    {
+      "descripcion": "Línea 2\" (supuesta céd. 40)",
+      "longitud_m": 40.0,
+      "nps": "2",
+      "cedula": "40"
+    }
+  ],
+  "incluir_tuberia": true,
+  "n_politropico": 1.0,
+  "margen_consumo_pct": 0.0,
+  "nombre": "Caso 2: casa de filtros y equipos, 200 Nm³/h, 128.9 → 108.97 psia",
+  "p_inferior": {
+    "valor": 108.9745,
+    "unidad": "psia"
+  },
+  "q_consumo": {
+    "valor": 200.0,
+    "unidad": "m³/h",
+    "referencia": "normal"
+  },
+  "t_retencion_req_min": 10.0,
+  "notas": "T_aire = 40 °C es un ESCENARIO provisional (dato no proporcionado). Cédula 40 supuesta.",
+  "espesor": {
+    "p_diseno": {
+      "valor": null,
+      "unidad": "psig"
+    },
+    "t_diseno_c": null,
+    "s": {
+      "valor": null,
+      "unidad": "psi",
+      "fuente": ""
+    },
+    "e": 1.0,
+    "w": 1.0,
+    "y": 0.4,
+    "c_por_ano_in": 0.00625,
+    "vida_util_anos": 10,
+    "tolerancia_pct": 12.5,
+    "barlow": {
+      "s_cedencia": {
+        "valor": null,
+        "unidad": "psi",
+        "fuente": ""
+      },
+      "clase_localizacion": "3",
+      "junta": "A106 sin costura",
+      "aplica_nom": false
+    }
+  }
+}

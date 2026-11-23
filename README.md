@@ -4,10 +4,50 @@ Plataforma de escritorio (Python + Tkinter) con 15 calculadoras de ingeniería a
 
 > **Aviso.** Herramienta de apoyo para cálculos de ingeniería. Sus resultados no constituyen una memoria certificada ni sustituyen la revisión y firma de un ingeniero responsable. Cada resultado indica su nivel de confianza; los de nivel **O** provienen de criterios del programa original sin fuente y **no están validados**.
 
-## Revisión independiente de agitadores, bombas y ductos HVAC
+## Acceso a todas las calculadoras
 
-Las tres memorias nativas se revisan desde archivos independientes, sin cambios
-al menú principal. Abra y ejecute en su IDE el archivo correspondiente:
+**INICIAR.bat** abre un menú con **25 herramientas**: las 15 calculadoras básicas,
+las tres memorias completas y siete aplicaciones adicionales. Se incorporaron
+agitadores, bombas y ductos HVAC (memorias completas), líneas de agua, vapor,
+aceite, gas y aire comprimido, gas combustible, tanque pulmón y HVAC industrial.
+
+El inventario completo, los identificadores para PowerShell y el origen del
+código están en [INTEGRACION_MENU_COMPLETO.md](docs/INTEGRACION_MENU_COMPLETO.md).
+Las seis aplicaciones procedentes del PR #4 muestran **Revisión pendiente**;
+sus dos observaciones abiertas se describen en ese documento.
+
+HVAC industrial se abre en una ventana independiente y conserva sus propios
+proyectos. La primera vez, prepare su entorno ejecutando
+`HVAC_INDUSTRIAL_CALCULATOR/instalar_windows.bat`. El menú prefiere ese entorno
+`.venv` y avisa si faltan componentes. No instala paquetes automáticamente.
+El menú inicia HVAC directamente en un solo proceso, sin cargar antes sus
+bibliotecas para comprobarlas. La carga ocurre en su ventana independiente;
+el menú sigue respondiendo y muestra un aviso si la aplicación termina con error.
+Cerrar el menú no cierra HVAC industrial; guarde y cierre sus proyectos desde
+esa aplicación. Sus páginas de aire, caudales, campanas, ductos, pérdidas, redes,
+ventiladores, potencia y reportes se encuentran dentro de esa misma ventana.
+
+Las seis aplicaciones del PR #4 abren sus casos desde **Abrir caso** en su propia
+ventana. Las calculadoras básicas y las memorias completas también permiten
+abrir sus casos desde **Archivo → Abrir caso guardado…** del menú principal.
+La integración conserva las interfaces existentes; el rediseño queda pendiente.
+
+## Memorias completas de agitadores, bombas y ductos HVAC
+
+Abra **INICIAR.bat** y seleccione el grupo **Memorias de cálculo RMR**. Las tres
+memorias también aparecen en el buscador y se abren con doble clic o con
+**Abrir calculadora**. Puede mantener abiertas varias memorias y calculadoras;
+cerrar una memoria conserva el menú abierto.
+
+Desde PowerShell puede abrirlas directamente con:
+
+```powershell
+py menu_principal.py --calculadora memoria_agitadores
+py menu_principal.py --calculadora memoria_bombas
+py menu_principal.py --calculadora memoria_hvac
+```
+
+Los archivos independientes siguen disponibles para ejecutarlos desde su IDE:
 
 - `revisar_agitadores.py`
 - `revisar_bombas.py`
@@ -18,7 +58,13 @@ También puede ejecutar `py revisar_agitadores.py`, `py revisar_bombas.py` o
 actualización automática, esquemas/curvas, captura SI/US, casos JSON y exportación
 PDF/Excel. El acceso usa la configuración de contraseña existente.
 
-Alcance y pruebas: [INTEGRACION_MEMORIAS.md](docs/INTEGRACION_MEMORIAS.md).
+Los casos JSON de las memorias también se abren desde **Archivo → Abrir caso
+guardado…** del menú principal. Sus metadatos se capturan en **Datos del
+documento**; conservan su formato propio y no se añaden al historial de las
+calculadoras básicas.
+
+Antecedente de la incorporación independiente:
+[INTEGRACION_MEMORIAS.md](docs/INTEGRACION_MEMORIAS.md).
 Las referencias de equivalencia comprueban la migración del código; las curvas
 y coeficientes deben revisarse para cada proyecto.
 
@@ -28,7 +74,7 @@ y coeficientes deben revisarse para cada proyecto.
 2. Descomprima esta carpeta donde quiera (no necesita una ruta fija).
 3. Doble clic en **`INSTALAR.bat`** (o, en una terminal dentro de la carpeta: `py -m pip install -r requirements.txt`).
 4. Si Windows muestra «No se pudo comprobar el editor» al abrir los `.bat`, es porque el ZIP vino de internet: presione **Ejecutar**, o antes de descomprimir haga clic derecho en el ZIP → Propiedades → marque **Desbloquear**.
-5. Si falta alguna biblioteca, el menú lo indica en rojo y dice qué función se afecta. El cálculo no depende de ellas: sin matplotlib la memoria PDF se genera sin gráfica; sin openpyxl no se exporta a Excel.
+5. Si falta alguna biblioteca, el menú lo indica en rojo y dice qué función se afecta. Las calculadoras básicas pueden calcular sin ellas: sin matplotlib su memoria PDF se genera sin gráfica; sin openpyxl no se exporta a Excel. Las tres memorias completas requieren Matplotlib para sus ventanas y NumPy para el ajuste de curvas de bombas; instale todas las dependencias antes de abrirlas.
 
 ## 2. Uso
 
@@ -46,7 +92,9 @@ y coeficientes deben revisarse para cada proyecto.
 - **Datos del proyecto…** (botón de cada calculadora o menú Archivo): proyecto, cliente, documento, revisión, elaboró, revisó y aprobó. Encabezan el PDF, el Excel, los casos guardados y el historial; se recuerdan entre sesiones (`registro/proyecto.json`).
 - **Historial de cálculos** (menú Archivo): cada cálculo válido queda registrado en `registro/historial.jsonl`; doble clic reabre la calculadora con esos datos y recalcula.
 - Otras opciones de línea de comandos:
-  - `py menu_principal.py --lista` — lista las calculadoras y su estado.
+  - `py menu_principal.py --lista` — lista las 25 herramientas y sus estados.
+  - `py menu_principal.py --calculadora hvac_industrial` — abre HVAC industrial desde el menú.
+  - `py menu_principal.py --calculadora linea_agua` — abre la calculadora de líneas de agua.
   - `py menu_principal.py --calculadora bomba` — abre directamente una calculadora (ids en `docs/CATALOGO_DE_CALCULADORAS.md`).
 
 ### Niveles de confianza
