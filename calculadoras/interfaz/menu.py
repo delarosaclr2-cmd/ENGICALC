@@ -2,19 +2,22 @@
 
 Sustituye al «manejador de archivos» original, que abría scripts por rutas fijas
 ``D:\\Python\\...`` con ``subprocess`` (rutas rotas en cualquier otra PC). Aquí cada
-calculadora se abre como ventana dentro del mismo proceso a partir del registro
-``calculadoras.calculos.CALCULADORAS``; agregar una calculadora al registro la
-agrega automáticamente al menú.
+calculadora o memoria se abre como ventana dentro del mismo proceso a partir de
+el catálogo de ``calculadoras.catalogo``. HVAC industrial usa su propio proceso Qt.
 """
 from __future__ import annotations
 
+import json
 import tkinter as tk
 import webbrowser
 from pathlib import Path
 from tkinter import filedialog, messagebox, ttk
 
 from .. import __version__
-from ..calculos import CALCULADORAS, POR_ID, buscar, por_disciplina
+from ..calculos import CALCULADORAS, POR_ID
+from ..memorias import POR_ID as MEMORIAS_POR_ID
+from ..catalogo import HERRAMIENTAS, POR_ID as POR_HERRAMIENTA, buscar, por_disciplina
+from ..aplicaciones import POR_ID as APLICACIONES_POR_ID, abrir_nativa, abrir_externa
 from ..nucleo.configuracion import RAIZ, cargar, recurso
 from ..nucleo.modelo import NIVELES, VALIDACION_PENDIENTE, VALIDADA_CONDICIONES
 
@@ -39,7 +42,9 @@ class MenuPrincipal(ttk.Frame):
         super().__init__(raiz, padding=10)
         self.raiz = raiz
         self.config_app = cargar()
-        self.ventanas: dict[str, VentanaCalculadora] = {}
+        self.ventanas: dict[str, tk.Toplevel] = {}
+        self.procesos = {}
+        self._vigias = {}
         raiz.title("Calculadoras de Ingeniería RMR")
         raiz.geometry("1000x640")
         raiz.minsize(760, 480)
@@ -122,7 +127,8 @@ class MenuPrincipal(ttk.Frame):
         sitio = self.config_app["sitio"]
         self.estado = ttk.Label(self, anchor="w",
                                 text=f"Versión {__version__} · {len(CALCULADORAS)} calculadoras · Sitio por defecto: "
-                                     f"{sitio.get('nombre', '')} ({sitio.get('altitud_m', 0)} m) — config/configuracion.json")
+                                     f"{sitio.get('nombre', '')} ({sitio.get('altitud_m', 0)} m) · "
+                                     f"{len(HERRAMIENTAS)} herramientas disponibles")
         self.estado.pack(fill="x", pady=(6, 0))
         faltantes = bibliotecas_faltantes()
         if faltantes:
@@ -148,9 +154,11 @@ class MenuPrincipal(ttk.Frame):
 
     # ------------------------------------------------------------ lógica
     def filtrar(self) -> None:
-        visibles = {c.id for c in buscar(self.texto_busqueda.get())}
+        texto = self.texto_busqueda.get()
+        visibles = {c.id for c in buscar(texto)}
         self.arbol.delete(*self.arbol.get_children())
-        for disciplina, lista in por_disciplina().items():
+        grupos = por_disciplina()
+        for disciplina, lista in grupos.items():
             lista = [c for c in lista if c.id in visibles]
             if not lista:
                 continue
@@ -165,7 +173,7 @@ class MenuPrincipal(ttk.Frame):
 
     def seleccion(self):
         sel = self.arbol.selection()
-        return POR_ID.get(sel[0]) if sel else None
+        return POR_HERRAMIENTA.get(sel[0]) if sel else None
 
     def describir(self) -> None:
         c = self.seleccion()
@@ -190,27 +198,88 @@ class MenuPrincipal(ttk.Frame):
             return self.abrir(c.id)
         return None
 
-    def abrir(self, id_calculadora: str) -> VentanaCalculadora:
-        """Abre (o trae al frente) la ventana de una calculadora."""
+    def abrir(self, id_calculadora: str):
+        """Abre (o trae al frente) una calculadora o memoria completa."""
+        aplicacion = APLICACIONES_POR_ID.get(id_calculadora)
+        if aplicacion and aplicacion.carpeta:
+            proceso = self.procesos.get(id_calculadora)
+            if proceso is not None and proceso.poll() is None:
+                messagebox.showinfo("Aplicación en ejecución", f"{aplicacion.nombre} se está abriendo "
+                                    "o ya está abierta. Puede volver a su ventana desde la barra de tareas.",
+                                    parent=self.raiz)
+                return proceso
+            try:
+                proceso = abrir_externa(aplicacion)
+            except (OSError, ValueError) as error:
+                messagebox.showerror("No se pudo abrir", str(error), parent=self.raiz)
+                return None
+            anterior = self._vigias.pop(id_calculadora, None)
+            if anterior:
+                self.after_cancel(anterior)
+            self.procesos[id_calculadora] = proceso
+            self._vigilar_aplicacion(id_calculadora, proceso)
+            return proceso
         ventana = self.ventanas.get(id_calculadora)
         if ventana is not None and ventana.winfo_exists():
             ventana.deiconify()
             ventana.lift()
             return ventana
-        ventana = VentanaCalculadora(self.raiz, POR_ID[id_calculadora])
+        if id_calculadora in MEMORIAS_POR_ID:
+            from ..memorias.lanzador import abrir_memoria
+
+            ventana = abrir_memoria(self.raiz, id_calculadora)
+        elif aplicacion:
+            ventana = abrir_nativa(self.raiz, aplicacion)
+        else:
+            ventana = VentanaCalculadora(self.raiz, POR_ID[id_calculadora])
         self.ventanas[id_calculadora] = ventana
         return ventana
+
+    def _vigilar_aplicacion(self, identificador, proceso):
+        """Recoge errores del proceso sin hacer esperar al menú durante los imports de HVAC."""
+        if self.procesos.get(identificador) is not proceso:
+            return
+        codigo = proceso.poll()
+        if codigo is None:
+            self._vigias[identificador] = self.after(
+                250, lambda: self._vigilar_aplicacion(identificador, proceso))
+            return
+        self._vigias.pop(identificador, None)
+        mensaje = proceso.mensaje_error() if codigo and hasattr(proceso, "mensaje_error") else ""
+        if hasattr(proceso, "cerrar_registro"):
+            proceso.cerrar_registro()
+        if codigo:
+            messagebox.showerror("Error de HVAC industrial", mensaje or
+                                 "La aplicación terminó con un error.", parent=self.raiz)
+
+    def destroy(self):
+        for token in self._vigias.values():
+            try:
+                self.after_cancel(token)
+            except tk.TclError:
+                pass
+        self._vigias.clear()
+        super().destroy()
 
     def abrir_caso(self) -> None:
         ruta = filedialog.askopenfilename(parent=self.raiz, filetypes=[("Caso de cálculo", "*.json")])
         if not ruta:
             return
         try:
-            datos = reportes.abrir_caso(ruta)
+            with open(ruta, encoding="utf-8") as archivo:
+                cabecera = json.load(archivo)
+            if not isinstance(cabecera, dict):
+                raise ValueError("El archivo no es un caso de cálculo RMR.")
+            if cabecera.get("formato") == "RMR-memoria":
+                from ..memorias import reportes as reportes_memorias
+
+                datos = reportes_memorias.abrir_caso(ruta)
+            else:
+                datos = reportes.abrir_caso(ruta)
         except (OSError, ValueError) as e:
             messagebox.showerror("No se pudo abrir", str(e), parent=self.raiz)
             return
-        if datos["calculadora"] not in POR_ID:
+        if datos["calculadora"] not in {*POR_ID, *MEMORIAS_POR_ID}:
             messagebox.showerror("Calculadora desconocida", f"«{datos['calculadora']}» no existe en esta versión.",
                                  parent=self.raiz)
             return

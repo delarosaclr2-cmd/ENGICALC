@@ -11,6 +11,7 @@ import tkinter as tk
 import pytest
 
 from calculadoras.calculos import CALCULADORAS, POR_ID
+from calculadoras.catalogo import HERRAMIENTAS
 from tests.casos import CASOS
 from tests.casos_libros import CASOS_LIBROS, valor
 
@@ -58,18 +59,18 @@ def menu(monkeypatch):
 
 def test_menu_lista_todas_las_calculadoras(menu):
     hijos = [h for d in menu.arbol.get_children() for h in menu.arbol.get_children(d)]
-    assert sorted(hijos) == sorted(POR_ID)
+    assert sorted(hijos) == sorted(h.id for h in HERRAMIENTAS)
 
 
 def test_buscador(menu):
     menu.texto_busqueda.set("npsh")
     hijos = [h for d in menu.arbol.get_children() for h in menu.arbol.get_children(d)]
-    assert hijos == ["bomba"]
+    assert set(hijos) == {"bomba", "memoria_bombas", "linea_agua"}
     menu.texto_busqueda.set("transportador")
     hijos = {h for d in menu.arbol.get_children() for h in menu.arbol.get_children(d)}
     assert {"helicoidal", "neumatico", "banda"} <= hijos
     menu.texto_busqueda.set("")
-    assert len([h for d in menu.arbol.get_children() for h in menu.arbol.get_children(d)]) == len(CALCULADORAS)
+    assert len([h for d in menu.arbol.get_children() for h in menu.arbol.get_children(d)]) == len(HERRAMIENTAS)
     # una búsqueda sin coincidencias limpia el panel de detalle (hallazgo de la prueba en vivo)
     menu.arbol.selection_set("soplador")
     menu.describir()
