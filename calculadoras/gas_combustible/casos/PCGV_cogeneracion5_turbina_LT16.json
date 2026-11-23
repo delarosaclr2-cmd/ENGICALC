@@ -1,0 +1,44 @@
+{
+  "nombre": "Cogeneración 5: turbina LT16 y quemador HRSG",
+  "documento": "CÁLCULO DE CONSUMOS DE GAS NATURAL 120324",
+  "composicion": {
+    "metano": 95.335,
+    "etano": 1.996,
+    "propano": 0.303,
+    "isobutano": 0.107,
+    "n-butano": 0.063,
+    "isopentano": 0.026,
+    "n-pentano": 0.025,
+    "hexano": 0.012,
+    "heptano": 0.003,
+    "octano": 0.001,
+    "nonano": 0.003,
+    "oxigeno": 0.016,
+    "nitrogeno": 0.087,
+    "co2": 2.023
+  },
+  "referencia": "estandar_60F",
+  "z_ref": null,
+  "lhv_laboratorio_mj_m3": 34.06,
+  "turbina": {
+    "nombre": "Turbina LT16 (Cog. 5)",
+    "heat_rate_kj_kwh": 10055,
+    "potencia_kw": 16590,
+    "lhv_kj_kg": 47134.1
+  },
+  "consumidores_kg_h": [
+    {
+      "nombre": "Quemador HRSG Cog. 5 (dato de la hoja, por confirmar)",
+      "kg_h": 372
+    }
+  ],
+  "linea": {
+    "p": {
+      "valor": 449.61,
+      "unidad": "psig"
+    },
+    "t_c": 25.0
+  },
+  "p_atm_psia": 14.696,
+  "notas": "Composición: hoja 'Hoja1' (laboratorio). HR, potencia y LHV: Attachment #4 NOVALT 16 y Site Performance table (no verificados por la auditoría). 372 kg/h del quemador: nota 5 de la hoja GAS NATURAL; PCGV-DM-006 Rev F usa 18 000 kg/día (750 kg/h): confirmar."
+}

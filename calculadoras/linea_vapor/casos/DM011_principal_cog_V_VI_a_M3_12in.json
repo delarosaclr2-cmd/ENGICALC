@@ -1,0 +1,59 @@
+{
+  "documento": "PCGV-DM-011 Rev D",
+  "p_atm_kpa": 101.325,
+  "p_entrada": {
+    "valor": 284.56,
+    "unidad": "psia"
+  },
+  "estado": "saturado",
+  "rugosidad_mm": 0.04572,
+  "longitud_m": 0,
+  "accesorios": [],
+  "criterio_velocidad": {
+    "v_min_m_s": 30.5,
+    "v_max_m_s": 50.9,
+    "fuente": "Menon (2005) tabla 4.4: vapor saturado ≥ 345 kPa g, 30.5–50.9 m/s"
+  },
+  "nombre": "Línea principal de vapor Cog. V y VI → Máquina 3 (12\")",
+  "flujo": {
+    "valor": 85000,
+    "unidad": "kg/h"
+  },
+  "tuberia": {
+    "nps": "12",
+    "cedula": "40"
+  },
+  "espesor": {
+    "codigo": "B31.1",
+    "p_diseno": {
+      "valor": 269.86,
+      "unidad": "psig"
+    },
+    "t_diseno_c": 211.4,
+    "s": {
+      "valor": 15000,
+      "unidad": "psi",
+      "fuente": "Valor de la memoria (A106 B, B31.1); verificar en la edición contractual"
+    },
+    "e": 1.0,
+    "y": 0.4,
+    "tolerancia_pct": 12.5,
+    "c_por_ano_in": 0.00625,
+    "vida_util_anos": 10,
+    "p_operacion": {
+      "valor": null,
+      "unidad": "psig"
+    },
+    "barlow": {
+      "s_cedencia": {
+        "valor": 35000,
+        "unidad": "psi",
+        "fuente": "SMYS de A106 Gr. B indicada en las memorias PCGV; verificar en ASTM A106"
+      },
+      "clase_localizacion": "3",
+      "junta": "A106 sin costura",
+      "aplica_nom": false
+    }
+  },
+  "notas": "Datos de la memoria: vapor saturado a 284.56 psia (412.5 °F) a la salida de la caldera. La memoria no da longitudes ni accesorios: capture los reales para obtener la caída de presión (con L = 0 solo se evalúan velocidad y espesor). P de espesor = 269.86 psig (la de operación; confirmar la de diseño)."
+}

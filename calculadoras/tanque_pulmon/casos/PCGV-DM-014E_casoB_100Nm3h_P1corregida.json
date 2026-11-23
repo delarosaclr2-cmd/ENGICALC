@@ -1,0 +1,63 @@
+{
+  "documento": "PCGV-DM-014 Rev E (10/03/25)",
+  "p_atm_sitio": {
+    "valor": 14.7,
+    "unidad": "psia"
+  },
+  "v_tanque": {
+    "valor": 20.0,
+    "unidad": "m³"
+  },
+  "t_aire": {
+    "valor": 28.0,
+    "unidad": "°C"
+  },
+  "p_inferior": {
+    "valor": 115.0,
+    "unidad": "psia"
+  },
+  "tramos": [],
+  "incluir_tuberia": false,
+  "n_politropico": 1.0,
+  "margen_consumo_pct": 0.0,
+  "t_retencion_req_min": 10.0,
+  "nombre": "Rev E B: 100 Nm³/h, P1 con ΔP corregido del rack (130.60 psia)",
+  "p_superior": {
+    "valor": 130.596,
+    "unidad": "psia"
+  },
+  "q_consumo": {
+    "valor": 100.0,
+    "unidad": "m³/h",
+    "referencia": "normal"
+  },
+  "notas": "T = 28 °C es la temperatura de operación de la propia memoria Rev E. Solo tanque (conservador): no se sabe si hay válvula de retención o regulador entre el rack y el tanque. P1 = 130.7 psia − 0.104 psi (calculadora linea_gas, caso L1).",
+  "espesor": {
+    "p_diseno": {
+      "valor": null,
+      "unidad": "psig"
+    },
+    "t_diseno_c": null,
+    "s": {
+      "valor": null,
+      "unidad": "psi",
+      "fuente": ""
+    },
+    "e": 1.0,
+    "w": 1.0,
+    "y": 0.4,
+    "c_por_ano_in": 0.00625,
+    "vida_util_anos": 10,
+    "tolerancia_pct": 12.5,
+    "barlow": {
+      "s_cedencia": {
+        "valor": null,
+        "unidad": "psi",
+        "fuente": ""
+      },
+      "clase_localizacion": "3",
+      "junta": "A106 sin costura",
+      "aplica_nom": false
+    }
+  }
+}
