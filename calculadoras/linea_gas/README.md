@@ -75,3 +75,12 @@ Seis hallazgos de la revisión. Los tres primeros podían producir un CUMPLE ind
 Estado de las verificaciones: **CUMPLE**, **NO CUMPLE**, **INFORMATIVO** (criterio que no aplica a este servicio) y **NO EVALUABLE** (el método no cubre ese caso). El último es nuevo y aparece con fondo gris en la interfaz y en el PDF.
 
 Pruebas de regresión en `tests/test_revision_pr.py`, con los mismos números de los escenarios reportados.
+
+## Segunda ronda de comentarios del PR (v1.2.2)
+
+| # | Qué pasaba | Qué se hizo |
+|---|---|---|
+| C-2 | La **capacidad máxima** se mostraba con redondeo al más cercano. En gas (DM014E_L1, v máx 15 m/s) la tabla anunciaba 3,026.15 Nm³/h, que al reintroducirse daba 15.000010344 m/s y NO CUMPLE. El mismo defecto estaba en la fila «Capacidad máxima» de la memoria y en la etiqueta de la gráfica. | `seleccion.redondeo_seguro`: la capacidad máxima se redondea **hacia abajo**; el caudal mínimo y el diámetro requerido, **hacia arriba**. La tabla comprueba el valor mostrado reintroduciéndolo con el modelo del dictamen. El criterio físico no cambia: 3,026.15 sigue siendo NO CUMPLE. |
+| C-3 | El **caudal mínimo** se resolvía con la velocidad de salida, pero el dictamen juzga el mínimo con la de **entrada** (la menor del tramo); el estado del barrido hacía lo mismo. En el escenario de vapor el mínimo mostrado dejaba la entrada en 29.73 m/s, por debajo de 30.5. | `limites_de_caudal`: Q_mín = v_mín·A con la velocidad de entrada. `estado_velocidad(v, …, v_baja)`: el máximo con la mayor velocidad del tramo y el mínimo con la menor, igual que el dictamen. En líquidos ambas son iguales y nada cambia. |
+
+El comentario de K por diámetro no aplicaba a gas: su barrido ya corre `calcular()` con el NPS de cada diámetro, que retoma los K tabulados de ese NPS y conserva los capturados. Se agregó una prueba que lo comprueba fila por fila. Pruebas: `test_capacidad_mostrada_reintroducida_cumple_con_el_limite`, `test_caudal_minimo_mostrado_deja_la_entrada_en_el_intervalo`, `test_barrido_de_gas_coincide_con_el_calculo_completo_en_otro_diametro` y las comunes de `seleccion`.

@@ -1,6 +1,8 @@
 """Piezas de dibujo comunes a las calculadoras de líneas (solo dibujan resultados ya calculados)."""
 from __future__ import annotations
 
+import math
+
 from ..ui.dibujo import COLORES
 
 VALVULAS = {"compuerta": "C", "globo": "G", "angulo": "A", "bola": "B", "check_columpio": "R",
@@ -140,5 +142,5 @@ def curva_velocidad(esc, x, y, w, h, cv, unidad="m³/h", donde_v=""):
     if cv.get("q_max_m3h"):
         p = T(cv["q_max_m3h"], min(hi, vmax_g))
         esc.linea([(p[0], y), (p[0], p[1])], COLORES["mal"], 0.25, guion=(1.2, 1.2))
-        esc.texto(p[0] - 1.2, y + h * 0.06, f"capacidad {cv['q_max_m3h']:,.0f} {unidad}", 2.2, "w",
+        esc.texto(p[0] - 1.2, y + h * 0.06, f"capacidad {math.floor(cv['q_max_m3h']):,.0f} {unidad}", 2.2, "w",
                   COLORES["mal"], rot=90, info="Caudal que agota el criterio de velocidad")

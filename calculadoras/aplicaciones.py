@@ -20,10 +20,10 @@ class Aplicacion:
     descripcion: str
     modulo: str = ""
     carpeta: str = ""
-    estado_auditoria: str = "PR #4: correcciones en revisión"
-    estado_validacion: str = "Revisión pendiente"
+    estado_auditoria: str = "PR #4 revisado e integrado en main"
+    estado_validacion: str = "Revisión de código aprobada"
     limitaciones: tuple[str, ...] = (
-        "La revisión del PR #4 sigue pendiente; comprobar los resultados para cada proyecto.",
+        "La revisión de código y las pruebas no sustituyen la revisión de ingeniería de cada proyecto.",
         "Las unidades, criterios y datos de material deben corresponder al servicio real.",
     )
     archivos_originales: tuple[str, ...] = ()
@@ -39,13 +39,11 @@ APLICACIONES = (
     _linea("linea_agua", "Líneas de agua", "Máquinas de fluido y bombeo",
            "Velocidad, pérdidas de presión, NPSH, espesor y selección de diámetros de agua."),
     _linea("linea_vapor", "Líneas de vapor", "Térmica y transferencia de calor",
-           "Propiedades del vapor, velocidad, pérdidas, venteo y espesor. Revisar cada diámetro "
-           "con el cálculo completo: el barrido conserva los K del diámetro original."),
+           "Propiedades del vapor, velocidad, pérdidas, venteo, espesor y selección de diámetros."),
     _linea("linea_aceite", "Líneas de aceite", "Máquinas de fluido y bombeo",
            "Viscosidad, velocidad, pérdidas de presión y espesor de líneas de aceite."),
     _linea("linea_gas", "Líneas de gas y aire comprimido", "Máquinas de fluido y bombeo",
-           "Flujo compresible, velocidad, presión de llegada y capacidad. Comprobar el caudal "
-           "máximo mostrado: el redondeo puede cambiar el dictamen al volver a capturarlo."),
+           "Flujo compresible, velocidad, presión de llegada y capacidad de líneas de gas y aire."),
     _linea("gas_combustible", "Gas combustible", "Térmica y transferencia de calor",
            "Composición del gas, propiedades, consumo de combustible y caudales de turbinas."),
     _linea("tanque_pulmon", "Tanque pulmón de aire comprimido", "Máquinas de fluido y bombeo",

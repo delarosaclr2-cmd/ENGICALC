@@ -1,5 +1,7 @@
 """Inventario, apertura y aislamiento de las aplicaciones integradas al menú."""
 from types import SimpleNamespace
+from pathlib import Path
+import json
 import subprocess
 import time
 
@@ -48,6 +50,43 @@ def test_abrir_calcular_cerrar_y_reabrir_desde_menu(menu, app):
     nueva = menu.abrir(app.id)
     menu.raiz.update()
     assert nueva is not ventana
+    assert not menu.errores
+
+
+@pytest.mark.skipif(not HAY_PANTALLA, reason="sin pantalla disponible para Tk")
+def test_correccion_redondeo_gas_desde_menu(menu):
+    ventana = menu.abrir("linea_gas")
+    marco = next(w for w in ventana.winfo_children() if hasattr(w, "memoria"))
+    ruta = Path(__file__).resolve().parents[1] / "calculadoras/linea_gas/casos/DM014E_L1_rack_4in.json"
+    caso = json.loads(ruta.read_text(encoding="utf-8"))
+    caso["criterios"] = {"v_max_m_s": 15.0}
+    marco.poner(caso)
+    tabla = next(t for t in marco.memoria.tablas if t[0].startswith("Capacidad de la línea"))
+    fila = next(f for f in tabla[2] if "máxima" in f[0])
+    assert fila[2] == "3,026.14"
+    caso["caudal"]["valor"] = float(fila[2].replace(",", ""))
+    marco.poner(caso)
+    verificacion = next(v for v in marco.memoria.verificaciones if v[0] == "Velocidad máxima")
+    assert verificacion[3] == "CUMPLE"
+    assert not menu.errores
+
+
+@pytest.mark.skipif(not HAY_PANTALLA, reason="sin pantalla disponible para Tk")
+def test_correccion_accesorios_vapor_desde_menu(menu):
+    ventana = menu.abrir("linea_vapor")
+    marco = next(w for w in ventana.winfo_children() if hasattr(w, "memoria"))
+    ruta = Path(__file__).resolve().parents[1] / "calculadoras/linea_vapor/casos/ESCENARIO_principal_12in_150m.json"
+    caso = json.loads(ruta.read_text(encoding="utf-8"))
+    caso["flujo"]["valor"] = 53265.24
+    marco.poner(caso)
+    tabla = next(t for t in marco.memoria.tablas if t[0].startswith("Velocidad por diámetro"))
+    fila = next(f for f in tabla[2] if f[0] == "8")
+    assert fila[7] == "NO CUMPLE"
+    assert float(fila[3]) == pytest.approx(51.020, abs=0.001)
+    caso["tuberia"]["nps"] = "8"
+    marco.poner(caso)
+    verificacion = next(v for v in marco.memoria.verificaciones if v[0].startswith("Velocidad máxima"))
+    assert verificacion[3] == "NO CUMPLE"
     assert not menu.errores
 
 

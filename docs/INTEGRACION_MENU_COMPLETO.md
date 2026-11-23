@@ -53,13 +53,16 @@ En PowerShell, `py menu_principal.py --lista` muestra el catálogo. Use
   `.venv` cuando está instalado. Se inicia directamente en un único proceso;
   los errores del propio arranque se recogen sin bloquear el menú, sin instalar
   paquetes ni cerrar la sesión principal.
-- Por instrucción del usuario se incorporan seis directorios del PR #4:
+- Por instrucción del usuario se incorporaron inicialmente seis directorios del PR #4:
   `linea_agua`, `linea_vapor`, `linea_aceite`, `linea_gas`, `gas_combustible` y
   `tanque_pulmon`, tomados del commit
   `546d3bb9b1e5b4e552f7534dc972e9005d2443e1` de
   `feature/presion-velocidades-v1.1.0`. Son 229 archivos, incluidos casos,
   recursos, instrucciones de ejecución independiente y pruebas de origen.
-  No se fusionó la rama ni se modificaron sus ecuaciones o pruebas.
+  La incorporación inicial se hizo por copia, sin modificar sus ecuaciones o pruebas.
+  Después se actualizaron desde `main`, commit
+  `477d6e4c43b527af6b246abd791c6d7cf4adeac7`, que fusionó el PR #4 con las
+  correcciones revisadas del commit `7fb6228274b93aa1aacbb6bc5689662893566ab7`.
 - El registro de las 15 calculadoras básicas conserva su API y sus motores.
   El catálogo del menú reúne los tres tipos de herramienta sin mezclarlos.
 - El rediseño gráfico queda fuera de este cambio. Las aplicaciones conservan
@@ -68,21 +71,21 @@ En PowerShell, `py menu_principal.py --lista` muestra el catálogo. Use
 - Las memorias y las aplicaciones conservan sus metadatos propios; no se
   incorporan al historial ni reciben automáticamente el proyecto global.
 
-## Observaciones pendientes del PR #4
+## Correcciones del PR #4 integradas
 
-Estas seis aplicaciones se muestran con estado **Revisión pendiente**. Esta
-integración no equivale a aprobar el cálculo ni a resolver las observaciones:
+El PR #4 fue revisado y fusionado en `main`. Las seis aplicaciones muestran
+**Revisión de código aprobada**; ese estado no constituye aprobación de
+ingeniería de un proyecto. Las dos observaciones anteriores quedaron atendidas:
 
-1. En el barrido de diámetros de vapor se conservan los K de accesorios del NPS
-   original. En `ESCENARIO_principal_12in_150m.json`, a 53,265.24 kg/h y NPS 12,
-   la fila de 8 pulgadas indica CUMPLE; al seleccionar NPS 8 se obtienen
-   51.02 m/s frente al máximo de 50.9 m/s y NO CUMPLE.
-2. En gas, el caudal máximo mostrado se redondea a 3,026.15 Nm³/h para el caso
-   L1 con límite de 15 m/s. Al volver a capturarlo, un pequeño exceso de
-   redondeo produce NO CUMPLE. Debe verificarse el valor mostrado, además del
-   resultado interno del solucionador.
+1. El barrido de vapor recalcula los K tabulados para cada NPS y conserva los
+   K capturados explícitamente. En `ESCENARIO_principal_12in_150m.json`, a
+   53,265.24 kg/h y NPS 12, la fila de 8 pulgadas ahora indica 51.020 m/s y
+   NO CUMPLE, igual que el cálculo completo al seleccionar NPS 8.
+2. La capacidad de gas se redondea hacia abajo y el valor mostrado se comprueba
+   con el modelo del dictamen. El caso L1 con límite de 15 m/s anuncia
+   3,026.14 Nm³/h y cumple al reintroducirlo; 3,026.15 sigue siendo NO CUMPLE.
 
-Las correcciones futuras deben conservar la correspondencia con el PR de origen.
+Las seis carpetas conservan la correspondencia con la versión fusionada del PR.
 Los documentos históricos de auditoría y resultados no se modifican.
 
 ## Verificación
@@ -95,6 +98,9 @@ Los documentos históricos de auditoría y resultados no se modifican.
   se ejecutan en una copia temporal para conservar las evidencias históricas.
 
 ### Resultados observados el 23 de noviembre de 2026
+
+Los resultados de esta sección corresponden a la integración inicial, anterior
+a la actualización con `main`; los de la comprobación combinada se añaden al final.
 
 - Suite principal: **420 pruebas aprobadas**, sin omisiones, con
   `python -m pytest -q`.
@@ -143,3 +149,28 @@ de HVAC industrial conservan su código.
 
 La suite principal completa terminó con **422 pruebas aprobadas**, sin
 omisiones, mediante `python -m pytest -q`.
+
+## Comprobación combinada después de fusionar el PR #4
+
+El 23 de noviembre de 2026 se comprobó la actualización de la rama del menú
+con `main` (`477d6e4`), que incorpora la versión revisada `7fb6228`.
+Los 25 conflictos quedaron resueltos conservando las calculadoras de `main`.
+Se verificó que los **229 archivos** de las seis carpetas coinciden con esa
+versión, tanto en el área preparada para commit como en los archivos de trabajo.
+Los cambios específicos del menú quedan en nueve archivos respecto de `main`.
+
+Se actualizaron las descripciones y el estado de las seis aplicaciones a
+**Revisión de código aprobada**, retirando los avisos de los dos defectos ya
+corregidos. Las limitaciones de ingeniería de cada proyecto se conservan.
+
+Se añadieron dos regresiones en `tests/test_menu_aplicaciones.py` que abren
+las ventanas desde el menú y comprueban las correcciones en esa misma sesión:
+
+- Gas: la capacidad mostrada es 3,026.14 Nm³/h y al reintroducirla cumple.
+- Vapor: para 53,265.24 kg/h y NPS 12, la fila del NPS 8 muestra 51.020 m/s
+  y NO CUMPLE; al seleccionar ese NPS el dictamen completo también es NO CUMPLE.
+
+Las dos comprobaciones específicas pasaron antes de ejecutar la suite completa.
+La ejecución combinada de `python -m pytest -q` terminó con **424 pruebas
+aprobadas**, sin omisiones. No quedaron archivos con conflictos sin resolver.
+La revisión dejó el commit de la fusión y su publicación a cargo del usuario.

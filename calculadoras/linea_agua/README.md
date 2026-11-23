@@ -67,3 +67,11 @@ Seis hallazgos de la revisión. Los tres primeros podían producir un CUMPLE ind
 Estado de las verificaciones: **CUMPLE**, **NO CUMPLE**, **INFORMATIVO** (criterio que no aplica a este servicio) y **NO EVALUABLE** (el método no cubre ese caso). El último es nuevo y aparece con fondo gris en la interfaz y en el PDF.
 
 Pruebas de regresión en `tests/test_revision_pr.py`, con los mismos números de los escenarios reportados.
+
+## Segunda ronda de comentarios del PR (v1.1.2)
+
+| # | Qué pasaba | Qué se hizo |
+|---|---|---|
+| C-2 | La capacidad máxima se mostraba con redondeo al más cercano en la tabla, la memoria, el resumen y la gráfica; podía quedar por encima del límite. | Capacidad máxima hacia **abajo**; caudal mínimo y diámetro requerido hacia **arriba**. El criterio no cambia. |
+
+En un líquido la velocidad no cambia a lo largo del tramo, así que los demás comentarios no afectan a esta calculadora. Pruebas: `test_redondeo_de_capacidad_hacia_el_lado_seguro`, `test_memoria_anuncia_una_capacidad_que_cumple` y las comunes de `seleccion`.

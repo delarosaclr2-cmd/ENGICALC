@@ -73,10 +73,12 @@ def evaluar(c: dict) -> Memoria:
     cap = res.get("curva") or {}
     if cap.get("q_max_m3h"):
         resultados.append(("Capacidad máxima con el criterio de velocidad",
-                           f"{cap['q_max_m3h']:,.2f} m³/h", f"Q = v_máx·A, v_máx = {cap['v_max']:g} m/s"))
+                           f"{sel.redondeo_seguro(cap['q_max_m3h'], 2, 'abajo'):,.2f} m³/h",
+                           f"Q = v_máx·A, v_máx = {cap['v_max']:g} m/s (redondeada hacia abajo)"))
     if res.get("diametro_requerido_m"):
         resultados.append(("Diámetro interior requerido a la velocidad máxima",
-                           f"{res['diametro_requerido_m']*1000:.2f} mm", "Di = √(4·Q/(π·v))"))
+                           f"{sel.redondeo_seguro(res['diametro_requerido_m']*1000, 2, 'arriba'):.2f} mm",
+                           "Di = √(4·Q/(π·v)), redondeado hacia arriba"))
     tablas = [x for x in (res.get("tabla_diametros"), res.get("tabla_capacidad")) if x]
     if res.get("presion"):
         tablas.append(pres.tabla(res["presion"]))
@@ -112,7 +114,7 @@ def evaluar(c: dict) -> Memoria:
                         f"{_pm['p_max_pa']/PSI:,.0f} psig"
                         + ("" if _pm.get("dominio_valido", True) else " (no evaluable)")))
     if cap.get("q_max_m3h"):
-        resumen.append(("Capacidad máxima", f"{cap['q_max_m3h']:,.1f} m³/h"))
+        resumen.append(("Capacidad máxima", f"{sel.redondeo_seguro(cap['q_max_m3h'], 1, 'abajo'):,.1f} m³/h"))
     return Memoria(
         titulo="Línea de agua: velocidad, pérdidas, NPSH y espesor", caso=c["nombre"], version=__version__,
         huella=huella(c), documento=c.get("documento", ""),

@@ -13,8 +13,9 @@ aceite, gas y aire comprimido, gas combustible, tanque pulmón y HVAC industrial
 
 El inventario completo, los identificadores para PowerShell y el origen del
 código están en [INTEGRACION_MENU_COMPLETO.md](docs/INTEGRACION_MENU_COMPLETO.md).
-Las seis aplicaciones procedentes del PR #4 muestran **Revisión pendiente**;
-sus dos observaciones abiertas se describen en ese documento.
+Las seis aplicaciones procedentes del PR #4 incorporan las correcciones
+revisadas e integradas en `main`. El menú indica **Revisión de código aprobada**;
+la revisión de ingeniería de cada proyecto sigue siendo necesaria.
 
 HVAC industrial se abre en una ventana independiente y conserva sus propios
 proyectos. La primera vez, prepare su entorno ejecutando
