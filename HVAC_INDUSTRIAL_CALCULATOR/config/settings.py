@@ -21,8 +21,14 @@ def app_root() -> str:
 
 def user_data_dir() -> str:
     """Carpeta de datos del usuario (configuración editada, autoguardado)."""
-    base = os.environ.get("APPDATA") or os.path.join(os.path.expanduser("~"), ".config")
-    d = os.path.join(base, "HVAC_Industrial_Calculator")
+    portable = os.path.dirname(os.path.dirname(os.path.abspath(sys.executable)))
+    if os.environ.get("ENGICALC_HVAC_DATOS"):
+        d = os.path.abspath(os.environ["ENGICALC_HVAC_DATOS"])
+    elif getattr(sys, "frozen", False) and os.path.isfile(os.path.join(portable, "portable.flag")):
+        d = os.path.join(portable, "datos_usuario", "HVAC")
+    else:
+        base = os.environ.get("APPDATA") or os.path.join(os.path.expanduser("~"), ".config")
+        d = os.path.join(base, "HVAC_Industrial_Calculator")
     os.makedirs(d, exist_ok=True)
     return d
 
@@ -87,7 +93,8 @@ def load_settings(path: str | None = None) -> Settings:
         if c and os.path.exists(c):
             try:
                 with open(c, encoding="utf-8") as fh:
-                    return Settings(_merge(base, json.load(fh)), c)
+                    destino = None if getattr(sys, "frozen", False) and c == SHIPPED_PATH else c
+                    return Settings(_merge(base, json.load(fh)), destino)
             except (OSError, json.JSONDecodeError):
                 continue
     return Settings(base, None)

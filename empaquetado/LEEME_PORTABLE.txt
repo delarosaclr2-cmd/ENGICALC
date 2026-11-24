@@ -1,0 +1,34 @@
+ENGICALC 2.2.0 — WINDOWS X64 PORTABLE, ENTREGA 1
+
+INICIO
+1. Extraiga TODO el ZIP en una carpeta donde pueda guardar archivos, por ejemplo
+   Documentos\ENGICALC. No ejecute el programa desde dentro del ZIP.
+2. Abra ENGICALC.exe. No necesita instalar Python ni descargar dependencias.
+3. Contraseña de acceso: rmr123.
+4. Abra las herramientas desde el menú. HVAC industrial usa su propia ventana.
+
+CONSERVE LA CARPETA COMPLETA
+ENGICALC.exe, _internal, HVAC_INDUSTRIAL_CALCULATOR y portable.flag forman parte
+del programa. No traslade únicamente el archivo EXE ni borre sus bibliotecas.
+
+SUS DATOS
+La configuración y el historial se guardan en datos_usuario, junto al programa.
+HVAC guarda ahí también su configuración, bases editadas y autoguardado.
+Los casos y reportes se guardan en la ubicación que seleccione al exportarlos.
+Si traslada el programa a otra carpeta o unidad, copie también datos_usuario.
+Para actualizar: extraiga la nueva versión en OTRA carpeta; conserve una copia
+de datos_usuario y de sus casos y reportes antes de trasladarlos a la nueva.
+
+ALCANCE
+Las 25 herramientas conservan la interfaz, los cálculos y las advertencias
+técnicas de la versión de origen. Consulte Información técnica en cada ventana.
+Esta entrega es para Windows 10/11 x64. No es una aplicación para macOS o Linux.
+El programa puede ocupar más espacio al extraerlo que el ZIP descargado.
+La compatibilidad con una computadora distinta debe verificarse allí antes de
+considerar la entrega definitiva. Las evidencias de comprobación se entregan
+por separado; el ZIP no contiene historiales ni cálculos personales previos.
+
+SI NO ABRE
+Compruebe que extrajo todos los archivos y que puede escribir en la carpeta.
+Si el problema continúa, conserve el mensaje y datos_usuario\registro\errores.log
+para comunicarlos a quien le entregó el programa.

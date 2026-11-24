@@ -41,6 +41,10 @@ def verify() -> int:
 
 
 def main() -> int:
+    if "--verificar-instalacion" in sys.argv:
+        from interface.verificar_distribucion import comprobar
+        indice = sys.argv.index("--verificar-instalacion")
+        return comprobar(sys.argv[indice + 1])
     if "--verificar" in sys.argv:
         return verify()
     from PySide6.QtCore import Qt

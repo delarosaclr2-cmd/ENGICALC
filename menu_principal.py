@@ -25,8 +25,15 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--calculadora", choices=sorted(c.id for c in herramientas),
                         help="abre directamente una calculadora o memoria completa")
     parser.add_argument("--lista", action="store_true", help="lista las calculadoras y memorias y termina")
+    parser.add_argument("--verificar-instalacion", metavar="CARPETA",
+                        help="comprueba ventanas y reportes; guarda evidencia técnica en CARPETA")
     parser.add_argument("--cambiar-contrasena", action="store_true", help="cambia la contraseña de acceso y termina")
     args = parser.parse_args(argv)
+
+    if args.verificar_instalacion:
+        from calculadoras.nucleo.verificar_distribucion import comprobar
+
+        return comprobar(Path(args.verificar_instalacion))
 
     if args.lista:
         for c in herramientas:

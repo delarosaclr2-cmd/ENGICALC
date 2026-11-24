@@ -556,8 +556,10 @@ def registrar_error(exc: BaseException) -> Path:
     import logging
     import traceback
 
-    carpeta = RAIZ / "registro"
-    carpeta.mkdir(exist_ok=True)
+    from ..nucleo.historial import carpeta_registro
+
+    carpeta = carpeta_registro()
+    carpeta.mkdir(parents=True, exist_ok=True)
     ruta = carpeta / "errores.log"
     registro = logging.getLogger("calculadoras")
     if not registro.handlers:
@@ -576,8 +578,12 @@ def _manejar_excepcion(raiz: tk.Misc):
         valor.__traceback__ = traza
         ruta = registrar_error(valor)
         if isinstance(valor, ImportError):
-            mensaje = (f"Falta una biblioteca: {valor.name or valor}.\n\nEjecute INSTALAR.bat "
-                       "(o: py -m pip install -r requirements.txt) y vuelva a abrir el programa.")
+            from ..nucleo.rutas import empaquetado
+
+            ayuda = ("Extraiga nuevamente el ZIP completo de ENGICALC en una carpeta nueva."
+                     if empaquetado() else "Ejecute INSTALAR.bat (o: py -m pip install -r requirements.txt) "
+                     "y vuelva a abrir el programa.")
+            mensaje = f"Falta una biblioteca: {valor.name or valor}.\n\n{ayuda}"
         else:
             mensaje = f"{tipo.__name__}: {valor}\n\nEl detalle quedó registrado en:\n{ruta}"
         try:  # el aviso aparece sobre la ventana en la que se trabajaba, no sobre el menú

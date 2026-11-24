@@ -10,6 +10,7 @@ import sys
 import tempfile
 
 from .nucleo.configuracion import RAIZ
+from .nucleo.rutas import empaquetado, raiz_instalacion
 
 
 @dataclass(frozen=True)
@@ -94,11 +95,12 @@ def interprete(carpeta: Path) -> Path:
 class ProcesoAplicacion:
     """Proceso independiente y registro de errores para el aviso asíncrono del menú."""
 
-    def __init__(self, proceso, registro, carpeta):
+    def __init__(self, proceso, registro, carpeta, es_portable=False):
         self.proceso = proceso
         self.registro = registro
         self.carpeta = carpeta
         self.salida = Path(registro.name) / "salida.log"
+        self.es_portable = es_portable
 
     def __getattr__(self, nombre):
         return getattr(self.proceso, nombre)
@@ -111,7 +113,10 @@ class ProcesoAplicacion:
         causa = texto.splitlines()[-1] if texto else "El proceso terminó de forma inesperada."
         mensaje = f"HVAC industrial terminó con un error:\n{causa}"
         if "ModuleNotFoundError" in texto or "ImportError" in texto:
-            mensaje += f"\n\nEjecute {self.carpeta / 'instalar_windows.bat'} y vuelva a abrirla."
+            if self.es_portable:
+                mensaje += "\n\nExtraiga nuevamente el ZIP completo de ENGICALC en una carpeta nueva."
+            else:
+                mensaje += f"\n\nEjecute {self.carpeta / 'instalar_windows.bat'} y vuelva a abrirla."
         return mensaje
 
     def cerrar_registro(self):
@@ -124,23 +129,33 @@ def abrir_externa(aplicacion: Aplicacion):
     Los errores del propio arranque se recogen en un registro temporal y el menú los consulta
     sin bloquear su interfaz. No se instala ni modifica ningún paquete al abrir la aplicación.
     """
-    carpeta = RAIZ / aplicacion.carpeta
-    entrada = carpeta / "main.py"
+    es_portable = empaquetado()
+    carpeta = (raiz_instalacion() if es_portable else RAIZ) / aplicacion.carpeta
+    if es_portable:
+        entrada = carpeta / "HVAC_Calculator.exe"
+        comando = [str(entrada)]
+    else:
+        entrada = carpeta / "main.py"
+        comando = [str(interprete(carpeta)), str(entrada)]
     if not entrada.is_file():
         raise ValueError(f"No se encontró la aplicación: {entrada}")
-    python = interprete(carpeta)
     flags = subprocess.CREATE_NO_WINDOW if os.name == "nt" else 0
-    if os.name == "nt" and python.with_name("pythonw.exe").is_file():
-        python = python.with_name("pythonw.exe")
+    if not es_portable and os.name == "nt":
+        pythonw = Path(comando[0]).with_name("pythonw.exe")
+        if pythonw.is_file():
+            comando[0] = str(pythonw)
+    entorno = dict(os.environ, PYTHONIOENCODING="utf-8")
+    if es_portable:
+        entorno["PYINSTALLER_RESET_ENVIRONMENT"] = "1"
     # En Windows, al cerrar el menú HVAC puede seguir usando el archivo: no se fuerza su cierre.
     registro = tempfile.TemporaryDirectory(prefix="engicalc_hvac_", ignore_cleanup_errors=True)
     try:
         with (Path(registro.name) / "salida.log").open("w", encoding="utf-8") as salida:
-            proceso = subprocess.Popen([str(python), str(entrada)], cwd=carpeta,
+            proceso = subprocess.Popen(comando, cwd=carpeta,
                                        stdin=subprocess.DEVNULL, stdout=salida,
                                        stderr=subprocess.STDOUT, creationflags=flags,
-                                       env=dict(os.environ, PYTHONIOENCODING="utf-8"))
+                                       env=entorno)
     except OSError:
         registro.cleanup()
         raise
-    return ProcesoAplicacion(proceso, registro, carpeta)
+    return ProcesoAplicacion(proceso, registro, carpeta, es_portable)
