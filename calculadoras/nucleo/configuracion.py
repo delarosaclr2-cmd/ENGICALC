@@ -13,8 +13,11 @@ import os
 import secrets
 from pathlib import Path
 
-RAIZ = Path(__file__).resolve().parents[2]
-RUTA_CONFIG = RAIZ / "config" / "configuracion.json"
+from .rutas import carpeta_datos, raiz_recursos
+
+RAIZ = raiz_recursos()
+RUTA_CONFIG_DISTRIBUIDA = RAIZ / "config" / "configuracion.json"
+RUTA_CONFIG = carpeta_datos() / "config" / "configuracion.json"
 RUTA_RECURSOS = RAIZ / "recursos"
 
 POR_DEFECTO = {
@@ -48,12 +51,14 @@ def _fusionar(base: dict, extra: dict) -> dict:
 
 
 def cargar(ruta: os.PathLike | str | None = None) -> dict:
-    ruta = Path(ruta) if ruta else RUTA_CONFIG
-    try:
-        with open(ruta, encoding="utf-8") as f:
-            return _fusionar(POR_DEFECTO, json.load(f))
-    except (OSError, ValueError):
-        return copy.deepcopy(POR_DEFECTO)
+    candidatas = [Path(ruta)] if ruta is not None else [RUTA_CONFIG, RUTA_CONFIG_DISTRIBUIDA]
+    for candidata in dict.fromkeys(candidatas):
+        try:
+            with open(candidata, encoding="utf-8") as f:
+                return _fusionar(POR_DEFECTO, json.load(f))
+        except (OSError, ValueError):
+            continue
+    return copy.deepcopy(POR_DEFECTO)
 
 
 def altitud_sitio() -> float:
@@ -91,7 +96,7 @@ def establecer_contrasena(nueva: str, ruta: os.PathLike | str | None = None,
         with open(ruta, encoding="utf-8") as f:
             actual = json.load(f)
     except (OSError, ValueError):
-        actual = {}
+        actual = cargar() if ruta == RUTA_CONFIG else {}
     config = _fusionar(POR_DEFECTO, actual)
     sal = secrets.token_hex(8)
     config["acceso"].update({"requerir_contrasena": requerir, "sal": sal,

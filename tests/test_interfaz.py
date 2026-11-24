@@ -161,7 +161,7 @@ def test_dialogo_de_acceso():
 def test_errores_inesperados_se_registran_y_se_muestran(monkeypatch, tmp_path):
     from calculadoras.interfaz import menu as modulo_menu
 
-    monkeypatch.setattr(modulo_menu, "RAIZ", tmp_path)
+    monkeypatch.setenv("CALCULADORAS_REGISTRO", str(tmp_path / "registro"))
     mostrados = []
     monkeypatch.setattr(modulo_menu.messagebox, "showerror", lambda t, m, parent=None: mostrados.append(m))
     raiz = crear_raiz()

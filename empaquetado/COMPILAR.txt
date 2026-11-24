@@ -1,0 +1,34 @@
+CREAR EL ZIP PORTABLE DE ENGICALC
+
+Trabajar en una rama de tarea. Requiere Windows x64 y Python 3.12 x64 en el
+equipo que compila. El equipo del destinatario no necesita Python ni pip.
+
+Preparar un entorno independiente, desde PowerShell en la raíz del proyecto:
+  py -3.12 -m venv build\entorno_portable
+  .\build\entorno_portable\Scripts\python.exe -m pip install -r empaquetado\requirements.txt
+
+Compilar y comprimir:
+  .\herramientas\crear_portable.ps1 -Python .\build\entorno_portable\Scripts\python.exe
+
+Cada ejecución genera una carpeta nueva en dist y conserva las anteriores.
+El script compila por separado ENGICALC (Tk) y HVAC (Qt), los reúne, agrega la
+marca portable.flag y comprueba las 25 herramientas sin Python en PATH. Solo
+si la comprobación pasa genera el ZIP, un manifiesto de archivos y su SHA-256.
+No publica cambios, no crea commits y no modifica las instalaciones de Python.
+Durante la compilación limita PATH a Windows y al intérprete elegido, y lo
+restaura al terminar. Así no se incorporan DLL de programas externos (por ejemplo
+la ICU de herramientas PDF, incompatible con la ICU de Windows que usa Qt).
+
+Comprobar la distribución desde los ejecutables incluidos:
+  .\dist\<entrega>\compilados\ENGICALC\ENGICALC.exe --verificar-instalacion C:\ruta\evidencias
+El resultado se guarda en resultado.json. El proceso verifica las 24 herramientas
+Tk y el ejecutable independiente de HVAC, calcula ejemplos y exporta PDF/Excel.
+No sustituye las pruebas numéricas ni la revisión de ingeniería existente.
+
+Antes de entregar, extraer el ZIP en Windows x64 sin Python ni acceso a internet
+y repetir apertura, contraseña, 25 herramientas, exportaciones y persistencia.
+Cerrar y abrir otra vez, trasladar la carpeta y comprobar la conservación de datos.
+Anotar la versión de Windows y los resultados; no afirmar esta prueba sin hacerla.
+
+Las dependencias pueden tener licencias propias: conservar las licencias que
+PyInstaller incorpora y el inventario de versiones generado con cada entrega.

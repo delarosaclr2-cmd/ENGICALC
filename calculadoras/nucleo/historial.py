@@ -17,7 +17,7 @@ import os
 from datetime import datetime
 from pathlib import Path
 
-from .configuracion import RAIZ
+from .rutas import carpeta_datos
 
 CAMPOS_PROYECTO = (
     ("proyecto", "Proyecto"),
@@ -35,7 +35,7 @@ def carpeta_registro(carpeta: os.PathLike | str | None = None) -> Path:
     """Carpeta del registro: argumento > variable de entorno CALCULADORAS_REGISTRO > <programa>/registro."""
     if carpeta:
         return Path(carpeta)
-    return Path(os.environ.get("CALCULADORAS_REGISTRO") or RAIZ / "registro")
+    return Path(os.environ.get("CALCULADORAS_REGISTRO") or carpeta_datos() / "registro")
 
 
 def proyecto_vacio() -> dict:
