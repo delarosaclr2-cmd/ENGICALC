@@ -5,21 +5,26 @@ import math
 
 from matplotlib.patches import Arc, FancyArrowPatch, Polygon, Rectangle
 
+# Paleta del sistema visual ENGICALC v1 (geometría, material, cotas, equipo). Solo color: el dibujo a
+# escala, las cotas y los valores no cambian.
 C = {
-    "estructura": "#455A64",
-    "relleno": "#ECEFF1",
-    "material": "#D7B98E",
-    "material_borde": "#8D6E63",
-    "aire": "#1E88E5",
+    "estructura": "#2B3A4E",
+    "relleno": "#EEF2F7",
+    "material": "#E3C99A",
+    "material_borde": "#B8925A",
+    "aire": "#1F5FBF",
     "agua": "#0277BD",
-    "caliente": "#D32F2F",
+    "caliente": "#C2410C",
     "frio": "#1565C0",
-    "cota": "#263238",
-    "carga": "#C62828",
-    "ok": "#2E7D32",
-    "mal": "#C62828",
-    "tenue": "#90A4AE",
-    "texto": "#212121",
+    "cota": "#536175",
+    "carga": "#A61B1B",
+    "ok": "#1B6B3F",
+    "mal": "#A61B1B",
+    "tenue": "#9AA6B6",
+    "texto": "#142033",
+    "titulo": "#0E2A5C",
+    "ficha": "#F8FAFC",
+    "ficha_borde": "#D5DCE5",
 }
 
 FUENTE = 8
@@ -35,7 +40,7 @@ def preparar(ax, titulo: str, a_escala: bool, unidades: str = "m") -> None:
     """Ejes sin marcos, proporción 1:1 y leyenda de escala."""
     ax.set_aspect("equal", adjustable="box")
     ax.axis("off")
-    ax.set_title(titulo, fontsize=10, fontweight="bold", color=C["texto"], loc="left")
+    ax.set_title(titulo, fontsize=10, fontweight="bold", color=C["titulo"], loc="left")
     nota = (f"Dibujo a escala · cotas en {unidades}" if a_escala
             else "Esquema sin escala · valores del cálculo")
     ax.text(0.0, -0.02, nota, transform=ax.transAxes, fontsize=7, color=C["tenue"], va="top", ha="left",
@@ -103,7 +108,7 @@ def cuadro(ax, lineas: list[str], x: float = 1.0, y: float = 1.0, ha: str = "rig
     texto = "\n".join(([titulo] if titulo else []) + lineas)
     ax.text(x, y, texto, transform=ax.transAxes, ha=ha, va=va, fontsize=FUENTE, color=C["texto"],
             family="DejaVu Sans", linespacing=1.35,
-            bbox=dict(boxstyle="round,pad=0.4", fc="#FFFFFF", ec=C["tenue"], lw=0.6, alpha=0.95))
+            bbox=dict(boxstyle="round,pad=0.4", fc=C["ficha"], ec=C["ficha_borde"], lw=0.8, alpha=0.97))
 
 
 def poligono(ax, puntos, color: str, borde: str | None = None, lw: float = 1.0, alpha: float = 1.0,

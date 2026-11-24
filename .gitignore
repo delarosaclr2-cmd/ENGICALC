@@ -34,3 +34,6 @@ htmlcov/
 # Compilaciones
 build/
 dist/
+
+# Preferencias de la interfaz de cada equipo (favoritos y recientes del menú)
+registro/preferencias_menu.json

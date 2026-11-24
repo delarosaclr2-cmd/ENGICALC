@@ -312,13 +312,16 @@ def test_casos_de_libros_se_abren_y_dan_el_resultado_publicado(menu, nombre):
 
 @pytest.mark.parametrize("cid", sorted(POR_ID))
 def test_pestana_esquema(menu, cid):
-    """Todas las calculadoras menos la bomba tienen la pestaña «Esquema»; se dibuja con el cálculo."""
+    """Todas las calculadoras menos la bomba tienen la pestaña «Esquema»; se dibuja con el cálculo.
+
+    Rediseño de interfaz v1: las ecuaciones y notas pasan del panel inferior a su propia pestaña."""
     ventana = menu.abrir(cid)
     menu.raiz.update()
+    pestanas = [ventana.pestanas.tab(t, "text") for t in ventana.pestanas.tabs()]
     if cid == "bomba":
-        assert ventana.pestanas is None and ventana.panel_esquema is None
+        assert pestanas == ["Resultados", "Ecuaciones y notas"] and ventana.panel_esquema is None
         return
-    assert [ventana.pestanas.tab(t, "text") for t in ventana.pestanas.tabs()] == ["Resultados", "Esquema"]
+    assert pestanas == ["Resultados", "Esquema", "Ecuaciones y notas"]
     ventana.asignar(CASOS[cid])
     assert ventana.calcular() is not None
     ventana.pestanas.select(ventana.panel_esquema)

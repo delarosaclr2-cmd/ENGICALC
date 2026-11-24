@@ -1,4 +1,10 @@
-"""Ventanas nativas de las tres memorias; Tkinter + Matplotlib, sin navegador."""
+"""Ventanas nativas de las tres memorias; Tkinter + Matplotlib, sin navegador.
+
+Sistema visual ENGICALC v1 (``calculadoras.interfaz.tema``): ruta y título de la memoria, actualización
+automática, subpestañas segmentadas, KPI en mono, Exportar como acción principal y serie de gráfica
+equipo (azul) / sistema (naranja) / afinidad (gris discontinuo). Solo apariencia: cálculos, textos,
+casos y reportes no cambian.
+"""
 from __future__ import annotations
 import datetime
 import math
@@ -10,6 +16,7 @@ from tkinter import ttk,filedialog,messagebox
 from .comun import copia,numero,exigir,catalogo
 from .editores import EditorTabla
 from . import reportes
+from ..interfaz import tema
 
 
 def obtener(obj,path):
@@ -43,31 +50,37 @@ class VentanaMemoria(tk.Toplevel):
         self.unidades=tk.StringVar(value="SI");self._sistema="SI";self.segmento="main";self._mode="design"
         self.documento={k:"" for k in ["Proyecto","Cliente","Ubicación / planta","Fecha","Equipo / TAG","Elaboró","Revisó","Documento / revisión"]}
         self.documento["Fecha"]=datetime.date.today().strftime("%d/%m/%Y")
-        self.title(memoria.nombre+" — RMR Ingeniería");self.configure(background="#f6f7f9")
+        self.title(memoria.nombre+" — RMR Ingeniería");tema.aplicar(self);self.configure(background=tema.FONDO)
         w=min(1600,self.winfo_screenwidth()-60);h=min(950,self.winfo_screenheight()-110);self.geometry(f"{w}x{h}+25+20");self.minsize(1050,650)
         self._estilos();self._construir();self.calcular();self._auto_suspension=0;self.protocol("WM_DELETE_WINDOW",self.destroy)
     def _estilos(self):
         s=ttk.Style(self)
-        for name in ["RMR.TFrame","RMR.TLabel","RMR.Small.TLabel","RMR.TCheckbutton"]:s.configure(name,background="#ffffff")
-        s.configure("RMR.TLabel",font=("Segoe UI",11),foreground="#202c39")
-        s.configure("RMR.Small.TLabel",font=("Segoe UI",9),foreground="#73818f")
-        s.configure("RMR.Title.TLabel",font=("Segoe UI",20,"bold"),background="#ffffff",foreground="#202c39")
-        s.configure("RMR.TButton",font=("Segoe UI",10),padding=(10,7))
-        s.configure("RMR.TEntry",font=("Segoe UI",11),padding=(6,5))
-        s.configure("RMR.TCombobox",font=("Segoe UI",11),padding=(5,5))
-        s.configure("RMR.TCheckbutton",font=("Segoe UI",11),padding=(0,4))
-        s.configure("RMR.TNotebook.Tab",font=("Segoe UI",11),padding=(14,8))
-        self.option_add("*TCombobox*Listbox.font",("Segoe UI",11))
-        s.configure("RMR.TLabelframe",background="#ffffff",padding=12)
-        s.configure("RMR.TLabelframe.Label",font=("Segoe UI",11,"bold"),background="#ffffff",foreground="#246c75")
-        s.configure("RMR.Treeview",font=("Segoe UI",10),rowheight=29)
-        s.configure("RMR.Treeview.Heading",font=("Segoe UI",10,"bold"))
+        for name in ["RMR.TFrame","RMR.TLabel","RMR.Small.TLabel","RMR.TCheckbutton"]:s.configure(name,background=tema.SUPERFICIE)
+        s.configure("RMR.TLabel",font=tema.fuente("cuerpo"),foreground=tema.TEXTO)
+        s.configure("RMR.Small.TLabel",font=tema.fuente("pequeno"),foreground=tema.TEXTO_2)
+        s.configure("RMR.Title.TLabel",font=tema.fuente("titulo"),background=tema.SUPERFICIE,foreground=tema.MARINO)
+        s.configure("RMR.Ruta.TLabel",font=tema.fuente("pequeno"),background=tema.SUPERFICIE,foreground=tema.TEXTO_2)
+        s.configure("RMR.Estado.TLabel",font=tema.fuente("pequeno"),background=tema.SUPERFICIE,foreground=tema.TEXTO_2)
+        s.configure("RMR.TButton",padding=(12,5))
+        s.configure("RMR.TEntry",padding=(8,4))
+        s.configure("RMR.TCombobox",padding=(8,4))
+        s.configure("RMR.TCheckbutton",font=tema.fuente("cuerpo"),padding=(0,4),background=tema.SUPERFICIE)
+        s.map("RMR.TCheckbutton",indicatorbackground=[("selected",tema.AZUL),("disabled",tema.DESHABILITADO)],background=[("active",tema.SUPERFICIE)])
+        s.configure("RMR.TNotebook.Tab",padding=(14,6))
+        s.configure("RMR.TLabelframe",background=tema.SUPERFICIE,padding=12)
+        s.configure("RMR.TLabelframe.Label",font=tema.fuente("grupo"),background=tema.SUPERFICIE,foreground=tema.MARINO)
+        s.configure("RMR.Treeview",font=tema.fuente("cuerpo"),rowheight=tema._px(self,28))
+        s.configure("RMR.Treeview.Heading",font=tema.fuente("etiqueta"))
     def _construir(self):
-        header=ttk.Frame(self,style="RMR.TFrame",padding=(20,14));header.pack(fill="x");header.columnconfigure(1,weight=1)
+        header=ttk.Frame(self,style="RMR.TFrame",padding=(24,12));header.pack(fill="x");header.columnconfigure(1,weight=1)
         if reportes.LOGO.is_file():
             from PIL import Image,ImageTk
-            image=Image.open(reportes.LOGO);image.thumbnail((220,54));self.logo=ImageTk.PhotoImage(image);ttk.Label(header,image=self.logo,style="RMR.TLabel").grid(row=0,column=0,sticky="w",padx=(0,24))
-        ttk.Label(header,text=self.memoria.nombre.split(" ·")[0],style="RMR.Title.TLabel").grid(row=0,column=1,sticky="w")
+            image=Image.open(reportes.LOGO);image.thumbnail((180,46));self.logo=ImageTk.PhotoImage(image);ttk.Label(header,image=self.logo,style="RMR.TLabel").grid(row=0,column=0,sticky="w",padx=(0,24))
+        titulos=ttk.Frame(header,style="RMR.TFrame");titulos.grid(row=0,column=1,sticky="w")
+        ttk.Label(titulos,text=f"Calculadoras  ›  {self.memoria.disciplina}  ›  {self.memoria.nombre}",style="RMR.Ruta.TLabel").pack(anchor="w")
+        fila_titulo=ttk.Frame(titulos,style="RMR.TFrame");fila_titulo.pack(anchor="w",pady=(2,0))
+        ttk.Label(fila_titulo,text=self.memoria.nombre.split(" ·")[0],style="RMR.Title.TLabel").pack(side="left")
+        tema.chip(fila_titulo,"Memoria de cálculo","nota").pack(side="left",padx=(12,0))
         controls=ttk.Frame(header,style="RMR.TFrame");controls.grid(row=0,column=2,sticky="e")
         def ajustar_cabecera(event):
             narrow=event.width<1320
@@ -75,13 +88,15 @@ class VentanaMemoria(tk.Toplevel):
         header.bind("<Configure>",ajustar_cabecera)
         for label,command in [("Restablecer ejemplo",self.restablecer),("Datos del documento",self.editar_documento)]:ttk.Button(controls,text=label,command=command,style="RMR.TButton").pack(side="left",padx=4)
         for label,options in [("Caso",[("Guardar caso…",self.guardar_caso),("Abrir caso…",self.abrir_caso)]),("Exportar",[("PDF…",self.exportar_pdf),("Excel…",self.exportar_excel)])]:
-            button=ttk.Menubutton(controls,text=label+" ▾",style="RMR.TButton");menu=tk.Menu(button,tearoff=False)
+            # actualización automática: no hay botón Calcular y Exportar es la acción principal
+            button=ttk.Menubutton(controls,text=label+" ▾",style="Primario.TMenubutton" if label=="Exportar" else "TMenubutton");menu=tk.Menu(button,tearoff=False)
             for text,command in options:menu.add_command(label=text,command=command)
             button["menu"]=menu;button.pack(side="left",padx=4)
-        self.paned=ttk.PanedWindow(self,orient="horizontal");self.paned.pack(fill="both",expand=True,padx=20,pady=16)
+        tk.Frame(self,height=1,background=tema.BORDE).pack(fill="x")
+        self.paned=ttk.PanedWindow(self,orient="horizontal");self.paned.pack(fill="both",expand=True,padx=24,pady=16)
         self.left=ttk.Frame(self.paned,style="RMR.TFrame",width=560);right=ttk.Frame(self.paned,style="RMR.TFrame");self.paned.add(self.left,weight=0);self.paned.add(right,weight=1)
         unitbar=ttk.Frame(self.left,style="RMR.TFrame",padding=10);unitbar.pack(fill="x")
-        ttk.Label(unitbar,text="Actualización automática · Unidades de captura",style="RMR.Small.TLabel").pack(side="left")
+        tema.chip(unitbar,"● Actualización automática","correcto").pack(side="left");ttk.Label(unitbar,text="  Unidades de captura",style="RMR.Small.TLabel").pack(side="left")
         combo=ttk.Combobox(unitbar,textvariable=self.unidades,values=["SI","US"],state="readonly",width=7);combo.pack(side="right");combo.bind("<<ComboboxSelected>>",lambda e:self.cambiar_unidades())
         self.notebook=ttk.Notebook(self.left,style="RMR.TNotebook");self.notebook.pack(fill="both",expand=True)
         self.inputs_host=ttk.Frame(self.notebook);self.notebook.add(self.inputs_host,text="Datos")
@@ -91,13 +106,14 @@ class VentanaMemoria(tk.Toplevel):
         self.tabla.heading("#0",text="Resultado");self.tabla.heading("value",text="Valor");self.tabla.heading("unit",text="Unidad")
         self.tabla.column("#0",width=290,minwidth=170);self.tabla.column("value",width=110,stretch=False,anchor="e");self.tabla.column("unit",width=80,stretch=False)
         scroll=ttk.Scrollbar(resultframe,command=self.tabla.yview);self.tabla.configure(yscrollcommand=scroll.set);scroll.pack(side="right",fill="y");self.tabla.pack(fill="both",expand=True)
-        self.ecuaciones=tk.Text(resultframe,height=8,wrap="word",font=("Segoe UI",10),relief="flat",background="#f6f8fa");self.ecuaciones.pack(fill="x")
+        self.ecuaciones=tk.Text(resultframe,height=8,wrap="word",font=tema.fuente("mono_pequeno"),relief="flat",background=tema.SUPERFICIE_2,foreground=tema.TEXTO,padx=12,pady=8,highlightthickness=0);self.ecuaciones.pack(fill="x")
         self.metricas=ttk.Frame(right,style="RMR.TFrame",padding=16);self.metricas.pack(fill="x");self.metric_cells=[];self.metricas.bind("<Configure>",lambda e:self._distribuir_metricas(e.width))
         from matplotlib.figure import Figure
         from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg,NavigationToolbar2Tk
         self.figura=Figure(figsize=(8,7),dpi=100,facecolor="white",layout="constrained");self.canvas=FigureCanvasTkAgg(self.figura,master=right);self.canvas.get_tk_widget().pack(fill="both",expand=True)
         toolbar=NavigationToolbar2Tk(self.canvas,right,pack_toolbar=False);toolbar.update();toolbar.pack(fill="x")
-        self.aviso=ttk.Label(self,text="",style="RMR.Small.TLabel",padding=(22,10),wraplength=1450);self.aviso.pack(fill="x")
+        tk.Frame(self,height=1,background=tema.BORDE).pack(fill="x")
+        self.aviso=ttk.Label(self,text="",style="RMR.Estado.TLabel",padding=(24,8),wraplength=1450);self.aviso.pack(fill="x")
         self.bind("<Control-s>",lambda e:self.guardar_caso());self.bind("<F5>",lambda e:self.calcular())
     def scroll_tab(self,notebook,title):
         frame=ttk.Frame(notebook);notebook.add(frame,text=title);canvas=tk.Canvas(frame,highlightthickness=0,bg="white",width=540);bar=ttk.Scrollbar(frame,command=canvas.yview);canvas.configure(yscrollcommand=bar.set);bar.pack(side="right",fill="y");canvas.pack(fill="both",expand=True)
@@ -158,7 +174,7 @@ class VentanaMemoria(tk.Toplevel):
         if self._auto_suspension or self._busy:return
         self._cancelar_actualizacion()
         self._auto_after=self.after(self.AUTO_DELAY_MS,self._actualizar_automaticamente)
-        if hasattr(self,"aviso"):self.aviso.configure(text="Actualizando al terminar de escribir…",foreground="#73818f")
+        if hasattr(self,"aviso"):self.aviso.configure(text="Actualizando al terminar de escribir…",foreground=tema.TEXTO_2)
     def _actualizar_automaticamente(self):
         self._auto_after=None
         if self.winfo_exists():self.calcular(automatico=True)
@@ -196,7 +212,7 @@ class VentanaMemoria(tk.Toplevel):
         for path in self.variables:self._desvincular_campo(path)
         for child in self.inputs_host.winfo_children():child.destroy()
         self.variables={};self.campos={};self.widgets={};self._scopes={};self.editores=[];self._scope="general"
-        self.tabs=ttk.Notebook(self.inputs_host,style="RMR.TNotebook");self.tabs.pack(fill="both",expand=True)
+        self.tabs=ttk.Notebook(self.inputs_host,style="Segmentado.TNotebook");self.tabs.pack(fill="both",expand=True)
         if self.memoria.modulo=="ductos":self._armar_ductos();return
         groups={};pages={}
         for f in catalogo(self.memoria.modulo)["fields"]:
@@ -256,7 +272,7 @@ class VentanaMemoria(tk.Toplevel):
             if self.campos[path]["type"]=="number":w.configure(state="normal")
         self._habilitar()
     def _avisar_edicion(self,error):
-        self.aviso.configure(text="Completa o corrige el dato: "+str(error),foreground="#95621e")
+        self.aviso.configure(text="Completa o corrige el dato: "+str(error),foreground=tema.ADVERTENCIA)
         self._programar_actualizacion()
     def _aplicar_tuberia(self):
         try:
@@ -311,7 +327,7 @@ class VentanaMemoria(tk.Toplevel):
         if not messagebox.askyesno("Restablecer ejemplo","¿Restablecer los datos de cálculo al ejemplo inicial?",parent=self):return
         self.estado=self.motor.por_defecto();self.segmento="main";self._mode="design";self._armar_inputs();self.calcular()
     def mostrar_error(self,error):
-        self.aviso.configure(text=str(error),foreground="#b63f45");messagebox.showerror("Revisa los datos",str(error),parent=self)
+        self.aviso.configure(text=str(error),foreground=tema.ERROR);messagebox.showerror("Revisa los datos",str(error),parent=self)
     def destroy(self):
         self._auto_suspension+=1;self._cancelar_actualizacion()
         self._desvincular_angulo()
@@ -342,7 +358,7 @@ class VentanaMemoria(tk.Toplevel):
             self._actualizar_disponibilidad()
             if self.memoria.modulo=="ductos":self._balance_readout();self._actualizar_propuesta()
             self._resultados();self.dibujar()
-            self.aviso.configure(text="✓ Actualizado automáticamente" if not result["warnings"] else "  •  ".join(result["warnings"]),foreground="#28714e" if not result["warnings"] else "#95621e")
+            self.aviso.configure(text="✓ Actualizado automáticamente" if not result["warnings"] else "  •  ".join(result["warnings"]),foreground=tema.CORRECTO if not result["warnings"] else tema.ADVERTENCIA)
             return result
         except (ValueError,ArithmeticError,KeyError,TypeError) as error:
             self.resultado=None;self.tabla.delete(*self.tabla.get_children())
@@ -350,7 +366,7 @@ class VentanaMemoria(tk.Toplevel):
             for child in self.metricas.winfo_children():child.destroy()
             ttk.Label(self.metricas,text="Corrige los datos para actualizar los resultados.",style="RMR.TLabel").pack(anchor="w")
             self.figura.clear();self.canvas.draw_idle()
-            if automatico:self.aviso.configure(text="Completa o corrige el dato: "+str(error),foreground="#95621e")
+            if automatico:self.aviso.configure(text="Completa o corrige el dato: "+str(error),foreground=tema.ADVERTENCIA)
             else:self.mostrar_error(error)
             return None
         finally:self._busy=False
@@ -378,7 +394,7 @@ class VentanaMemoria(tk.Toplevel):
             cell=ttk.Frame(self.metricas,style="RMR.TFrame");cell.grid(row=0,column=i,sticky="ew",padx=(0,18));self.metricas.columnconfigure(i,weight=1)
             self.metric_cells.append(cell)
             shown="—" if value is None else f"{value:,.0f}" if value==int(value) or abs(value)>=1000 else f"{value:,.2f}"
-            ttk.Label(cell,text=label,style="RMR.Small.TLabel").pack(anchor="w");ttk.Label(cell,text=f"{shown} {unit}",font=("Segoe UI",16,"bold"),background="white",foreground="#246c75").pack(anchor="w")
+            ttk.Label(cell,text=label,style="RMR.Small.TLabel").pack(anchor="w");ttk.Label(cell,text=f"{shown} {unit}",font=tema.fuente("kpi"),background=tema.SUPERFICIE,foreground=tema.MARINO).pack(anchor="w")
         self._distribuir_metricas(self.metricas.winfo_width())
     def _distribuir_metricas(self,width):
         columns=2 if width<720 else 4
@@ -616,7 +632,7 @@ class VentanaMemoria(tk.Toplevel):
 
     # --------------------------------------------------------- Dibujos nativos
     def dibujar(self):
-        self.figura.clear();kind=self.memoria.modulo;r=self.resultado;accent="#246c75"
+        self.figura.clear();kind=self.memoria.modulo;r=self.resultado;accent=tema.SERIE_1
         if kind=="agitadores":
             from matplotlib.patches import Rectangle,Ellipse
             ax=self.figura.add_subplot(111);d=self.estado["inputs"];T,H,D=d["T"],d["H"],d["D"];Ht=d["Htk"];ax.set_aspect("equal");ax.axis("off")
@@ -627,18 +643,18 @@ class VentanaMemoria(tk.Toplevel):
                     for x in [-T/2,T/2-d["Wb"]]:ax.add_patch(Rectangle((x,.1),d["Wb"],max(.1,min(H,Ht)-.2),facecolor="#afcbd3",edgecolor="#829da8"))
             else:
                 end=-T/2+d["Lsh"];ax.plot([-T/2-.5,end],[d["C"],d["C"]],color="#53616e",lw=4);ax.vlines(end,d["C"]-D/2,d["C"]+D/2,color=accent,lw=4);ax.text(-T/2-.55,d["C"]+.3,"Motor",ha="right",fontsize=11)
-            ax.annotate("",xy=(-T/2,-.3),xytext=(T/2,-.3),arrowprops=dict(arrowstyle="<->",color="#73818f"));ax.text(0,-.55,f"T = {T:g} m",ha="center",fontsize=11)
-            ax.annotate("",xy=(T/2+.3,0),xytext=(T/2+.3,H),arrowprops=dict(arrowstyle="<->",color="#73818f"));ax.text(T/2+.4,H/2,f"H = {H:g} m",rotation=90,va="center",fontsize=11)
+            ax.annotate("",xy=(-T/2,-.3),xytext=(T/2,-.3),arrowprops=dict(arrowstyle="<->",color=tema.TEXTO_2));ax.text(0,-.55,f"T = {T:g} m",ha="center",fontsize=11)
+            ax.annotate("",xy=(T/2+.3,0),xytext=(T/2+.3,H),arrowprops=dict(arrowstyle="<->",color=tema.TEXTO_2));ax.text(T/2+.4,H/2,f"H = {H:g} m",rotation=90,va="center",fontsize=11)
             if "Dc" in r:ax.add_patch(Ellipse((0,d["C"]),min(r["Dc"],T),min(r["Hc"],Ht),facecolor="#91d0c2",alpha=.4,edgecolor=accent));ax.text(0,-.85,f"Caverna: Dc = {r['Dc']:.2f} m",ha="center",fontsize=11)
             ax.set_xlim(-T/2-1,T/2+1.2);ax.set_ylim(-1.2,Ht+1.1);ax.set_title("Esquema del equipo · dimensiones de diseño",loc="left",pad=16,fontsize=13)
         elif kind=="bombas":
             ax,ax2=self.figura.subplots(2,1,gridspec_kw={"height_ratios":[2,1]});import numpy as np
-            qs=np.linspace(0,r["Qmax"],150);ax.plot(qs*3600,[r["hPump"](q) for q in qs],label="Bomba",color=accent,lw=2);ax.plot(qs*3600,[r["hSys"](q) for q in qs],label="Sistema",color="#d68445",lw=2)
-            if r["r"]:ax.plot(qs*3600,[r["r"]**2*r["can"]["A"]-r["r"]*r["can"]["B"]*q-r["can"]["C"]*q*q for q in qs],label="Afinidad",color="#9b8ac2",ls="--")
+            qs=np.linspace(0,r["Qmax"],150);ax.plot(qs*3600,[r["hPump"](q) for q in qs],label="Bomba",color=accent,lw=2);ax.plot(qs*3600,[r["hSys"](q) for q in qs],label="Sistema",color=tema.SERIE_2,lw=2)
+            if r["r"]:ax.plot(qs*3600,[r["r"]**2*r["can"]["A"]-r["r"]*r["can"]["B"]*q-r["can"]["C"]*q*q for q in qs],label="Afinidad",color=tema.SERIE_REFERENCIA,ls="--")
             points=self.estado["curves"]["hq"];ax.scatter([p["x"]*3600 for p in points],[p["y"] for p in points],color=accent,s=20)
-            if r["Qop"]:ax.scatter([r["Qop"]*3600],[r["Hop"]],color="#202c39",s=45,zorder=5);ax.annotate(f"Operación\n{r['Qop']*3600:.1f} m³/h · {r['Hop']:.1f} m",(r["Qop"]*3600,r["Hop"]),xytext=(10,12),textcoords="offset points",fontsize=10)
+            if r["Qop"]:ax.scatter([r["Qop"]*3600],[r["Hop"]],color=tema.MARINO,s=45,zorder=5);ax.annotate(f"Operación\n{r['Qop']*3600:.1f} m³/h · {r['Hop']:.1f} m",(r["Qop"]*3600,r["Hop"]),xytext=(10,12),textcoords="offset points",fontsize=10)
             ax.scatter([r["Qd"]*3600],[r["TDH"]],facecolor="white",edgecolor=accent,s=45,zorder=5);ax.set_ylabel("Altura (m)");ax.set_xlabel("Caudal (m³/h)");ax.set_ylim(bottom=0);ax.set_title("Curvas de bomba y sistema",loc="left");ax.legend(frameon=False,fontsize=9)
-            ax2.plot(qs*3600,[r["npshAt"](q)["a"] for q in qs],label="NPSHa",color=accent);ax2.plot(qs*3600,[r["npshrAt"](q) for q in qs],label="NPSHr",color="#d68445");ax2.set_ylabel("NPSH (m)");ax2.set_xlabel("Caudal (m³/h)");ax2.legend(frameon=False,fontsize=9)
+            ax2.plot(qs*3600,[r["npshAt"](q)["a"] for q in qs],label="NPSHa",color=accent);ax2.plot(qs*3600,[r["npshrAt"](q) for q in qs],label="NPSHr",color=tema.SERIE_2);ax2.set_ylabel("NPSH (m)");ax2.set_xlabel("Caudal (m³/h)");ax2.legend(frameon=False,fontsize=9)
             for a in [ax,ax2]:a.grid(alpha=.18);a.spines[["top","right"]].set_visible(False)
         else:
             import numpy as np
@@ -646,8 +662,8 @@ class VentanaMemoria(tk.Toplevel):
             qs=np.linspace(0,qmax,65);sys=[];guess=None
             for q in qs:
                 point=r["net"].at(float(q),guess);sys.append(point["dP"]);guess=point["split"]["Q"] if q>0 else None
-            ax.plot(qs*3600,sys,color="#d68445",label="Sistema");qf=np.linspace(fan.qMin*r["speed"],fan.qMax*r["speed"],100);ax.plot(qf*3600,[fan.at(q,r["speed"],r["air"]["rhoRatio"]) for q in qf],color=accent,label="Ventilador");ax.scatter([r["duty"]["Q"]*3600],[r["duty"]["dP"]],facecolor="white",edgecolor=accent,s=40,zorder=5)
-            if r["op"]["found"]:op=r["op"];ax.scatter([op["Q"]*3600],[op["dP"]],color="#202c39",s=40,zorder=5);ax.annotate(f"Operación\n{op['Q']*3600:,.0f} m³/h · {op['dP']:.0f} Pa",(op["Q"]*3600,op["dP"]),xytext=(9,10),textcoords="offset points",fontsize=9)
+            ax.plot(qs*3600,sys,color=tema.SERIE_2,label="Sistema");qf=np.linspace(fan.qMin*r["speed"],fan.qMax*r["speed"],100);ax.plot(qf*3600,[fan.at(q,r["speed"],r["air"]["rhoRatio"]) for q in qf],color=accent,label="Ventilador");ax.scatter([r["duty"]["Q"]*3600],[r["duty"]["dP"]],facecolor="white",edgecolor=accent,s=40,zorder=5)
+            if r["op"]["found"]:op=r["op"];ax.scatter([op["Q"]*3600],[op["dP"]],color=tema.MARINO,s=40,zorder=5);ax.annotate(f"Operación\n{op['Q']*3600:,.0f} m³/h · {op['dP']:.0f} Pa",(op["Q"]*3600,op["dP"]),xytext=(9,10),textcoords="offset points",fontsize=9)
             ax.set_xlabel("Caudal (m³/h)");ax.set_ylabel("Presión total ΔPt (Pa)");ax.set_title("Ventilador y red",loc="left");ax.grid(alpha=.18);ax.spines[["top","right"]].set_visible(False);ax.legend(frameon=False,fontsize=9);ax.set_ylim(0,max(r["duty"]["dP"]*1.7,max(fan.at(q,r["speed"],r["air"]["rhoRatio"]) for q in qf)*1.2))
             st=self.estado;t=r["design"]["tree"];positions={};cursor=[0]
             def place(i,depth):
