@@ -4,6 +4,10 @@ Sustituye al «manejador de archivos» original, que abría scripts por rutas fi
 ``D:\\Python\\...`` con ``subprocess`` (rutas rotas en cualquier otra PC). Aquí cada
 calculadora o memoria se abre como ventana dentro del mismo proceso a partir de
 el catálogo de ``calculadoras.catalogo``. HVAC industrial usa su propio proceso Qt.
+
+Rediseño de interfaz v1: encabezado con logotipo y buscador, categorías con conteo,
+favoritos y recientes a la izquierda, catálogo agrupado al centro y ficha de la
+herramienta (limitaciones principales, estado de validación) a la derecha.
 """
 from __future__ import annotations
 
@@ -19,11 +23,12 @@ from ..memorias import POR_ID as MEMORIAS_POR_ID
 from ..catalogo import HERRAMIENTAS, POR_ID as POR_HERRAMIENTA, buscar, por_disciplina
 from ..aplicaciones import POR_ID as APLICACIONES_POR_ID, abrir_nativa, abrir_externa
 from ..nucleo.configuracion import RAIZ, cargar, recurso
-from ..nucleo.modelo import NIVELES, VALIDACION_PENDIENTE, VALIDADA_CONDICIONES
+from ..nucleo.modelo import NIVELES
+from . import preferencias, reportes, tema
+from .ventana import ESTADO_CORTO, VentanaCalculadora, chip_validacion  # noqa: F401 (ESTADO_CORTO: compatibilidad)
 
-ESTADO_CORTO = {VALIDADA_CONDICIONES: "Validada con condiciones", VALIDACION_PENDIENTE: "Validación pendiente"}
-from . import reportes
-from .ventana import VentanaCalculadora
+TODAS = "Todas"
+TEXTO_BUSQUEDA = "Buscar calculadora, categoría o norma (p. ej. ISO 5048)"
 
 
 BIBLIOTECAS = {"reportlab": "memoria PDF", "openpyxl": "exportar a Excel", "matplotlib": "gráficas",
@@ -39,15 +44,19 @@ def bibliotecas_faltantes() -> list[str]:
 
 class MenuPrincipal(ttk.Frame):
     def __init__(self, raiz: tk.Tk):
-        super().__init__(raiz, padding=10)
+        tema.aplicar(raiz)
+        super().__init__(raiz, padding=0)
         self.raiz = raiz
         self.config_app = cargar()
         self.ventanas: dict[str, tk.Toplevel] = {}
         self.procesos = {}
         self._vigias = {}
+        self.preferencias = preferencias.cargar()
+        self.categoria = TODAS
         raiz.title("Calculadoras de Ingeniería RMR")
-        raiz.geometry("1000x640")
-        raiz.minsize(760, 480)
+        raiz.configure(background=tema.FONDO)
+        raiz.geometry(f"{min(1360, raiz.winfo_screenwidth() - 40)}x{min(820, raiz.winfo_screenheight() - 80)}")
+        raiz.minsize(min(980, raiz.winfo_screenwidth() - 40), min(600, raiz.winfo_screenheight() - 80))
         self._icono()
         self._menu()
         self._construir()
@@ -80,91 +89,266 @@ class MenuPrincipal(ttk.Frame):
         self.raiz.config(menu=barra)
 
     def _construir(self) -> None:
-        cabecera = ttk.Frame(self)
-        cabecera.pack(fill="x")
-        self._logo(cabecera)
-        ttk.Label(cabecera, text="Calculadoras de Ingeniería", font=("Segoe UI", 15, "bold")).pack(side="left", padx=10)
-        busqueda = ttk.Frame(self)
-        busqueda.pack(fill="x", pady=(8, 4))
-        ttk.Label(busqueda, text="Buscar:").pack(side="left")
+        self._construir_encabezado()
+        sitio = self.config_app["sitio"]
+        self.estado = tema.BarraEstado(
+            self, f"Versión {__version__} · {len(CALCULADORAS)} calculadoras · Sitio por defecto: "
+                  f"{sitio.get('nombre', '')} ({sitio.get('altitud_m', 0)} m) · "
+                  f"{len(HERRAMIENTAS)} herramientas disponibles")
+        self.estado.pack(fill="x", side="bottom")
+        faltantes = bibliotecas_faltantes()
+        if faltantes:
+            t = tema.TONOS["critico"]
+            caja = tk.Frame(self, background=t["fondo"], highlightthickness=1, highlightbackground=t["borde"],
+                            padx=12, pady=8)
+            caja.pack(fill="x", side="bottom", padx=24, pady=(0, 10))
+            tema.icono(caja, "error", t["color"], t["fondo"]).pack(side="left", padx=(0, 10))
+            self.aviso_bibliotecas = tema.etiqueta(
+                caja, "Faltan bibliotecas: " + ", ".join(faltantes) + ". Funciones afectadas: "
+                + "; ".join(BIBLIOTECAS[b] for b in faltantes) + ". Ejecute INSTALAR.bat.", "cuerpo", t["texto"],
+                t["fondo"])
+            self.aviso_bibliotecas.pack(side="left", fill="x", expand=True)
+
+        cuerpo = tk.Frame(self, background=tema.FONDO)
+        cuerpo.pack(fill="both", expand=True, padx=tema._px(self, 24), pady=tema._px(self, 20))
+        cuerpo.columnconfigure(0, minsize=tema._px(self, 230))
+        cuerpo.columnconfigure(1, weight=1)
+        cuerpo.columnconfigure(2, minsize=tema._px(self, 360))
+        cuerpo.rowconfigure(0, weight=1)
+        self._construir_navegacion(cuerpo)
+        self._construir_catalogo(cuerpo)
+        self._construir_detalle(cuerpo)
+
+    def _construir_encabezado(self) -> None:
+        banda = tk.Frame(self, background=tema.SUPERFICIE)
+        banda.pack(fill="x", side="top")
+        tema.separador(banda, "horizontal", tema.DIVISOR).pack(fill="x", side="top")
+        fila = tk.Frame(banda, background=tema.SUPERFICIE)
+        fila.pack(fill="x", padx=tema._px(self, 24), pady=tema._px(self, 14))
+        logo = tema.logotipo(fila, recurso(self.config_app["reportes"].get("logo", "")), 48, tema.SUPERFICIE)
+        if logo is not None:
+            logo.pack(side="left", padx=(0, tema._px(self, 24)))
+        titulos = tk.Frame(fila, background=tema.SUPERFICIE)
+        titulos.pack(side="left")
+        tema.etiqueta(titulos, "Calculadoras de Ingeniería", "titulo_app", tema.MARINO).pack(anchor="w")
+        categorias = len([d for d, lista in por_disciplina().items() if lista])
+        tema.etiqueta(titulos, f"{len(HERRAMIENTAS)} herramientas · {categorias} categorías", "pequeno",
+                      tema.TEXTO_2).pack(anchor="w", pady=(2, 0))
+
+        caja = tk.Frame(fila, background=tema.SUPERFICIE_2, highlightthickness=1,
+                        highlightbackground=tema.BORDE_CONTROL, highlightcolor=tema.AZUL)
+        caja.pack(side="right", fill="x", expand=True, padx=(tema._px(self, 40), 0), ipady=2)
+        caja.configure(width=tema._px(self, 520))
+        tema.icono(caja, "buscar", tema.TEXTO_2, tema.SUPERFICIE_2, 18).pack(side="left", padx=(10, 6))
         self.texto_busqueda = tk.StringVar()
         self.texto_busqueda.trace_add("write", lambda *a: self.filtrar())
-        entrada = ttk.Entry(busqueda, textvariable=self.texto_busqueda, width=40)
-        entrada.pack(side="left", padx=6)
-        entrada.focus_set()
-        ttk.Button(busqueda, text="Limpiar", command=lambda: self.texto_busqueda.set("")).pack(side="left")
+        entrada = tk.Entry(caja, textvariable=self.texto_busqueda, relief="flat", borderwidth=0,
+                           highlightthickness=0, background=tema.SUPERFICIE_2, foreground=tema.TEXTO,
+                           insertbackground=tema.TEXTO, font=tema.fuente("cuerpo"))
+        entrada.pack(side="left", fill="x", expand=True, ipady=5)
+        self.entrada_busqueda = entrada
+        indicacion = tema.etiqueta(caja, TEXTO_BUSQUEDA, "cuerpo", tema.TEXTO_3, tema.SUPERFICIE_2)
+        indicacion.bind("<Button-1>", lambda e: entrada.focus_set())
+        limpiar = tema.etiqueta(caja, "×", "subtitulo", tema.TEXTO_2, tema.SUPERFICIE_2, cursor="hand2")
+        limpiar.bind("<Button-1>", lambda e: (self.texto_busqueda.set(""), entrada.focus_set()))
+        self._limpiar_busqueda = limpiar
 
-        cuerpo = ttk.Frame(self)
-        cuerpo.pack(fill="both", expand=True)
-        cuerpo.columnconfigure(0, weight=3, uniform="col")
-        cuerpo.columnconfigure(1, weight=2, uniform="col")
-        cuerpo.rowconfigure(0, weight=1)
-        izq = ttk.Frame(cuerpo)
-        izq.grid(row=0, column=0, sticky="nsew")
-        self.arbol = ttk.Treeview(izq, columns=("estado",), show="tree headings", selectmode="browse")
-        self.arbol.heading("#0", text="Calculadora")
-        self.arbol.heading("estado", text="Validación")
-        self.arbol.column("#0", width=290, minwidth=180)
-        self.arbol.column("estado", width=200, minwidth=120, stretch=False)
-        self.arbol.pack(side="left", fill="both", expand=True)
-        barra = ttk.Scrollbar(izq, orient="vertical", command=self.arbol.yview)
+        def indicar(*_):
+            vacio = not self.texto_busqueda.get()
+            if vacio:
+                indicacion.place(in_=entrada, x=0, rely=0.5, anchor="w")
+                limpiar.pack_forget()
+            else:
+                indicacion.place_forget()
+                limpiar.pack(side="right", padx=(6, 10))
+
+        self.texto_busqueda.trace_add("write", indicar)
+        entrada.bind("<Escape>", lambda e: self.texto_busqueda.set(""))
+        entrada.bind("<Down>", lambda e: self._enfocar_catalogo())
+        entrada.bind("<Return>", lambda e: self._enfocar_catalogo())
+        entrada.after_idle(indicar)
+        entrada.focus_set()
+        tema.separador(banda, "horizontal").pack(fill="x", side="bottom")
+
+    def _construir_navegacion(self, cuerpo: tk.Frame) -> None:
+        nav = tk.Frame(cuerpo, background=tema.FONDO)
+        nav.grid(row=0, column=0, sticky="nsew", padx=(0, tema._px(self, 20)))
+        tema.titulo_seccion(nav, "Categoría").pack(anchor="w", padx=10, pady=(0, 6))
+        self.facetas: dict[str, dict] = {}
+        conteos = {d: len(lista) for d, lista in por_disciplina().items() if lista}
+        for nombre, n in ((TODAS, len(HERRAMIENTAS)), *conteos.items()):
+            fila = tk.Frame(nav, background=tema.FONDO, cursor="hand2", padx=10, pady=6)
+            fila.pack(fill="x", pady=1)
+            rotulo = tema.etiqueta(fila, nombre, "cuerpo", tema.TEXTO, tema.FONDO, wraplength=tema._px(self, 175))
+            rotulo.pack(side="left")
+            cuenta = tema.etiqueta(fila, str(n), "mono_pequeno", tema.TEXTO_2, tema.FONDO)
+            cuenta.pack(side="right")
+            for w in (fila, rotulo, cuenta):
+                w.bind("<Button-1>", lambda e, c=nombre: self.elegir_categoria(c))
+                w.bind("<Enter>", lambda e, c=nombre: self._pintar_faceta(c, sobre=True))
+                w.bind("<Leave>", lambda e, c=nombre: self._pintar_faceta(c))
+            self.facetas[nombre] = {"fila": fila, "rotulo": rotulo, "cuenta": cuenta}
+        self._pintar_facetas()
+
+        self.caja_favoritos = self._caja_lista(nav, "Favoritos", estrella=True)
+        self.caja_recientes = self._caja_lista(nav, "Recientes")
+        self._actualizar_listas()
+
+    def _caja_lista(self, padre: tk.Misc, titulo: str, estrella: bool = False) -> tk.Frame:
+        caja = tema.tarjeta(padre, padx=12, pady=10)
+        caja.pack(fill="x", pady=(tema._px(self, 18), 0))
+        cab = tk.Frame(caja, background=tema.SUPERFICIE)
+        cab.pack(fill="x", pady=(0, 4))
+        if estrella:
+            tk.Label(cab, image=tema.imagen_estrella(self, True, 14), background=tema.SUPERFICIE).pack(
+                side="left", padx=(0, 6))
+        tema.titulo_seccion(cab, titulo, tema.SUPERFICIE).pack(side="left")
+        caja.lista = tk.Frame(caja, background=tema.SUPERFICIE)
+        caja.lista.pack(fill="x")
+        return caja
+
+    def _actualizar_listas(self) -> None:
+        for caja, ids, vacio in ((self.caja_favoritos, self.preferencias["favoritos"],
+                                  "Marque con la estrella sus herramientas frecuentes."),
+                                 (self.caja_recientes, self.preferencias["recientes"],
+                                  "Aún no ha abierto herramientas.")):
+            for hijo in caja.lista.winfo_children():
+                hijo.destroy()
+            validos = [i for i in ids if i in POR_HERRAMIENTA]
+            if not validos:
+                tema.etiqueta(caja.lista, vacio, "pequeno", tema.TEXTO_2, tema.SUPERFICIE,
+                              wraplength=tema._px(self, 190)).pack(anchor="w")
+            for identificador in validos:
+                enlace = tema.etiqueta(caja.lista, POR_HERRAMIENTA[identificador].nombre, "pequeno", tema.AZUL,
+                                       tema.SUPERFICIE, cursor="hand2", wraplength=tema._px(self, 190))
+                enlace.pack(anchor="w", pady=1)
+                enlace.bind("<Button-1>", lambda e, i=identificador: self.abrir(i))
+
+    def _construir_catalogo(self, cuerpo: tk.Frame) -> None:
+        tarjeta = tema.tarjeta(cuerpo, padx=8, pady=8)
+        tarjeta.grid(row=0, column=1, sticky="nsew")
+        self.arbol = ttk.Treeview(tarjeta, columns=("descripcion",), show="tree headings", selectmode="browse",
+                                  style="Catalogo.Treeview")
+        self.arbol.heading("#0", text="CALCULADORA", anchor="w")
+        self.arbol.heading("descripcion", text="DESCRIPCIÓN", anchor="w")
+        self.arbol.column("#0", width=tema._px(self, 300), minwidth=tema._px(self, 200))
+        self.arbol.column("descripcion", width=tema._px(self, 380), minwidth=tema._px(self, 120))
+        self.arbol.tag_configure("grupo", font=tema.fuente("grupo"), foreground=tema.MARINO)
+        self.arbol.tag_configure("herramienta", font=tema.fuente("cuerpo"), foreground=tema.TEXTO)
+        barra = ttk.Scrollbar(tarjeta, orient="vertical", command=self.arbol.yview)
         barra.pack(side="right", fill="y")
+        self.arbol.pack(side="left", fill="both", expand=True)
         self.arbol.configure(yscrollcommand=barra.set)
         self.arbol.bind("<<TreeviewSelect>>", lambda e: self.describir())
         self.arbol.bind("<Double-1>", lambda e: self.abrir_seleccion())
         self.arbol.bind("<Return>", lambda e: self.abrir_seleccion())
+        self.arbol.bind("<Button-1>", self._clic_catalogo, add="+")
+        self.arbol.bind("<KeyPress-f>", lambda e: self.alternar_favorito())
 
-        der = ttk.Frame(cuerpo, padding=(10, 0))
-        der.grid(row=0, column=1, sticky="nsew")
-        self.titulo = ttk.Label(der, text="Seleccione una calculadora", font=("Segoe UI", 12, "bold"), wraplength=360)
-        self.titulo.pack(anchor="w")
-        self.detalle = tk.Text(der, wrap="word", width=40, height=18, font=("Segoe UI", 9), relief="flat")
-        self.detalle.pack(fill="both", expand=True, pady=6)
-        self.detalle.configure(state="disabled")
-        self.boton_abrir = ttk.Button(der, text="Abrir calculadora", command=self.abrir_seleccion, state="disabled")
-        self.boton_abrir.pack(anchor="e")
+    def _construir_detalle(self, cuerpo: tk.Frame) -> None:
+        tarjeta = tema.tarjeta(cuerpo)
+        tarjeta.grid(row=0, column=2, sticky="nsew", padx=(tema._px(self, 20), 0))
+        ancho = tema._px(self, 330)
+        cab = tk.Frame(tarjeta, background=tema.SUPERFICIE, padx=20, pady=18)
+        cab.pack(fill="x")
+        self.categoria_detalle = tema.etiqueta(cab, "", "pequeno", tema.TEXTO_2, tema.SUPERFICIE)
+        self.categoria_detalle.pack(anchor="w")
+        self.titulo = tema.etiqueta(cab, "Seleccione una calculadora", "titulo_panel", tema.MARINO, tema.SUPERFICIE,
+                                    wraplength=ancho)
+        self.titulo.pack(anchor="w", pady=(4, 6))
+        self.descripcion = tema.etiqueta(cab, "Elija una herramienta del catálogo para ver su descripción, su "
+                                         "estado de validación y sus limitaciones.", "cuerpo", tema.TEXTO,
+                                         tema.SUPERFICIE, wraplength=ancho)
+        self.descripcion.pack(anchor="w")
+        self.fila_estado = tk.Frame(cab, background=tema.SUPERFICIE)
+        self.fila_estado.pack(anchor="w", fill="x", pady=(10, 0))
+        tema.separador(tarjeta, "horizontal", tema.DIVISOR).pack(fill="x")
 
-        sitio = self.config_app["sitio"]
-        self.estado = ttk.Label(self, anchor="w",
-                                text=f"Versión {__version__} · {len(CALCULADORAS)} calculadoras · Sitio por defecto: "
-                                     f"{sitio.get('nombre', '')} ({sitio.get('altitud_m', 0)} m) · "
-                                     f"{len(HERRAMIENTAS)} herramientas disponibles")
-        self.estado.pack(fill="x", pady=(6, 0))
-        faltantes = bibliotecas_faltantes()
-        if faltantes:
-            self.aviso_bibliotecas = ttk.Label(
-                self, anchor="w", foreground="#B71C1C",
-                text="Faltan bibliotecas: " + ", ".join(faltantes) + ". Funciones afectadas: "
-                     + "; ".join(BIBLIOTECAS[b] for b in faltantes) + ". Ejecute INSTALAR.bat.")
-            self.aviso_bibliotecas.pack(fill="x")
+        pie = tk.Frame(tarjeta, background=tema.SUPERFICIE_2)
+        pie.pack(fill="x", side="bottom")
+        tema.separador(pie, "horizontal", tema.DIVISOR).pack(fill="x", side="top")
+        fila_pie = tk.Frame(pie, background=tema.SUPERFICIE_2, padx=20, pady=12)
+        fila_pie.pack(fill="x")
+        self.boton_abrir = ttk.Button(fila_pie, text="Abrir calculadora →", command=self.abrir_seleccion,
+                                      state="disabled", style="Primario.TButton")
+        self.boton_abrir.pack(side="right")
+        tema.etiqueta(fila_pie, "Doble clic o Intro\ntambién abren", "pequeno", tema.TEXTO_2,
+                      tema.SUPERFICIE_2).pack(side="left")
 
-    def _logo(self, padre) -> None:
-        ruta = recurso(self.config_app["reportes"].get("logo", ""))
-        if not ruta.is_file():
-            return
-        try:
-            from PIL import Image, ImageTk
+        self.detalle = tk.Frame(tarjeta, background=tema.SUPERFICIE, padx=20, pady=16)
+        self.detalle.pack(fill="both", expand=True)
+        self._ancho_detalle = ancho
 
-            imagen = Image.open(ruta)
-            imagen.thumbnail((220, 58))
-            self._foto_logo = ImageTk.PhotoImage(imagen)
-            ttk.Label(padre, image=self._foto_logo).pack(side="left")
-        except Exception:  # sin Pillow o imagen dañada: el menú sigue funcionando
-            pass
+    def _pintar_faceta(self, nombre: str, sobre: bool = False) -> None:
+        f = self.facetas[nombre]
+        activa = nombre == self.categoria
+        fondo = tema.AZUL_50 if activa else (tema.DESHABILITADO if sobre else tema.FONDO)
+        for w in (f["fila"], f["rotulo"], f["cuenta"]):
+            w.configure(background=fondo)
+        f["rotulo"].configure(font=tema.fuente("cuerpo_negrita" if activa else "cuerpo"),
+                              foreground=tema.MARINO if activa else tema.TEXTO)
+        f["cuenta"].configure(foreground=tema.AZUL if activa else tema.TEXTO_2)
+
+    def _pintar_facetas(self) -> None:
+        for nombre in self.facetas:
+            self._pintar_faceta(nombre)
+
+    def elegir_categoria(self, nombre: str) -> None:
+        self.categoria = nombre
+        self._pintar_facetas()
+        self.filtrar()
+
+    def _enfocar_catalogo(self) -> str:
+        hijos = [h for d in self.arbol.get_children() for h in self.arbol.get_children(d)]
+        if hijos:
+            seleccion = self.arbol.selection()
+            objetivo = seleccion[0] if seleccion and seleccion[0] in hijos else hijos[0]
+            self.arbol.selection_set(objetivo)
+            self.arbol.focus(objetivo)
+            self.arbol.see(objetivo)
+        self.arbol.focus_set()
+        return "break"
+
+    def _clic_catalogo(self, evento) -> str | None:
+        """Clic sobre la estrella: agrega o quita la herramienta de favoritos."""
+        fila = self.arbol.identify_row(evento.y)
+        if fila in POR_HERRAMIENTA and self.arbol.identify_element(evento.x, evento.y) == "image":
+            self.alternar_favorito(fila)
+            return "break"
+        return None
+
+    def alternar_favorito(self, identificador: str | None = None) -> bool:
+        if identificador is None:
+            c = self.seleccion()
+            if c is None:
+                return False
+            identificador = c.id
+        es_favorito = preferencias.alternar_favorito(self.preferencias, identificador)
+        if self.arbol.exists(identificador):
+            self.arbol.item(identificador, image=tema.imagen_estrella(self, es_favorito))
+        self._actualizar_listas()
+        self.describir()
+        return es_favorito
 
     # ------------------------------------------------------------ lógica
     def filtrar(self) -> None:
         texto = self.texto_busqueda.get()
-        visibles = {c.id for c in buscar(texto)}
+        visibles = {c.id for c in buscar(texto)
+                    if self.categoria == TODAS or c.disciplina == self.categoria}
         self.arbol.delete(*self.arbol.get_children())
         grupos = por_disciplina()
+        favoritos = set(self.preferencias["favoritos"])
         for disciplina, lista in grupos.items():
             lista = [c for c in lista if c.id in visibles]
             if not lista:
                 continue
-            nodo = self.arbol.insert("", "end", iid=f"disciplina::{disciplina}", text=disciplina, open=True)
+            nodo = self.arbol.insert("", "end", iid=f"disciplina::{disciplina}", text=disciplina, open=True,
+                                     values=(f"{len(lista)} herramienta" + ("s" if len(lista) > 1 else ""),),
+                                     tags=("grupo",))
             for c in lista:
-                self.arbol.insert(nodo, "end", iid=c.id, text=c.nombre, values=(ESTADO_CORTO.get(c.estado_validacion, c.estado_validacion),))
+                self.arbol.insert(nodo, "end", iid=c.id, text=c.nombre,
+                                  values=(c.descripcion,), tags=("herramienta",),
+                                  image=tema.imagen_estrella(self, c.id in favoritos))
         if len(visibles) == 1:
             unico = next(iter(visibles))
             self.arbol.selection_set(unico)
@@ -177,20 +361,62 @@ class MenuPrincipal(ttk.Frame):
 
     def describir(self) -> None:
         c = self.seleccion()
-        self.detalle.configure(state="normal")
-        self.detalle.delete("1.0", "end")
+        for hijo in self.detalle.winfo_children():
+            hijo.destroy()
+        for hijo in self.fila_estado.winfo_children():
+            hijo.destroy()
         if c is None:
+            self.categoria_detalle.configure(text="")
             self.titulo.configure(text="Seleccione una calculadora")
+            self.descripcion.configure(text="Elija una herramienta del catálogo para ver su descripción, su estado "
+                                            "de validación y sus limitaciones.")
             self.boton_abrir.configure(state="disabled")
-        else:
-            self.titulo.configure(text=c.nombre)
-            texto = [c.descripcion, "", f"Disciplina: {c.disciplina}", f"Auditoría: {c.estado_auditoria}",
-                     f"Validación: {c.estado_validacion}", "", "Limitaciones principales:"]
-            texto += [f"• {li}" for li in c.limitaciones[:4]]
-            texto += ["", "Sustituye a: " + ", ".join(c.archivos_originales)]
-            self.detalle.insert("1.0", "\n".join(texto))
-            self.boton_abrir.configure(state="normal")
-        self.detalle.configure(state="disabled")
+            return
+        self.categoria_detalle.configure(text=c.disciplina)
+        self.titulo.configure(text=c.nombre)
+        self.descripcion.configure(text=c.descripcion)
+        chip_validacion(self.fila_estado, c.estado_validacion).pack(anchor="w")
+        tema.etiqueta(self.fila_estado, f"Auditoría: {c.estado_auditoria}", "pequeno", tema.TEXTO_2,
+                      tema.SUPERFICIE, wraplength=self._ancho_detalle).pack(anchor="w", pady=(6, 0))
+        ancho = self._ancho_detalle
+        t = tema.TONOS["advertencia"]
+        limitaciones = list(c.limitaciones[:4])
+        if limitaciones:
+            caja = tk.Frame(self.detalle, background="#FFF8EB", highlightthickness=1, highlightbackground=t["borde"],
+                            padx=14, pady=10)
+            caja.pack(fill="x")
+            tema.etiqueta(caja, "Limitaciones principales", "pequeno_negrita", t["color"], "#FFF8EB").pack(
+                anchor="w", pady=(0, 4))
+            for linea in limitaciones:
+                tema.etiqueta(caja, f"•  {linea}", "pequeno", "#3D2600", "#FFF8EB",
+                              wraplength=ancho - tema._px(self, 30)).pack(anchor="w", pady=1)
+        favorito = c.id in self.preferencias["favoritos"]
+        acciones = tk.Frame(self.detalle, background=tema.SUPERFICIE)
+        acciones.pack(fill="x", pady=(12, 0))
+        boton_favorito = ttk.Button(acciones, text="Quitar de favoritos" if favorito else "Agregar a favoritos",
+                                    image=tema.imagen_estrella(self, favorito, 16), compound="left",
+                                    style="Fantasma.TButton", command=self.alternar_favorito)
+        boton_favorito.pack(side="left")
+        self.boton_favorito = boton_favorito
+        if c.archivos_originales:
+            sustituye = tk.Frame(self.detalle, background=tema.SUPERFICIE)
+            sustituye.pack(fill="x", pady=(8, 0))
+            conmutador = tema.etiqueta(sustituye, "▸ Sustituye a", "pequeno", tema.TEXTO_2, tema.SUPERFICIE,
+                                       cursor="hand2")
+            conmutador.pack(anchor="w")
+            archivos = tema.etiqueta(sustituye, ", ".join(c.archivos_originales), "mono_pequeno", tema.TEXTO_2,
+                                     tema.SUPERFICIE, wraplength=ancho)
+
+            def alternar(_e=None):
+                if archivos.winfo_ismapped():
+                    archivos.pack_forget()
+                    conmutador.configure(text="▸ Sustituye a")
+                else:
+                    archivos.pack(anchor="w", pady=(4, 0))
+                    conmutador.configure(text="▾ Sustituye a")
+
+            conmutador.bind("<Button-1>", alternar)
+        self.boton_abrir.configure(state="normal")
 
     def abrir_seleccion(self):
         c = self.seleccion()
@@ -200,6 +426,11 @@ class MenuPrincipal(ttk.Frame):
 
     def abrir(self, id_calculadora: str):
         """Abre (o trae al frente) una calculadora o memoria completa."""
+        preferencias.registrar_reciente(self.preferencias, id_calculadora)
+        self._actualizar_listas()
+        return self._abrir(id_calculadora)
+
+    def _abrir(self, id_calculadora: str):
         aplicacion = APLICACIONES_POR_ID.get(id_calculadora)
         if aplicacion and aplicacion.carpeta:
             proceso = self.procesos.get(id_calculadora)
@@ -305,11 +536,8 @@ class MenuPrincipal(ttk.Frame):
         ventana.calcular()
         return ventana
 
-    def niveles(self) -> None:
-        messagebox.showinfo("Niveles de confianza", "\n".join(f"{k} = {v}" for k, v in NIVELES.items()) +
-                            "\n\nLos resultados de nivel O provienen de tablas o criterios del programa original "
-                            "sin fuente identificada: verifíquelos con el fabricante o la norma aplicable.",
-                            parent=self.raiz)
+    def niveles(self) -> "DialogoNiveles":
+        return DialogoNiveles(self.raiz)
 
     def documentacion(self) -> None:
         webbrowser.open((RAIZ / "docs").as_uri())
@@ -367,10 +595,7 @@ def iniciar(id_calculadora: str | None = None, pedir_acceso: bool = True) -> Non
 
     raiz = tk.Tk()
     raiz.report_callback_exception = _manejar_excepcion(raiz)
-    try:
-        ttk.Style(raiz).theme_use("vista" if "vista" in ttk.Style(raiz).theme_names() else "clam")
-    except tk.TclError:
-        pass
+    tema.aplicar(raiz)  # sistema visual ENGICALC v1 (sobre el tema «clam» de ttk)
     raiz.withdraw()
     if pedir_acceso and not solicitar_acceso(raiz):
         raiz.destroy()
@@ -383,27 +608,26 @@ def iniciar(id_calculadora: str | None = None, pedir_acceso: bool = True) -> Non
     raiz.mainloop()
 
 
-class VentanaHistorial(tk.Toplevel):
+class VentanaHistorial(tema.DialogoBase):
     """Lista de los últimos cálculos (registro/historial.jsonl); doble clic reabre el cálculo."""
 
     def __init__(self, menu: "MenuPrincipal"):
-        super().__init__(menu.raiz)
+        super().__init__(menu.raiz, "Historial de cálculos",
+                         "Últimos cálculos registrados con sus datos de entrada. Doble clic reabre el cálculo.",
+                         ancho_texto=760)
         from ..nucleo import historial
 
         self.menu = menu
-        self.title("Historial de cálculos")
-        self.geometry("900x420")
+        self.geometry(f"{tema._px(self, 900)}x{tema._px(self, 460)}")
         self.registros = historial.leer(500)
-        marco = ttk.Frame(self, padding=8)
-        marco.pack(fill="both", expand=True)
         columnas = ("fecha", "calculadora", "proyecto", "documento", "version")
-        self.tabla = ttk.Treeview(marco, columns=columnas, show="headings", selectmode="browse")
+        self.tabla = ttk.Treeview(self.cuerpo, columns=columnas, show="headings", selectmode="browse")
         for col, titulo, ancho in (("fecha", "Fecha", 150), ("calculadora", "Calculadora", 230),
                                    ("proyecto", "Proyecto", 230), ("documento", "Documento", 150),
                                    ("version", "Versión", 70)):
-            self.tabla.heading(col, text=titulo)
-            self.tabla.column(col, width=ancho, anchor="w")
-        barra = ttk.Scrollbar(marco, orient="vertical", command=self.tabla.yview)
+            self.tabla.heading(col, text=titulo.upper())
+            self.tabla.column(col, width=tema._px(self, ancho), anchor="w")
+        barra = ttk.Scrollbar(self.cuerpo, orient="vertical", command=self.tabla.yview)
         self.tabla.configure(yscrollcommand=barra.set)
         self.tabla.pack(side="left", fill="both", expand=True)
         barra.pack(side="left", fill="y")
@@ -413,15 +637,34 @@ class VentanaHistorial(tk.Toplevel):
                 reg.get("fecha", "").replace("T", " "), reg.get("nombre", reg.get("calculadora")),
                 proyecto.get("proyecto", ""), proyecto.get("documento", ""), reg.get("version", "")))
         self.tabla.bind("<Double-1>", lambda _e: self.abrir())
-        pie = ttk.Frame(self, padding=(8, 0, 8, 8))
-        pie.pack(fill="x")
+        self.tabla.bind("<Return>", lambda _e: self.abrir())
         texto = f"{len(self.registros)} cálculos registrados." if self.registros else "Aún no hay cálculos registrados."
-        ttk.Label(pie, text=texto).pack(side="left")
-        ttk.Button(pie, text="Cerrar", command=self.destroy).pack(side="right", padx=2)
-        ttk.Button(pie, text="Abrir cálculo", command=self.abrir).pack(side="right", padx=2)
+        self.boton("Abrir cálculo", self.abrir, primario=True)
+        self.boton("Cerrar", self.destroy)
+        tema.etiqueta(self.botones, texto, "pequeno", tema.TEXTO_2, tema.SUPERFICIE_2).pack(side="left")
 
     def abrir(self):
         seleccion = self.tabla.selection()
         if not seleccion:
             return None
         return self.menu.abrir_registro(self.registros[int(seleccion[0])])
+
+
+class DialogoNiveles(tema.DialogoBase):
+    """Niveles de confianza de los resultados (mismo texto que el aviso anterior)."""
+
+    def __init__(self, padre: tk.Misc):
+        super().__init__(padre, "Niveles de confianza")
+        self.resizable(False, False)
+        self.transient(padre)
+        for nivel, nombre in NIVELES.items():
+            fila = tk.Frame(self.cuerpo, background=tema.SUPERFICIE)
+            fila.pack(fill="x", pady=3)
+            tema.insignia_nivel(fila, nivel).pack(side="left", padx=(0, 10))
+            tema.etiqueta(fila, nombre, "cuerpo", tema.TEXTO, tema.SUPERFICIE).pack(side="left")
+        aviso = tema.Aviso(self.cuerpo, "advertencia", "Los resultados de nivel O provienen de tablas o criterios "
+                           "del programa original sin fuente identificada: verifíquelos con el fabricante o la "
+                           "norma aplicable.", titulo="Nivel O")
+        aviso.configure(width=tema._px(self, 380))
+        aviso.pack(fill="x", pady=(12, 0))
+        self.boton("Aceptar", self.destroy, primario=True)
